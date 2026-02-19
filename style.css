@@ -1,0 +1,85 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+.form-group input, .form-group select, .form-group button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Style cho Card giống trong ảnh */
+.card {
+    width: 500px;
+    height: 280px;
+    border: 4px solid #87CEEB; /* Màu xanh lightblue */
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    margin: 20px auto;
+    background-size: cover;
+    background-position: center;
+}
+
+.card-content {
+    display: flex;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.8); /* Làm mờ nền để thấy chữ nếu có ảnh nền */
+    height: 100%;
+}
+
+.avatar-box {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #87CEEB;
+    overflow: hidden;
+    margin-right: 20px;
+}
+
+.avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-box {
+    color: #000;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.card-title {
+    color: #3498db;
+    margin: 0 0 10px 0;
+    font-size: 20px;
+}
+
+.hashtag {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+.download-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
