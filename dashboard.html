@@ -57,13 +57,13 @@
             if (userData.used_giftcode === "yes") return alert("Đã nhận rồi!");
             const code = prompt("Nhập mã:");
             if (code === window.targetCode) {
-                alert("Chờ 30s...");
+                alert("Chờ 1s...");
                 setTimeout(async () => {
                     const add = Math.floor(Math.random() * 20) + 1;
                     await update({ coins: parseInt(userData.coins) + add, used_giftcode: "yes" });
                     alert(`Npc xin trả lời: +${add} xu!`);
                     location.reload();
-                }, 30000);
+                }, 1000);
             } else { alert("Sai mã!"); }
         }
 
