@@ -2,111 +2,79 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Trang chủ - Artist</title>
+    <title>Trang chủ - Artists</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <marquee id="marqueeTxt" class="marquee-style">Đang tải thông báo từ hệ thống...</marquee>
-
+    <marquee id="marqueeTxt" class="marquee-style"></marquee>
     <div class="header-bar">
-        <div class="balance">Số dư: <span id="userCoins">0</span> Xu 🪙</div>
-        <button class="gift-btn" onclick="useGiftcode()">NHẬP GIFTCODE</button>
+        <div class="balance">Xu: <span id="userCoins">0</span> 🪙</div>
+        <button onclick="useGiftcode()" style="width:auto; padding:5px 10px;">GIFTCODE</button>
     </div>
 
     <div class="main-content">
-        <div class="fish-section">
-            <div class="fish-icon" id="fish">🐟</div>
-            <button class="feed-btn" id="feedBtn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
-        </div>
-
-        <div id="adminInfo" class="info-box">Đang tải thông tin...</div>
-
-        <div class="leaderboard-section">
-            <h3>🏆 BẢNG XẾP HẠNG</h3>
-            <ul id="leaderboardList"></ul>
-        </div>
+        <div class="fish-icon" onclick="feedFish()">🐟</div>
+        <button class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
+        <div id="adminInfo" class="info-box"></div>
+        <h3>🏆 BẢNG XẾP HẠNG</h3>
+        <ul id="leaderboardList"></ul>
     </div>
 
     <script>
         const p1 = "h" + "tt" + "ps://";
         const p2 = "api" + "." + "steinhq" + ".com";
         const p3 = "/v1/storages/";
-        const p4 = "699" + "ed5d6" + "affba40a" + "625413ac";
+        const p4 = "699" + "eda16" + "affba40a" + "6254160c"; 
         const FULL_URL = p1 + p2 + p3 + p4 + "/Sheet1";
 
         let userData = JSON.parse(localStorage.getItem("currentUser"));
 
         async function init() {
             if (!userData) { window.location.href = "index.html"; return; }
-
             const res = await fetch(FULL_URL);
-            const allData = await res.json();
-            const config = allData[0]; // Dòng đầu tiên
+            const data = await res.json();
+            const conf = data[0];
 
-            // Hiển thị thông tin
-            document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + config.marquee_text;
-            document.getElementById('adminInfo').innerText = config.info_box;
+            document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + conf.marquee_text;
+            document.getElementById('adminInfo').innerText = conf.info_box;
             document.getElementById('userCoins').innerText = userData.coins;
-            window.currentGiftcode = config.giftcode_val;
+            window.targetCode = conf.giftcode_val;
 
-            // Bảng xếp hạng
-            const sorted = allData.sort((a, b) => b.coins - a.coins);
-            document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map(u => 
-                `<li><span>${u.username}</span> <span>${u.coins} Xu</span></li>`
-            ).join('');
+            data.sort((a,b) => b.coins - a.coins);
+            document.getElementById('leaderboardList').innerHTML = data.map(u => `<li>${u.username}: ${u.coins} Xu</li>`).join('');
         }
 
         async function feedFish() {
             const now = Date.now();
-            const lastFeed = parseInt(userData.last_feed) || 0;
-
-            if (now - lastFeed < 86400000) {
-                alert("Cá đã no rồi, hãy quay lại sau 24 giờ!");
-                return;
-            }
-
+            if (now - (userData.last_feed || 0) < 86400000) return alert("Cá no rồi!");
             const add = Math.floor(Math.random() * 3) + 1;
-            const newCoins = parseInt(userData.coins) + add;
-            
-            await updateSheet({ coins: newCoins, last_feed: now });
-            alert(`Npc xin trả lời: Bạn nhận được ${add} xu!`);
+            await update({ coins: parseInt(userData.coins) + add, last_feed: now });
+            alert(`Npc xin trả lời: +${add} xu!`);
             location.reload();
         }
 
         async function useGiftcode() {
-            if (localStorage.getItem('gift_lock') > Date.now()) {
-                alert("Bạn đang bị khóa chức năng này 1 tiếng!"); return;
-            }
-            if (userData.used_giftcode === "yes") {
-                alert("Tài khoản này đã nhận quà rồi!"); return;
-            }
-
-            const code = prompt("Nhập mã Giftcode:");
-            if (code === window.currentGiftcode) {
-                alert("Đang xác thực... Chờ 30s để nhận xu ngẫu nhiên.");
+            if (userData.used_giftcode === "yes") return alert("Đã nhận rồi!");
+            const code = prompt("Nhập mã:");
+            if (code === window.targetCode) {
+                alert("Chờ 30s...");
                 setTimeout(async () => {
                     const add = Math.floor(Math.random() * 20) + 1;
-                    await updateSheet({ coins: parseInt(userData.coins) + add, used_giftcode: "yes" });
-                    alert(`Npc xin trả lời: Chúc mừng! Bạn nhận được ${add} xu.`);
+                    await update({ coins: parseInt(userData.coins) + add, used_giftcode: "yes" });
+                    alert(`Npc xin trả lời: +${add} xu!`);
                     location.reload();
                 }, 30000);
-            } else {
-                localStorage.setItem('gift_lock', Date.now() + 3600000); // Khóa 1 tiếng
-                alert("Sai mã! Bạn bị khóa chức năng này 1 tiếng.");
-            }
+            } else { alert("Sai mã!"); }
         }
 
-        async function updateSheet(setData) {
+        async function update(obj) {
             await fetch(FULL_URL, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ condition: {username: userData.username}, set: setData })
+                body: JSON.stringify({ condition: {username: userData.username}, set: obj })
             });
-            // Cập nhật lại local
-            userData = {...userData, ...setData};
-            localStorage.setItem("currentUser", JSON.stringify(userData));
+            localStorage.setItem("currentUser", JSON.stringify({...userData, ...obj}));
         }
-
         init();
     </script>
 </body>
