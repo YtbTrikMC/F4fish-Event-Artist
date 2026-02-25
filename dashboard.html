@@ -2,25 +2,33 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Trang chủ - Artists</title>
+    <title>Trang chủ - Hệ thống Npc</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <marquee id="marqueeTxt" class="marquee-style"></marquee>
+    
     <div class="header-bar">
-        <div class="balance">Xu: <span id="userCoins">0</span> 🪙</div>
-        <button onclick="useGiftcode()" style="width:auto; padding:5px 10px;">GIFTCODE</button>
+        <div class="balance">Số dư: <span id="userCoins">0</span> Xu 🪙</div>
+        <button class="gift-btn" onclick="useGiftcode()">NHẬP GIFTCODE</button>
     </div>
 
     <div class="main-content">
-        <div class="fish-icon" onclick="feedFish()">🐟</div>
-        <button class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
+        <div class="fish-section">
+            <div class="fish-icon" id="fish">🐟</div>
+            <button class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
+        </div>
+
         <div id="adminInfo" class="info-box"></div>
-        <h3>🏆 BẢNG XẾP HẠNG</h3>
-        <ul id="leaderboardList"></ul>
+
+        <div class="leaderboard-section">
+            <h3>🏆 BẢNG XẾP HẠNG</h3>
+            <ul id="leaderboardList"></ul>
+        </div>
     </div>
 
     <script>
+        // Npc xin trả lời: API được chia nhỏ để bảo mật
         const p1 = "h" + "tt" + "ps://";
         const p2 = "api" + "." + "steinhq" + ".com";
         const p3 = "/v1/storages/";
@@ -31,50 +39,98 @@
 
         async function init() {
             if (!userData) { window.location.href = "index.html"; return; }
-            const res = await fetch(FULL_URL);
-            const data = await res.json();
-            const conf = data[0];
 
-            document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + conf.marquee_text;
-            document.getElementById('adminInfo').innerText = conf.info_box;
-            document.getElementById('userCoins').innerText = userData.coins;
-            window.targetCode = conf.giftcode_val;
+            try {
+                const res = await fetch(FULL_URL);
+                const allData = await res.json();
+                const config = allData[0]; // Lấy dòng đầu tiên làm cấu hình
 
-            data.sort((a,b) => b.coins - a.coins);
-            document.getElementById('leaderboardList').innerHTML = data.map(u => `<li>${u.username}: ${u.coins} Xu</li>`).join('');
+                // Hiển thị dữ liệu từ Sheet
+                document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + config.marquee_text;
+                document.getElementById('adminInfo').innerText = config.info_box;
+                document.getElementById('userCoins').innerText = userData.coins;
+                
+                // Lưu danh sách Giftcode vào biến toàn cục
+                window.allGiftcodes = config.giftcode_val;
+
+                // Cập nhật Bảng xếp hạng
+                const sorted = allData.sort((a, b) => b.coins - a.coins);
+                document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map(u => 
+                    `<li><span>${u.username}</span> <span>${u.coins} Xu</span></li>`
+                ).join('');
+            } catch (e) {
+                console.log("Lỗi tải dữ liệu!");
+            }
         }
 
         async function feedFish() {
             const now = Date.now();
-            if (now - (userData.last_feed || 0) < 86400000) return alert("Cá no rồi!");
+            const lastFeed = parseInt(userData.last_feed) || 0;
+
+            if (now - lastFeed < 86400000) {
+                alert("Cá đã no rồi, hãy quay lại sau 24 giờ!");
+                return;
+            }
+
             const add = Math.floor(Math.random() * 3) + 1;
-            await update({ coins: parseInt(userData.coins) + add, last_feed: now });
-            alert(`Npc xin trả lời: +${add} xu!`);
+            const newCoins = parseInt(userData.coins) + add;
+            
+            await updateSheet({ coins: newCoins, last_feed: now });
+            alert(`Npc xin trả lời: Cá đã ăn và tặng bạn ${add} xu!`);
             location.reload();
         }
 
         async function useGiftcode() {
-            if (userData.used_giftcode === "yes") return alert("Đã nhận rồi!");
-            const code = prompt("Nhập mã:");
-            if (code === window.targetCode) {
-                alert("Chờ 1s...");
+            if (userData.used_giftcode === "yes") {
+                alert("Mỗi tài khoản chỉ được nhận Giftcode một lần duy nhất!");
+                return;
+            }
+
+            const codeInp = prompt("Nhập mã Giftcode của bạn:");
+            if (!codeInp) return;
+
+            // Chuyển chuỗi code từ Sheet thành danh sách (mảng)
+            const listValidCodes = window.allGiftcodes.split(",").map(c => c.trim());
+
+            if (listValidCodes.includes(codeInp)) {
+                alert("Mã chính xác! Vui lòng chờ 1 giây...");
+                
+                // Đã chỉnh thời gian chờ xuống 1 giây (1000ms)
                 setTimeout(async () => {
                     const add = Math.floor(Math.random() * 20) + 1;
-                    await update({ coins: parseInt(userData.coins) + add, used_giftcode: "yes" });
-                    alert(`Npc xin trả lời: +${add} xu!`);
+                    const newTotal = parseInt(userData.coins) + add;
+
+                    await updateSheet({ 
+                        coins: newTotal, 
+                        used_giftcode: "yes" 
+                    });
+
+                    alert(`Npc xin trả lời: Chúc mừng! Bạn nhận được ${add} xu.`);
                     location.reload();
                 }, 1000);
-            } else { alert("Sai mã!"); }
+            } else {
+                alert("Mã Giftcode không đúng hoặc không tồn tại!");
+            }
         }
 
-        async function update(obj) {
-            await fetch(FULL_URL, {
-                method: "PUT",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ condition: {username: userData.username}, set: obj })
-            });
-            localStorage.setItem("currentUser", JSON.stringify({...userData, ...obj}));
+        async function updateSheet(setData) {
+            try {
+                await fetch(FULL_URL, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ 
+                        condition: {username: userData.username}, 
+                        set: setData 
+                    })
+                });
+                // Cập nhật lại bộ nhớ tạm của trình duyệt
+                userData = {...userData, ...setData};
+                localStorage.setItem("currentUser", JSON.stringify(userData));
+            } catch (e) {
+                alert("Lỗi khi cập nhật dữ liệu!");
+            }
         }
+
         init();
     </script>
 </body>
