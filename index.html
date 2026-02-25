@@ -2,54 +2,36 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Hệ thống Npc</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h2>Npc xin trả lời: Đăng nhập</h2>
-        <div class="input-group">
-            <input type="text" id="username" placeholder="Tài khoản do Admin cấp">
-            <input type="password" id="password" placeholder="Mật khẩu">
-        </div>
+        <input type="text" id="username" placeholder="Tài khoản">
+        <input type="password" id="password" placeholder="Mật khẩu">
         <button id="loginBtn" onclick="login()">Vào hệ thống</button>
-        <p id="statusMsg" style="font-size: 12px; color: #666; margin-top: 10px;"></p>
     </div>
 
     <script>
-        // Phân chia API để bảo mật
+        // Cập nhật API ID mới của bạn
         const p1 = "h" + "tt" + "ps://";
         const p2 = "api" + "." + "steinhq" + ".com";
         const p3 = "/v1/storages/";
-        const p4 = "699" + "ed5d6" + "affba40a" + "625413ac";
+        const p4 = "699" + "eda16" + "affba40a" + "6254160c"; 
         const FULL_URL = p1 + p2 + p3 + p4 + "/Sheet1";
-
-        window.onload = function() {
-            const entryLock = sessionStorage.getItem('entry_lock');
-            if (entryLock && Date.now() < entryLock) {
-                document.body.innerHTML = "<div class='container'><h3>Vui lòng chờ 1 phút để đăng nhập lại (chống spam out web)</h3></div>";
-            }
-        };
 
         async function login() {
             const userInp = document.getElementById('username').value;
             const passInp = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
-
-            // Kiểm tra khóa 10 phút
-            const loginLock = localStorage.getItem('login_lock');
-            if (loginLock && Date.now() < loginLock) {
-                const remain = Math.ceil((loginLock - Date.now()) / 60000);
-                alert(`Bạn đang bị khóa. Hãy quay lại sau ${remain} phút.`);
-                return;
+            
+            // Logic khóa 10 phút nếu sai 3 lần
+            if (localStorage.getItem('login_lock') > Date.now()) {
+                alert("Bạn bị khóa 10 phút!"); return;
             }
 
-            if (!userInp || !passInp) { alert("Vui lòng nhập đủ thông tin!"); return; }
-
             alert("ĐỪNG SPAM NÚT ĐĂNG NHẬP, HÃY CHỜ NÓ LOADING");
-            btn.disabled = true;
-            btn.innerText = "Đang kiểm tra...";
+            document.getElementById('loginBtn').disabled = true;
 
             try {
                 const response = await fetch(`${FULL_URL}?search={"username":"${userInp}"}`);
@@ -57,26 +39,15 @@
 
                 if (data.length > 0 && data[0].password === passInp) {
                     localStorage.setItem("currentUser", JSON.stringify(data[0]));
-                    localStorage.removeItem('fail_count');
                     window.location.href = "dashboard.html";
                 } else {
                     let fails = (parseInt(localStorage.getItem('fail_count')) || 0) + 1;
                     localStorage.setItem('fail_count', fails);
-                    sessionStorage.setItem('entry_lock', Date.now() + 60000); // Khóa 1 phút khi out/vào lại
-
-                    if (fails >= 3) {
-                        localStorage.setItem('login_lock', Date.now() + 600000); // Khóa 10 phút
-                        alert("Sai 3 lần! Bạn bị khóa 10 phút.");
-                    } else {
-                        alert("Sai tài khoản hoặc mật khẩu!");
-                    }
+                    if (fails >= 3) localStorage.setItem('login_lock', Date.now() + 600000);
+                    alert("Sai tài khoản hoặc mật khẩu!");
                 }
-            } catch (error) {
-                alert("Lỗi kết nối API. Hãy kiểm tra lại quyền Editor của Sheet!");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Vào hệ thống";
-            }
+            } catch (error) { alert("Lỗi kết nối Stein! Hãy tắt Auth và để Editor."); }
+            document.getElementById('loginBtn').disabled = false;
         }
     </script>
 </body>
