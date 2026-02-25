@@ -4,28 +4,50 @@
     <meta charset="UTF-8">
     <title>Trang chủ - Hệ thống Npc</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 20px; overflow: hidden; }
+        .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
+        .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 20px; font-weight: bold; color: #000; z-index: 1; }
+        .shop-section { margin-top: 15px; padding: 10px; border: 2px dashed #3498db; border-radius: 10px; background: #ebf5fb; }
+        .leaderboard-section li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .rank-name { font-weight: bold; }
+        .rank-info { color: #555; }
+    </style>
 </head>
 <body>
     <marquee id="marqueeTxt" class="marquee-style"></marquee>
     
     <div class="header-bar">
-        <div class="balance">Số dư: <span id="userCoins">0</span> Xu 🪙</div>
-        <button class="gift-btn" onclick="useGiftcode()">NHẬP GIFTCODE</button>
+        <div class="balance">Xu: <span id="userCoins">0</span> 🪙 | Level: <span id="userLevel">1</span></div>
+        <button class="gift-btn" onclick="useGiftcode()">GIFTCODE</button>
     </div>
 
     <div class="main-content">
-        <div class="fish-section">
-            <div class="fish-icon" id="fish">🐟</div>
-            <button class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
+        <div class="level-container">
+            <div class="level-text" id="levelScoreTxt">0/100 XP</div>
+            <div class="level-bar" id="levelBar"></div>
         </div>
+
+        <div class="fish-section">
+            <img src="" id="fishGif" class="fish-gif" onclick="feedFish()" alt="Cá bơi">
+            <button class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (MIỄN PHÍ 24H)</button>
+        </div>
+
+        <div class="shop-section">
+            <p style="font-size: 13px; margin: 0 0 5px 0; color: #2980b9;"><b>Cửa hàng:</b> 10 xu = +10 XP & Nhận xu ngay</p>
+            <button onclick="buyFood()" style="background:#e67e22; width:auto; padding:5px 15px; font-size: 12px;">MUA THỨC ĂN (1 LẦN/NGÀY)</button>
+        </div>
+
         <div id="adminInfo" class="info-box"></div>
+
         <div class="leaderboard-section">
-            <h3>🏆 BẢNG XẾP HẠNG</h3>
+            <h3>🏆 BẢNG XẾP HẠNG (LVL & XU)</h3>
             <ul id="leaderboardList"></ul>
         </div>
     </div>
 
     <script>
+        // Npc xin trả lời: Bảo mật API
         const p1 = "h" + "tt" + "ps://";
         const p2 = "api" + "." + "steinhq" + ".com";
         const p3 = "/v1/storages/";
@@ -34,6 +56,13 @@
 
         let userData = JSON.parse(localStorage.getItem("currentUser"));
 
+        // GIF CÁ BẠN CUNG CẤP
+        const GIFS = {
+            lv1: "https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif",
+            lv2: "https://image2url.com/r2/default/gifs/1772021046327-83a1abb8-5bc1-47a7-888e-34918c5a1410.gif",
+            lv3: "https://image2url.com/r2/default/gifs/1772021071582-773603d9-15ed-4bb0-a37f-6d801ccd3639.gif"
+        };
+
         async function init() {
             if (!userData) { window.location.href = "index.html"; return; }
             try {
@@ -41,68 +70,119 @@
                 const allData = await res.json();
                 const config = allData[0];
 
+                const myData = allData.find(u => u.username === userData.username);
+                userData = myData;
+                localStorage.setItem("currentUser", JSON.stringify(myData));
+
+                const score = parseInt(userData.level_score) || 0;
+                const level = Math.floor(score / 100) + 1;
+                const xpInLevel = score % 100;
+
+                // Cập nhật giao diện
+                document.getElementById('userLevel').innerText = level;
+                document.getElementById('userCoins').innerText = userData.coins;
+                document.getElementById('levelBar').style.width = xpInLevel + "%";
+                document.getElementById('levelScoreTxt').innerText = xpInLevel + "/100 XP";
                 document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + config.marquee_text;
                 document.getElementById('adminInfo').innerText = config.info_box;
-                document.getElementById('userCoins').innerText = userData.coins;
                 window.allGiftcodes = config.giftcode_val;
 
-                const sorted = allData.sort((a, b) => b.coins - a.coins);
-                document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map(u => 
-                    `<li><span>${u.username}</span> <span>${u.coins} Xu</span></li>`
-                ).join('');
-            } catch (e) { console.log("Lỗi tải dữ liệu!"); }
+                // Cập nhật GIF theo level
+                const fishImg = document.getElementById('fishGif');
+                if (level === 1) fishImg.src = GIFS.lv1;
+                else if (level === 2) fishImg.src = GIFS.lv2;
+                else fishImg.src = GIFS.lv3;
+
+                // BẢNG XẾP HẠNG NÂNG CẤP
+                const sorted = allData.sort((a, b) => (parseInt(b.level_score) || 0) - (parseInt(a.level_score) || 0));
+                document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map((u, index) => {
+                    const uLvl = Math.floor((parseInt(u.level_score) || 0) / 100) + 1;
+                    return `<li>
+                        <span class="rank-name">${index + 1}. ${u.username}</span>
+                        <span class="rank-info">Lvl ${uLvl} - ${u.coins} Xu</span>
+                    </li>`;
+                }).join('');
+
+            } catch (e) { console.log("Lỗi kết nối dữ liệu!"); }
+        }
+
+        function getRandomCoins(level) {
+            if (level === 1) return Math.floor(Math.random() * 20) + 1;
+            if (level === 2) return Math.floor(Math.random() * 25) + 1;
+            if (level === 3) return Math.floor(Math.random() * 24) + 2;
+            return Math.floor(Math.random() * 23) + 3;
         }
 
         async function feedFish() {
             const now = Date.now();
             if (now - (parseInt(userData.last_feed) || 0) < 86400000) {
-                alert("Cá đã no rồi!"); return;
+                alert("Npc xin trả lời: Cá đã no rồi! Hãy quay lại sau 24h."); return;
             }
-            const add = Math.floor(Math.random() * 3) + 1;
-            await updateSheet({ coins: parseInt(userData.coins) + add, last_feed: now });
-            alert(`Npc xin trả lời: +${add} xu!`);
+            await processFeeding(now);
+        }
+
+        async function buyFood() {
+            const now = Date.now();
+            if (userData.last_buy && now - parseInt(userData.last_buy) < 86400000) {
+                alert("Npc xin trả lời: Mỗi ngày chỉ được mua thêm 1 lần!"); return;
+            }
+            if (parseInt(userData.coins) < 10) {
+                alert("Bạn không đủ 10 xu!"); return;
+            }
+            if(confirm("Dùng 10 xu để mua thức ăn?")) {
+                await processFeeding(userData.last_feed, 10, now);
+            }
+        }
+
+        async function processFeeding(feedTime, cost = 0, buyTime = null) {
+            const currentScore = parseInt(userData.level_score) || 0;
+            const currentLevel = Math.floor(currentScore / 100) + 1;
+            const addCoins = getRandomCoins(currentLevel);
+            
+            const updateData = {
+                coins: parseInt(userData.coins) + addCoins - cost,
+                level_score: currentScore + 10,
+                last_feed: feedTime
+            };
+            if (buyTime) updateData.last_buy = buyTime;
+
+            await updateSheet(updateData);
+            alert(`Npc xin trả lời: +10 XP và +${addCoins} xu!`);
             location.reload();
+        }
+
+        async function updateSheet(setData) {
+            await fetch(FULL_URL, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ condition: {username: userData.username}, set: setData })
+            });
+            userData = {...userData, ...setData};
+            localStorage.setItem("currentUser", JSON.stringify(userData));
         }
 
         async function useGiftcode() {
             const codeInp = prompt("Nhập mã Giftcode:");
             if (!codeInp) return;
-
-            // 1. Lấy danh sách mã hợp lệ từ Admin (cách nhau bằng dấu phẩy)
             const listValidCodes = window.allGiftcodes.split(",").map(c => c.trim());
-
-            // 2. Lấy danh sách mã người dùng đã từng nhập (cách nhau bằng dấu gạch đứng |)
             let usedCodes = userData.used_giftcode ? userData.used_giftcode.split("|") : [];
 
-            // 3. Kiểm tra mã
-            if (!listValidCodes.includes(codeInp)) {
-                alert("Mã Giftcode không đúng!");
-                return;
-            }
-
-            if (usedCodes.includes(codeInp)) {
-                alert("Bạn đã sử dụng mã này rồi!");
-                return;
-            }
-
-            // 4. Hợp lệ -> Tiến hành cộng xu
-            alert("Mã chính xác! Đang nhận thưởng...");
-            setTimeout(async () => {
-                const add = Math.floor(Math.random() * 20) + 1;
-                usedCodes.push(codeInp); // Thêm mã vừa dùng vào danh sách
-                
-                await updateSheet({ 
-                    coins: parseInt(userData.coins) + add, 
-                    used_giftcode: usedCodes.join("|") // Lưu lại dạng CHUOI1|CHUOI2
-                });
-
-                alert(`Npc xin trả lời: Bạn nhận được ${add} xu từ mã ${codeInp}!`);
-                location.reload();
-            }, 1000);
+            if (listValidCodes.includes(codeInp) && !usedCodes.includes(codeInp)) {
+                alert("Mã đúng! Đang nhận thưởng...");
+                setTimeout(async () => {
+                    const add = Math.floor(Math.random() * 20) + 1;
+                    usedCodes.push(codeInp);
+                    await updateSheet({ coins: parseInt(userData.coins) + add, used_giftcode: usedCodes.join("|") });
+                    alert(`Npc xin trả lời: +${add} xu!`);
+                    location.reload();
+                }, 1000);
+            } else { alert("Mã sai hoặc đã dùng!"); }
         }
 
-        async function updateSheet(setData) {
-            await fetch(FULL_URL, {
+        init();
+    </script>
+</body>
+</html>
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({ condition: {username: userData.username}, set: setData })
