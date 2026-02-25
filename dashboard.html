@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ - Artist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <marquee id="marqueeTxt" class="marquee-style">Đang tải thông báo từ hệ thống...</marquee>
+
+    <div class="header-bar">
+        <div class="balance">Số dư: <span id="userCoins">0</span> Xu 🪙</div>
+        <button class="gift-btn" onclick="useGiftcode()">NHẬP GIFTCODE</button>
+    </div>
+
+    <div class="main-content">
+        <div class="fish-section">
+            <div class="fish-icon" id="fish">🐟</div>
+            <button class="feed-btn" id="feedBtn" onclick="feedFish()">CHO CÁ ĂN (24H)</button>
+        </div>
+
+        <div id="adminInfo" class="info-box">Đang tải thông tin...</div>
+
+        <div class="leaderboard-section">
+            <h3>🏆 BẢNG XẾP HẠNG</h3>
+            <ul id="leaderboardList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const p1 = "h" + "tt" + "ps://";
+        const p2 = "api" + "." + "steinhq" + ".com";
+        const p3 = "/v1/storages/";
+        const p4 = "699" + "ed5d6" + "affba40a" + "625413ac";
+        const FULL_URL = p1 + p2 + p3 + p4 + "/Sheet1";
+
+        let userData = JSON.parse(localStorage.getItem("currentUser"));
+
+        async function init() {
+            if (!userData) { window.location.href = "index.html"; return; }
+
+            const res = await fetch(FULL_URL);
+            const allData = await res.json();
+            const config = allData[0]; // Dòng đầu tiên
+
+            // Hiển thị thông tin
+            document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + config.marquee_text;
+            document.getElementById('adminInfo').innerText = config.info_box;
+            document.getElementById('userCoins').innerText = userData.coins;
+            window.currentGiftcode = config.giftcode_val;
+
+            // Bảng xếp hạng
+            const sorted = allData.sort((a, b) => b.coins - a.coins);
+            document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map(u => 
+                `<li><span>${u.username}</span> <span>${u.coins} Xu</span></li>`
+            ).join('');
+        }
+
+        async function feedFish() {
+            const now = Date.now();
+            const lastFeed = parseInt(userData.last_feed) || 0;
+
+            if (now - lastFeed < 86400000) {
+                alert("Cá đã no rồi, hãy quay lại sau 24 giờ!");
+                return;
+            }
+
+            const add = Math.floor(Math.random() * 3) + 1;
+            const newCoins = parseInt(userData.coins) + add;
+            
+            await updateSheet({ coins: newCoins, last_feed: now });
+            alert(`Npc xin trả lời: Bạn nhận được ${add} xu!`);
+            location.reload();
+        }
+
+        async function useGiftcode() {
+            if (localStorage.getItem('gift_lock') > Date.now()) {
+                alert("Bạn đang bị khóa chức năng này 1 tiếng!"); return;
+            }
+            if (userData.used_giftcode === "yes") {
+                alert("Tài khoản này đã nhận quà rồi!"); return;
+            }
+
+            const code = prompt("Nhập mã Giftcode:");
+            if (code === window.currentGiftcode) {
+                alert("Đang xác thực... Chờ 30s để nhận xu ngẫu nhiên.");
+                setTimeout(async () => {
+                    const add = Math.floor(Math.random() * 20) + 1;
+                    await updateSheet({ coins: parseInt(userData.coins) + add, used_giftcode: "yes" });
+                    alert(`Npc xin trả lời: Chúc mừng! Bạn nhận được ${add} xu.`);
+                    location.reload();
+                }, 30000);
+            } else {
+                localStorage.setItem('gift_lock', Date.now() + 3600000); // Khóa 1 tiếng
+                alert("Sai mã! Bạn bị khóa chức năng này 1 tiếng.");
+            }
+        }
+
+        async function updateSheet(setData) {
+            await fetch(FULL_URL, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ condition: {username: userData.username}, set: setData })
+            });
+            // Cập nhật lại local
+            userData = {...userData, ...setData};
+            localStorage.setItem("currentUser", JSON.stringify(userData));
+        }
+
+        init();
+    </script>
+</body>
+</html>
