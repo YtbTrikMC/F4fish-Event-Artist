@@ -2,17 +2,26 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Artists</title>
+    <title>Dashboard - Artist</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Style giữ nguyên các phần cũ */
         .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 22px; overflow: hidden; }
         .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
         .lucky-box-section { margin: 20px auto; padding: 15px; max-width: 400px; background: linear-gradient(145deg, #ff4757, #e84118); border: 3px solid #fbc531; border-radius: 15px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .lucky-btn { background: #fbc531; color: #c23616; font-weight: bold; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 16px; text-transform: uppercase; box-shadow: 0 4px 0 #e1b12c; transition: 0.2s; }
-        .info-box { background: #f9f9f9; border-left: 5px solid #3498db; padding: 10px; margin: 15px 0; font-size: 13px; color: #333; line-height: 1.5; }
-        .marquee-fixed { background: #2980b9; color: white; padding: 5px; font-weight: bold; font-size: 14px; display: block; }
-        .marquee-alert { background: #f1c40f; color: #c0392b; padding: 3px; font-weight: bold; font-size: 13px; border-bottom: 2px solid #e67e22; display: none; }
+        
+        /* KHUNG NHẬT KÝ MỚI */
+        .history-box { 
+            margin: 20px auto; max-width: 400px; background: #fff; 
+            border: 1px solid #ddd; border-radius: 10px; overflow: hidden;
+        }
+        .history-header { background: #34495e; color: white; padding: 8px; font-weight: bold; font-size: 14px; text-align: center; }
+        .history-list { height: 120px; overflow-y: auto; padding: 10px; font-size: 13px; list-style: none; margin: 0; }
+        .history-list li { padding: 5px 0; border-bottom: 1px dotted #ccc; color: #2c3e50; }
+        .history-list b { color: #e67e22; }
+
         .rank-tabs { display: flex; gap: 5px; margin-top: 20px; justify-content: center; }
         .tab-btn { padding: 10px 20px; border: none; background: #ecf0f1; cursor: pointer; border-radius: 5px 5px 0 0; font-weight: bold; }
         .tab-btn.active { background: #3498db; color: white; }
@@ -21,8 +30,7 @@
     </style>
 </head>
 <body>
-    <marquee id="fixedMsg" class="marquee-fixed">Đang tải thông báo...</marquee>
-    <marquee id="alertMsg" class="marquee-alert"></marquee>
+    <marquee id="fixedMsg" style="background: #2980b9; color: white; padding: 5px; font-weight: bold; display: block;">Đang tải thông báo...</marquee>
     
     <div class="header-bar">
         <div class="balance">Xu: <span id="userCoins">0</span> 🪙 | Level: <span id="userLevel">1</span></div>
@@ -33,7 +41,7 @@
         <div class="level-container"><div class="level-text" id="levelScoreTxt">0/100 XP</div><div class="level-bar" id="levelBar"></div></div>
         
         <div class="fish-section" style="text-align: center; padding: 10px;">
-            <img src="" id="fishGif" style="width: 110px; cursor: pointer;" onclick="feedFish()" alt="Cá">
+            <img src="" id="fishGif" style="width: 100px; cursor: pointer;" onclick="feedFish()" alt="Cá">
             <br><button id="btnFeed" onclick="feedFish()" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 5px;">CHO CÁ ĂN (24H)</button>
         </div>
 
@@ -44,10 +52,11 @@
             <p id="lixiStatus" style="font-size: 12px; margin-top: 10px; font-weight: bold;"></p>
         </div>
 
-        <div class="info-box" id="infoBox">
-            <b>📢 LƯU Ý TỪ ADMIN:</b><br>
-            - 1 Xu = 100 VNĐ. Đủ 100 Xu có thể quy đổi.<br>
-            - Tham gia sự kiện vẽ tranh để nhận thêm lượt mở quà.
+        <div class="history-box">
+            <div class="history-header">📜 NHẬT KÝ NHẬN QUÀ</div>
+            <ul id="historyList" class="history-list">
+                <li>Đang cập nhật lịch sử...</li>
+            </ul>
         </div>
 
         <h3 style="text-align: center;">🏆 BẢNG XẾP HẠNG</h3>
@@ -75,32 +84,39 @@
                 const freshData = globalData.find(u => u.username === userData.username);
                 if(freshData) { userData = freshData; localStorage.setItem("currentUser", JSON.stringify(freshData)); }
 
-                const config = globalData[0];
-                document.getElementById('fixedMsg').innerText = config.marquee_text || "Chào mừng bạn!";
-                if(config.lixi_log) {
-                    const alertEl = document.getElementById('alertMsg');
-                    alertEl.innerText = config.lixi_log;
-                    alertEl.style.display = "block";
+                document.getElementById('fixedMsg').innerText = globalData[0].marquee_text || "Chào mừng!";
+                
+                // CẬP NHẬT NHẬT KÝ TỪ SHEET (Cột lixi_log)
+                const historyEl = document.getElementById('historyList');
+                if(globalData[0].lixi_log) {
+                    const logs = globalData[0].lixi_log.split("|"); // Giả sử dùng dấu | để tách các dòng log
+                    historyEl.innerHTML = logs.reverse().map(log => `<li>${log}</li>`).join('');
                 }
 
-                document.getElementById('userCoins').innerText = userData.coins;
-                document.getElementById('poolCoins').innerText = globalData.find(u => u.username === "admin").coins;
-                
-                const score = parseInt(userData.level_score) || 0;
-                const level = Math.floor(score / 100) + 1;
-                document.getElementById('userLevel').innerText = level;
-                document.getElementById('levelBar').style.width = (score % 100) + "%";
-                document.getElementById('levelScoreTxt').innerText = (score % 100) + "/100 XP";
-                document.getElementById('fishGif').src = level === 1 ? GIFS.lv1 : (level === 2 ? GIFS.lv2 : GIFS.lv3);
-                document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
-
+                updateUI();
                 switchRank('xu');
             } catch (e) { console.error(e); }
+        }
+
+        function updateUI() {
+            document.getElementById('userCoins').innerText = userData.coins;
+            document.getElementById('poolCoins').innerText = globalData.find(u => u.username === "admin").coins;
+            const score = parseInt(userData.level_score) || 0;
+            const level = Math.floor(score / 100) + 1;
+            document.getElementById('userLevel').innerText = level;
+            document.getElementById('levelBar').style.width = (score % 100) + "%";
+            document.getElementById('levelScoreTxt').innerText = (score % 100) + "/100 XP";
+            document.getElementById('fishGif').src = level === 1 ? GIFS.lv1 : (level === 2 ? GIFS.lv2 : GIFS.lv3);
+            document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
         }
 
         async function openLuckyBox() {
             let count = parseInt(userData.lixi_count) || 0;
             if (count <= 0) { alert("Npc xin trả lời: Hết lượt!"); return; }
+            
+            const btn = document.getElementById('btnLixi');
+            btn.disabled = true; // Chặn bấm liên tục gây lỗi reset
+
             try {
                 const res = await fetch(p1);
                 const allData = await res.json();
@@ -110,23 +126,33 @@
                 let randomXu = Math.floor(Math.random() * 81) + 20; 
                 if (randomXu > pool) randomXu = pool;
 
-                if (confirm(`Dùng 1 lượt mở quà?`)) {
+                if (confirm(`Sử dụng 1 lượt mở quà?`)) {
+                    // Trừ quỹ Admin
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: pool - randomXu } })});
-                    const logMsg = `🔥 [${userData.username}] VỪA TRÚNG ${randomXu} XU (~${randomXu * 100}đ) !!!`;
-                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "config_row"}, set: { lixi_log: logMsg } })});
-                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: (parseInt(userData.coins) || 0) + randomXu, lixi_count: count - 1 } })});
-                    alert(`Npc xin trả lời: Nhận được ${randomXu} Xu (~${randomXu * 100}đ)!`);
-                    location.reload();
+                    
+                    // Cập nhật Nhật ký (Ghi thêm vào chuỗi cũ thay vì đè hoàn toàn)
+                    let oldLogs = allData[0].lixi_log || "";
+                    let newEntry = `✔️ <b>${userData.username}</b> nhận ${randomXu} Xu (${randomXu * 100}đ)`;
+                    let updatedLogs = (oldLogs ? oldLogs + "|" : "") + newEntry;
+                    
+                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "config_row"}, set: { lixi_log: updatedLogs } })});
+                    
+                    // Cộng xu user
+                    userData.coins = (parseInt(userData.coins) || 0) + randomXu;
+                    userData.lixi_count = count - 1;
+                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, lixi_count: userData.lixi_count } })});
+                    
+                    alert(`Npc xin trả lời: Chúc mừng nhận được ${randomXu} Xu!`);
+                    // KHÔNG DÙNG location.reload() nữa, chỉ cập nhật UI
+                    updateUI();
+                    localStorage.setItem("currentUser", JSON.stringify(userData));
                 }
             } catch (e) { alert("Lỗi!"); }
+            btn.disabled = false;
         }
 
         function switchRank(type) {
             const list = document.getElementById('leaderboardList');
-            const btnXu = document.getElementById('tabXu');
-            const btnLixi = document.getElementById('tabLixi');
-            if (type === 'xu') { btnXu.classList.add('active'); btnLixi.classList.remove('active'); }
-            else { btnLixi.classList.add('active'); btnXu.classList.remove('active'); }
             let sorted = [...globalData].sort((a, b) => (parseInt(b[type === 'xu' ? 'coins' : 'lixi_count']) || 0) - (parseInt(a[type === 'xu' ? 'coins' : 'lixi_count']) || 0));
             list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${type === 'xu' ? u.coins + ' Xu' : (u.lixi_count || 0) + ' Lượt'}</b></li>`).join('');
         }
@@ -135,9 +161,14 @@
             const now = Date.now();
             if (now - (parseInt(userData.last_feed) || 0) < 86400000) { alert("Cá no rồi!"); return; }
             let add = Math.floor(Math.random() * 10) + 5;
-            await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: (parseInt(userData.coins) || 0) + add, level_score: (parseInt(userData.level_score) || 0) + 10, last_feed: now } })});
+            userData.coins = (parseInt(userData.coins) || 0) + add;
+            userData.level_score = (parseInt(userData.level_score) || 0) + 10;
+            userData.last_feed = now;
+            
+            await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, level_score: userData.level_score, last_feed: now } })});
             alert(`Npc xin trả lời: +10 XP và +${add} xu.`);
-            location.reload();
+            updateUI();
+            localStorage.setItem("currentUser", JSON.stringify(userData));
         }
 
         init();
