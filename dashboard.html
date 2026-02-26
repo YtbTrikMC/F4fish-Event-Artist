@@ -5,51 +5,60 @@
     <title>Dashboard - Artists</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Giữ nguyên các style đã có của bạn */
+        /* Style tổng thể */
         .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 22px; overflow: hidden; }
         .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
         .lucky-box-section { margin: 20px auto; padding: 15px; max-width: 400px; background: linear-gradient(145deg, #ff4757, #e84118); border: 3px solid #fbc531; border-radius: 15px; color: white; text-align: center; }
-        .lucky-btn { background: #fbc531; color: #c23616; font-weight: bold; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; }
+        .lucky-btn { background: #fbc531; color: #c23616; font-weight: bold; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; text-transform: uppercase; }
         
-        /* KHUNG NHẬT KÝ (Cố định chiều cao để không nhảy trang) */
-        .history-box { margin: 20px auto; max-width: 400px; background: #fff; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; }
-        .history-header { background: #34495e; color: white; padding: 8px; font-weight: bold; font-size: 14px; text-align: center; }
-        .history-list { height: 100px; overflow-y: auto; padding: 10px; font-size: 12px; list-style: none; margin: 0; text-align: left; }
-        .history-list li { padding: 4px 0; border-bottom: 1px solid #eee; }
+        /* Nhật ký */
+        .history-box { margin: 15px auto; max-width: 400px; background: #fff; border: 1px solid #34495e; border-radius: 8px; overflow: hidden; }
+        .history-header { background: #34495e; color: white; padding: 6px; font-weight: bold; font-size: 13px; text-align: center; }
+        .history-list { height: 90px; overflow-y: auto; padding: 8px; font-size: 12px; list-style: none; margin: 0; text-align: left; }
+        .history-list li { border-bottom: 1px solid #eee; padding: 3px 0; }
 
-        .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; margin: 0 auto; max-width: 400px; }
-        .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        /* BXH */
+        .rank-tabs { display: flex; gap: 5px; margin-top: 15px; justify-content: center; }
+        .tab-btn { padding: 8px 15px; border: none; background: #ecf0f1; cursor: pointer; border-radius: 5px 5px 0 0; font-weight: bold; }
+        .tab-btn.active { background: #3498db; color: white; }
+        .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0 auto; max-width: 400px; border-radius: 0 0 5px 5px; }
+        .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 14px; }
     </style>
 </head>
 <body>
-    <marquee id="fixedMsg" style="background: #2980b9; color: white; padding: 5px; font-weight: bold;">1 XU = 100Đ - ĐỦ 100 XU QUY ĐỔI 10K</marquee>
+    <marquee id="fixedMsg" style="background: #2980b9; color: white; padding: 5px; font-weight: bold;">Đang tải...</marquee>
     
     <div class="header-bar">
         <div class="balance">Xu: <span id="userCoins">0</span> 🪙 | Level: <span id="userLevel">1</span></div>
+        <button class="gift-btn" onclick="useGiftcode()" style="background:#fbc531; border:none; padding:5px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">GIFTCODE</button>
     </div>
 
     <div class="main-content">
         <div class="level-container"><div class="level-text" id="levelScoreTxt">0/100 XP</div><div class="level-bar" id="levelBar"></div></div>
         
         <div class="fish-section" style="text-align: center; padding: 10px;">
-            <img src="https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif" id="fishGif" style="width: 80px;">
-            <br><button onclick="feedFish()" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">CHO CÁ ĂN</button>
+            <img src="" id="fishGif" style="width: 100px; cursor: pointer;" onclick="feedFish()">
+            <br><button id="btnFeed" onclick="feedFish()" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 5px;">CHO CÁ ĂN (24H)</button>
         </div>
 
         <div class="lucky-box-section">
             <h2>🧧 BAO QUÀ MAY MẮN</h2>
             <p>Quỹ còn: <span id="poolCoins">0</span> Xu</p>
             <button id="btnLixi" class="lucky-btn" onclick="openLuckyBox()">MỞ QUÀ NGAY</button>
-            <p id="lixiStatus" style="font-size: 11px; margin-top: 5px;"></p>
+            <p id="lixiStatus" style="font-size: 11px; margin-top: 5px; font-weight: bold;"></p>
         </div>
 
         <div class="history-box">
             <div class="history-header">📜 NHẬT KÝ NHẬN QUÀ</div>
-            <ul id="historyList" class="history-list"><li>Chưa có hoạt động mới...</li></ul>
+            <ul id="historyList" class="history-list"><li>Đang tải nhật ký...</li></ul>
         </div>
 
-        <h3 style="text-align: center;">🏆 BẢNG XẾP HẠNG</h3>
+        <h3 style="text-align: center; margin-top: 20px;">🏆 BẢNG XẾP HẠNG</h3>
+        <div class="rank-tabs">
+            <button id="tabXu" class="tab-btn active" onclick="switchRank('xu')">TOP XU</button>
+            <button id="tabLixi" class="tab-btn" onclick="switchRank('lixi')">TOP LƯỢT QUÀ</button>
+        </div>
         <ul id="leaderboardList" class="rank-list"></ul>
     </div>
 
@@ -57,6 +66,13 @@
         const p1 = "https://api.steinhq.com/v1/storages/699eda16affba40a6254160c/Sheet1";
         let userData = JSON.parse(localStorage.getItem("currentUser"));
         let globalData = [];
+        let allGiftcodes = "";
+
+        const GIFS = {
+            lv1: "https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif",
+            lv2: "https://image2url.com/r2/default/gifs/1772021046327-83a1abb8-5bc1-47a7-888e-34918c5a1410.gif",
+            lv3: "https://image2url.com/r2/default/gifs/1772021071582-773603d9-15ed-4bb0-a37f-6d801ccd3639.gif"
+        };
 
         async function init() {
             try {
@@ -65,67 +81,91 @@
                 const fresh = globalData.find(u => u.username === userData.username);
                 if(fresh) { userData = fresh; localStorage.setItem("currentUser", JSON.stringify(userData)); }
 
-                // Hiển thị nhật ký từ Sheet
+                allGiftcodes = globalData[0].giftcode_val || "";
+                document.getElementById('fixedMsg').innerText = globalData[0].marquee_text || "Chào mừng!";
+                
                 const historyEl = document.getElementById('historyList');
                 if(globalData[0].lixi_log) {
                     const logs = globalData[0].lixi_log.split("|").filter(x => x !== "");
                     historyEl.innerHTML = logs.reverse().map(log => `<li>${log}</li>`).join('');
                 }
+
                 updateUI();
-                renderRank();
-            } catch (e) { console.error("Lỗi tải dữ liệu"); }
+                switchRank('xu');
+            } catch (e) { console.error("Lỗi kết nối!"); }
         }
 
         function updateUI() {
             document.getElementById('userCoins').innerText = userData.coins;
-            const admin = globalData.find(u => u.username === "admin");
-            document.getElementById('poolCoins').innerText = admin ? admin.coins : "0";
-            document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở!`;
+            const adminAcc = globalData.find(u => u.username === "admin");
+            document.getElementById('poolCoins').innerText = adminAcc ? adminAcc.coins : "0";
+            document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
             
             const score = parseInt(userData.level_score) || 0;
+            const level = Math.floor(score / 100) + 1;
+            document.getElementById('userLevel').innerText = level;
             document.getElementById('levelBar').style.width = (score % 100) + "%";
             document.getElementById('levelScoreTxt').innerText = (score % 100) + "/100 XP";
+            document.getElementById('fishGif').src = level === 1 ? GIFS.lv1 : (level === 2 ? GIFS.lv2 : GIFS.lv3);
         }
 
         async function openLuckyBox() {
             let count = parseInt(userData.lixi_count) || 0;
             if (count <= 0) { alert("Npc xin trả lời: Hết lượt!"); return; }
-            
             const btn = document.getElementById('btnLixi');
-            btn.disabled = true; // Chống bấm nhiều lần gây lag
+            btn.disabled = true;
 
             try {
-                let randomXu = Math.floor(Math.random() * 81) + 20; 
-                // Thông báo trước cho người dùng đỡ sốt ruột
-                if (confirm(`Bạn muốn nhận quà ngay?`)) {
-                    // Cập nhật Nhật ký cục bộ để hiện luôn cho nhanh
-                    const historyEl = document.getElementById('historyList');
-                    const newLog = `✔️ <b>${userData.username}</b> vừa nhận ${randomXu} Xu (~${randomXu*100}đ)`;
-                    historyEl.insertAdjacentHTML('afterbegin', `<li>${newLog}</li>`);
-
-                    // Gửi dữ liệu lên server (Không dùng reload)
-                    let oldLogs = globalData[0].lixi_log || "";
-                    let updatedLogs = (oldLogs ? oldLogs + "|" : "") + newLog;
+                let randomXu = Math.floor(Math.random() * 81) + 20;
+                if (confirm(`Mở quà ngay?`)) {
+                    const newLog = `✔️ <b>${userData.username}</b> nhận ${randomXu} Xu (~${randomXu*100}đ)`;
+                    let updatedLogs = (globalData[0].lixi_log || "") + "|" + newLog;
 
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "config_row"}, set: { lixi_log: updatedLogs } })});
+                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: (parseInt(globalData.find(u=>u.username==="admin").coins)-randomXu) } })});
                     
                     userData.coins = (parseInt(userData.coins) || 0) + randomXu;
                     userData.lixi_count = count - 1;
-                    
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, lixi_count: userData.lixi_count } })});
                     
+                    alert(`Npc xin trả lời: Bạn nhận được ${randomXu} Xu!`);
                     localStorage.setItem("currentUser", JSON.stringify(userData));
-                    updateUI();
-                    alert(`Npc xin trả lời: Chúc mừng bạn nhận được ${randomXu} Xu!`);
+                    location.reload(); // Reset nhẹ để đồng bộ BXH
                 }
-            } catch (e) { alert("Lỗi kết nối server!"); }
+            } catch (e) { alert("Lỗi!"); }
             btn.disabled = false;
         }
 
-        function renderRank() {
+        async function feedFish() {
+            const now = Date.now();
+            if (now - (parseInt(userData.last_feed) || 0) < 86400000) { alert("Cá no rồi!"); return; }
+            let add = Math.floor(Math.random() * 10) + 5;
+            userData.coins = (parseInt(userData.coins) || 0) + add;
+            userData.level_score = (parseInt(userData.level_score) || 0) + 10;
+            userData.last_feed = now;
+            await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, level_score: userData.level_score, last_feed: now } })});
+            alert(`Npc xin trả lời: +10 XP và +${add} xu.`);
+            location.reload();
+        }
+
+        function switchRank(type) {
             const list = document.getElementById('leaderboardList');
-            let sorted = [...globalData].sort((a, b) => (parseInt(b.coins) || 0) - (parseInt(a.coins) || 0));
-            list.innerHTML = sorted.slice(0, 8).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u.coins} Xu</b></li>`).join('');
+            document.getElementById('tabXu').className = type === 'xu' ? 'tab-btn active' : 'tab-btn';
+            document.getElementById('tabLixi').className = type === 'lixi' ? 'tab-btn active' : 'tab-btn';
+            
+            let sorted = [...globalData].sort((a, b) => (parseInt(b[type === 'xu' ? 'coins' : 'lixi_count']) || 0) - (parseInt(a[type === 'xu' ? 'coins' : 'lixi_count']) || 0));
+            list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${type === 'xu' ? u.coins + ' Xu' : (u.lixi_count || 0) + ' Lượt'}</b></li>`).join('');
+        }
+
+        async function useGiftcode() {
+            let code = prompt("Nhập Giftcode:");
+            if(!code) return;
+            if(allGiftcodes.includes(code)) {
+                userData.lixi_count = (parseInt(userData.lixi_count) || 0) + 5;
+                await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { lixi_count: userData.lixi_count } })});
+                alert("Npc xin trả lời: +5 lượt mở quà!");
+                location.reload();
+            } else { alert("Sai code!"); }
         }
 
         init();
