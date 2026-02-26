@@ -10,7 +10,7 @@
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
         
         .lucky-box-section { 
-            margin-top: 20px; padding: 15px; 
+            margin: 20px auto; padding: 15px; max-width: 400px;
             background: linear-gradient(145deg, #ff4757, #e84118); 
             border: 3px solid #fbc531; border-radius: 15px; 
             color: white; text-align: center;
@@ -23,12 +23,12 @@
             box-shadow: 0 4px 0 #e1b12c; transition: 0.2s;
         }
         .lucky-btn:active { transform: translateY(4px); box-shadow: none; }
+        .lucky-btn:disabled { background: #95a5a6; color: #7f8c8d; box-shadow: none; cursor: not-allowed; }
 
-        /* Style cho BXH kép */
-        .rank-tabs { display: flex; gap: 5px; margin-top: 20px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #ecf0f1; cursor: pointer; border-radius: 5px 5px 0 0; font-weight: bold; }
+        .rank-tabs { display: flex; gap: 5px; margin-top: 20px; justify-content: center; }
+        .tab-btn { padding: 10px 20px; border: none; background: #ecf0f1; cursor: pointer; border-radius: 5px 5px 0 0; font-weight: bold; }
         .tab-btn.active { background: #3498db; color: white; }
-        .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0; border-radius: 0 0 5px 5px; }
+        .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0 auto; max-width: 400px; border-radius: 0 0 5px 5px; }
         .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 14px; }
         .rank-list b { color: #e67e22; }
     </style>
@@ -47,9 +47,10 @@
             <div class="level-bar" id="levelBar"></div>
         </div>
 
-        <div class="fish-section">
-            <img src="" id="fishGif" class="fish-gif" onclick="feedFish()" alt="Cá">
-            <button id="btnFeed" class="feed-btn" onclick="feedFish()">CHO CÁ ĂN (MIỄN PHÍ 24H)</button>
+        <div class="fish-section" style="text-align: center;">
+            <img src="https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif" id="fishGif" class="fish-gif" onclick="feedFish()" alt="Cá" style="width: 100px; cursor: pointer;">
+            <br>
+            <button id="btnFeed" class="feed-btn" onclick="feedFish()" style="margin-top: 10px; padding: 10px; background: #008080; color: white; border: none; border-radius: 5px; cursor: pointer;">CHO CÁ ĂN (MIỄN PHÍ 24H)</button>
         </div>
 
         <div class="lucky-box-section">
@@ -59,7 +60,7 @@
             <p id="lixiStatus" style="font-size: 11px; margin-top: 10px; opacity: 0.9; font-weight: bold;"></p>
         </div>
 
-        <h3 style="margin-bottom: 10px; margin-top: 25px;">🏆 BẢNG XẾP HẠNG</h3>
+        <h3 style="text-align: center; margin-top: 25px;">🏆 BẢNG XẾP HẠNG</h3>
         <div class="rank-tabs">
             <button id="tabXu" class="tab-btn active" onclick="switchRank('xu')">TOP XU</button>
             <button id="tabLixi" class="tab-btn" onclick="switchRank('lixi')">TOP LƯỢT QUÀ</button>
@@ -76,6 +77,11 @@
 
         let userData = JSON.parse(localStorage.getItem("currentUser"));
         let globalData = [];
+        const GIFS = {
+            lv1: "https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif",
+            lv2: "https://image2url.com/r2/default/gifs/1772021046327-83a1abb8-5bc1-47a7-888e-34918c5a1410.gif",
+            lv3: "https://image2url.com/r2/default/gifs/1772021071582-773603d9-15ed-4bb0-a37f-6d801ccd3639.gif"
+        };
 
         async function init() {
             if (!userData) { window.location.href = "index.html"; return; }
@@ -85,21 +91,30 @@
                 
                 const adminAccount = globalData.find(u => u.username === "admin");
                 const freshData = globalData.find(u => u.username === userData.username);
+                
                 if(freshData) { 
                     userData = freshData; 
                     localStorage.setItem("currentUser", JSON.stringify(freshData)); 
                 }
 
+                const config = globalData[0]; // Dòng đầu tiên chứa thông báo
+                document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + (config.marquee_text || "Chào mừng bạn!");
+                window.allGiftcodes = config.giftcode_val || "";
+
                 document.getElementById('userCoins').innerText = userData.coins;
                 document.getElementById('poolCoins').innerText = adminAccount ? adminAccount.coins : "0";
 
-                const count = parseInt(userData.lixi_count) || 0;
-                document.getElementById('lixiStatus').innerText = count > 0 ? `Bạn còn ${count} lượt mở quà!` : "Bạn đã hết lượt mở quà.";
-
-                // Hiển thị thanh XP và Fish Gif (giữ logic cũ của bạn)
                 const score = parseInt(userData.level_score) || 0;
+                const level = Math.floor(score / 100) + 1;
+                document.getElementById('userLevel').innerText = level;
                 document.getElementById('levelBar').style.width = (score % 100) + "%";
                 document.getElementById('levelScoreTxt').innerText = (score % 100) + "/100 XP";
+
+                const img = document.getElementById('fishGif');
+                img.src = level === 1 ? GIFS.lv1 : (level === 2 ? GIFS.lv2 : GIFS.lv3);
+
+                const count = parseInt(userData.lixi_count) || 0;
+                document.getElementById('lixiStatus').innerText = count > 0 ? `Bạn còn ${count} lượt mở quà!` : "Bạn đã hết lượt mở quà.";
 
                 switchRank('xu');
             } catch (e) { console.error(e); }
@@ -112,13 +127,11 @@
             
             let sorted = [];
             if (type === 'xu') {
-                btnXu.classList.add('active');
-                btnLixi.classList.remove('active');
+                btnXu.classList.add('active'); btnLixi.classList.remove('active');
                 sorted = [...globalData].sort((a, b) => (parseInt(b.coins) || 0) - (parseInt(a.coins) || 0));
                 list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u.coins} Xu</b></li>`).join('');
             } else {
-                btnLixi.classList.add('active');
-                btnXu.classList.remove('active');
+                btnLixi.classList.add('active'); btnXu.classList.remove('active');
                 sorted = [...globalData].sort((a, b) => (parseInt(b.lixi_count) || 0) - (parseInt(a.lixi_count) || 0));
                 list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u.lixi_count || 0} Lượt</b></li>`).join('');
             }
@@ -128,15 +141,17 @@
             let count = parseInt(userData.lixi_count) || 0;
             if (count <= 0) { alert("Npc xin trả lời: Bạn không còn lượt!"); return; }
 
+            const btn = document.getElementById('btnLixi');
+            btn.disabled = true;
+
             try {
                 const res = await fetch(FULL_URL);
                 const allData = await res.json();
                 const adminAcc = allData.find(u => u.username === "admin");
                 let pool = parseInt(adminAcc.coins) || 0;
 
-                if (pool <= 0) { alert("Npc xin trả lời: Quỹ quà đã hết sạch!"); return; }
+                if (pool <= 0) { alert("Npc xin trả lời: Quỹ đã hết!"); btn.disabled = false; return; }
 
-                // THUẬT TOÁN TỈ LỆ: TỐI THIỂU 20 XU (2.000đ)
                 let randomXu;
                 let rate = Math.random() * 100;
                 if (rate < 80) randomXu = Math.floor(Math.random() * (100 - 20 + 1)) + 20;
@@ -146,19 +161,56 @@
 
                 if (randomXu > pool) randomXu = pool;
 
-                if (confirm(`Bạn muốn dùng 1 lượt để mở quà?`)) {
-                    // Trừ quỹ Admin
+                if (confirm(`Npc xin trả lời: Bạn muốn dùng 1 lượt mở quà?`)) {
                     await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: pool - randomXu } })});
-                    // Cộng xu user và trừ 1 lượt lixi_count
                     await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: (parseInt(userData.coins) || 0) + randomXu, lixi_count: count - 1 } })});
-                    
-                    alert(`Npc xin trả lời: Bạn nhận được ${randomXu} Xu (~${randomXu * 100}đ)!`);
+                    alert(`Npc xin trả lời: Nhận được ${randomXu} Xu!`);
                     location.reload();
                 }
-            } catch (e) { alert("Lỗi kết nối!"); }
+            } catch (e) { alert("Lỗi!"); }
+            btn.disabled = false;
         }
 
-        // Các hàm updateData, feedFish, buyFish... của bạn giữ nguyên logic cập nhật userData
+        async function feedFish() {
+            const now = Date.now();
+            if (now - (parseInt(userData.last_feed) || 0) < 86400000) { alert("Npc xin trả lời: Cá còn no lắm, 24h mới được ăn 1 lần!"); return; }
+            
+            const btn = document.getElementById('btnFeed');
+            btn.disabled = true;
+
+            const lvl = Math.floor((parseInt(userData.level_score) || 0) / 100) + 1;
+            let add = Math.floor(Math.random() * 10) + 5; 
+            
+            try {
+                await fetch(FULL_URL, { 
+                    method: "PUT", 
+                    headers: {"Content-Type": "application/json"}, 
+                    body: JSON.stringify({ 
+                        condition: {username: userData.username}, 
+                        set: { coins: (parseInt(userData.coins) || 0) + add, level_score: (parseInt(userData.level_score) || 0) + 10, last_feed: now } 
+                    }) 
+                });
+                alert(`Npc xin trả lời: Cá ăn ngon quá! Bạn nhận được +10 XP và +${add} xu.`);
+                location.reload();
+            } catch (e) { alert("Lỗi hệ thống!"); }
+            btn.disabled = false;
+        }
+
+        async function useGiftcode() {
+            const code = prompt("Nhập Giftcode:");
+            if(!code) return;
+            const valid = window.allGiftcodes.split(",").map(c => c.trim());
+            if(valid.includes(code)) {
+                const add = 20; // Mã giftcode mặc định tặng 20 xu
+                await fetch(FULL_URL, { 
+                    method: "PUT", 
+                    headers: {"Content-Type": "application/json"}, 
+                    body: JSON.stringify({ condition: {username: userData.username}, set: { coins: (parseInt(userData.coins) || 0) + add } }) 
+                });
+                alert(`Npc xin trả lời: Nhận thành công +${add} xu!`); location.reload();
+            } else { alert("Mã sai hoặc không tồn tại!"); }
+        }
+
         init();
     </script>
 </body>
