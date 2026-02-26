@@ -2,15 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Trang chủ - Artists</title>
+    <title>Trang chủ - Hệ thống Npc</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Giao diện thanh Level */
         .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 22px; overflow: hidden; }
         .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
         
-        /* Giao diện BAO QUÀ MAY MẮN */
         .lucky-box-section { 
             margin-top: 20px; padding: 15px; 
             background: linear-gradient(145deg, #ff4757, #e84118); 
@@ -25,7 +23,15 @@
             box-shadow: 0 4px 0 #e1b12c; transition: 0.2s;
         }
         .lucky-btn:active { transform: translateY(4px); box-shadow: none; }
-        .lucky-btn:disabled { background: #95a5a6; color: #7f8c8d; box-shadow: none; cursor: not-allowed; }
+
+        /* Style cho BXH mới */
+        .rank-tabs { display: flex; gap: 5px; margin-top: 20px; }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: #ecf0f1; cursor: pointer; border-radius: 5px 5px 0 0; font-weight: bold; font-size: 12px; }
+        .tab-btn.active { background: #3498db; color: white; }
+        .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0; border-radius: 0 0 5px 5px; }
+        .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 14px; }
+        .rank-list li:last-child { border: none; }
+        .rank-list b { color: #e67e22; }
     </style>
 </head>
 <body>
@@ -51,17 +57,15 @@
             <h2 style="margin: 0 0 5px 0;">🧧 BAO QUÀ MAY MẮN</h2>
             <p style="font-size: 13px; margin-bottom: 10px;">Quỹ quà tặng còn: <span id="poolCoins" style="font-weight: bold; color: #fbc531;">0</span> Xu</p>
             <button id="btnLixi" class="lucky-btn" onclick="openLuckyBox()">MỞ QUÀ NGAY</button>
-            <p id="lixiStatus" style="font-size: 11px; margin-top: 10px; opacity: 0.9;"></p>
+            <p id="lixiStatus" style="font-size: 11px; margin-top: 10px; opacity: 0.9; font-weight: bold;"></p>
         </div>
 
-        <div class="shop-section" style="margin-top:15px; border:1px dashed #3498db; padding:10px; text-align: center;">
-            <p style="font-size:12px;">Cửa hàng: 10 xu = +10 XP</p>
-            <button onclick="buyFood()" style="background:orange; padding:5px 15px; color:white; border-radius:5px; border:none; cursor:pointer;">MUA THỨC ĂN (1 LẦN/NGÀY)</button>
+        <h3 style="margin-bottom: 10px; margin-top: 25px;">🏆 BẢNG XẾP HẠNG</h3>
+        <div class="rank-tabs">
+            <button id="tabXu" class="tab-btn active" onclick="switchRank('xu')">TOP XU</button>
+            <button id="tabLixi" class="tab-btn" onclick="switchRank('lixi')">TOP LƯỢT QUÀ</button>
         </div>
-
-        <div id="adminInfo" class="info-box" style="margin-top:15px;"></div>
-        <h3>🏆 BẢNG XẾP HẠNG</h3>
-        <ul id="leaderboardList"></ul>
+        <ul id="leaderboardList" class="rank-list"></ul>
     </div>
 
     <script>
@@ -72,138 +76,84 @@
         const FULL_URL = p1 + p2 + p3 + p4 + "/Sheet1";
 
         let userData = JSON.parse(localStorage.getItem("currentUser"));
-        const GIFS = {
-            lv1: "https://image2url.com/r2/default/gifs/1772020990089-c0dba8da-4cd7-4f28-b2e8-8fc7eb632f26.gif",
-            lv2: "https://image2url.com/r2/default/gifs/1772021046327-83a1abb8-5bc1-47a7-888e-34918c5a1410.gif",
-            lv3: "https://image2url.com/r2/default/gifs/1772021071582-773603d9-15ed-4bb0-a37f-6d801ccd3639.gif"
-        };
+        let globalData = [];
 
         async function init() {
             if (!userData) { window.location.href = "index.html"; return; }
             try {
                 const res = await fetch(FULL_URL);
-                const allData = await res.json();
+                globalData = await res.json();
                 
-                const adminData = allData.find(u => u.username === "admin");
-                const freshData = allData.find(u => u.username === userData.username);
+                const adminAccount = globalData.find(u => u.username === "admin");
+                const freshData = globalData.find(u => u.username === userData.username);
                 if(freshData) { 
                     userData = freshData; 
                     localStorage.setItem("currentUser", JSON.stringify(freshData)); 
                 }
 
-                const config = allData[0];
-                const score = parseInt(userData.level_score) || 0;
-                const level = Math.floor(score / 100) + 1;
-                const xpInLevel = score % 100;
-
-                // Cập nhật UI
-                document.getElementById('userLevel').innerText = level;
                 document.getElementById('userCoins').innerText = userData.coins;
-                document.getElementById('levelBar').style.width = xpInLevel + "%";
-                document.getElementById('levelScoreTxt').innerText = xpInLevel + "/100 XP";
-                document.getElementById('marqueeTxt').innerText = "THÔNG BÁO: " + (config.marquee_text || "");
-                document.getElementById('adminInfo').innerText = config.info_box || "";
-                window.allGiftcodes = config.giftcode_val || "";
-                document.getElementById('poolCoins').innerText = adminData ? adminData.coins : "0";
+                document.getElementById('poolCoins').innerText = adminAccount ? adminAccount.coins : "0";
 
-                const img = document.getElementById('fishGif');
-                img.src = level === 1 ? GIFS.lv1 : (level === 2 ? GIFS.lv2 : GIFS.lv3);
-
-                // Hiển thị số lượt Bao Quà
-                const st = document.getElementById('lixiStatus');
                 const count = parseInt(userData.lixi_count) || 0;
-                if (count > 0) st.innerHTML = `<b style="color: #fbc531;">Bạn còn ${count} lượt mở quà!</b>`;
-                else st.innerText = "Bạn đã hết lượt mở quà.";
+                document.getElementById('lixiStatus').innerText = count > 0 ? `Bạn còn ${count} lượt mở quà!` : "Bạn đã hết lượt mở quà.";
 
-                // BXH
-                const sorted = allData.filter(u => u.username).sort((a, b) => (parseInt(b.level_score) || 0) - (parseInt(a.level_score) || 0));
-                document.getElementById('leaderboardList').innerHTML = sorted.slice(0, 10).map((u, i) => {
-                    const uLvl = Math.floor((parseInt(u.level_score) || 0) / 100) + 1;
-                    return `<li>${i+1}. ${u.username} - Lv ${uLvl} - ${u.coins} Xu</li>`;
-                }).join('');
+                // Mặc định hiển thị BXH Xu
+                switchRank('xu');
             } catch (e) { console.error(e); }
+        }
+
+        function switchRank(type) {
+            const list = document.getElementById('leaderboardList');
+            const btnXu = document.getElementById('tabXu');
+            const btnLixi = document.getElementById('tabLixi');
+            
+            let sorted = [];
+            if (type === 'xu') {
+                btnXu.classList.add('active');
+                btnLixi.classList.remove('active');
+                // Sắp xếp theo Xu (Giữ lại admin)
+                sorted = [...globalData].sort((a, b) => (parseInt(b.coins) || 0) - (parseInt(a.coins) || 0));
+                list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u.coins} Xu</b></li>`).join('');
+            } else {
+                btnLixi.classList.add('active');
+                btnXu.classList.remove('active');
+                // Sắp xếp theo lượt quà (Giữ lại admin)
+                sorted = [...globalData].sort((a, b) => (parseInt(b.lixi_count) || 0) - (parseInt(a.lixi_count) || 0));
+                list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u.lixi_count || 0} Lượt</b></li>`).join('');
+            }
         }
 
         async function openLuckyBox() {
             let count = parseInt(userData.lixi_count) || 0;
-            if (count <= 0) {
-                alert("Npc xin trả lời: Bạn đã hết lượt mở bao quà rồi!");
-                return;
-            }
-
-            const btn = document.getElementById('btnLixi');
-            btn.disabled = true;
+            if (count <= 0) { alert("Npc xin trả lời: Hết lượt rồi!"); return; }
 
             try {
                 const res = await fetch(FULL_URL);
                 const allData = await res.json();
-                const adminAccount = allData.find(u => u.username === "admin");
-                let currentPool = parseInt(adminAccount.coins) || 0;
+                const adminAcc = allData.find(u => u.username === "admin");
+                let pool = parseInt(adminAcc.coins) || 0;
 
-                if (currentPool <= 0) {
-                    alert("Npc xin trả lời: Quỹ quà tặng chung đã hết!");
-                    btn.disabled = false;
-                    return;
-                }
+                if (pool <= 0) { alert("Npc xin trả lời: Quỹ hết sạch!"); return; }
 
-                // Thuật toán ép tỉ lệ hiếm
                 let randomXu;
                 let rate = Math.random() * 100;
-                if (rate < 80) randomXu = Math.floor(Math.random() * 91) + 10; // 80% trúng 1k-10k
-                else if (rate < 95) randomXu = Math.floor(Math.random() * 400) + 101; // 15% trúng 10k-50k
-                else if (rate < 99.5) randomXu = Math.floor(Math.random() * 400) + 501; // 4.5% trúng 50k-90k
-                else randomXu = Math.floor(Math.random() * 100) + 901; // 0.5% ĐỘC ĐẮC
+                if (rate < 80) randomXu = Math.floor(Math.random() * 91) + 10;
+                else if (rate < 95) randomXu = Math.floor(Math.random() * 400) + 101;
+                else if (rate < 99.5) randomXu = Math.floor(Math.random() * 500) + 501;
+                else randomXu = Math.floor(Math.random() * 100) + 901;
 
-                if (randomXu > currentPool) randomXu = currentPool;
+                if (randomXu > pool) randomXu = pool;
 
-                if (confirm(`Npc xin trả lời: Bạn có chắc muốn dùng 1 lượt để mở BAO QUÀ MAY MẮN? (Còn ${count} lượt)`)) {
-                    // Trừ quỹ Admin
-                    await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: currentPool - randomXu } })});
-                    // Trừ lượt và cộng xu cho User
+                if (confirm(`Dùng 1 lượt để mở quà?`)) {
+                    await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: pool - randomXu } })});
                     await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: (parseInt(userData.coins) || 0) + randomXu, lixi_count: count - 1 } })});
-                    
-                    alert(`🏮 CHÚC MỪNG! 🏮\nBạn đã nhận được: ${randomXu} Xu (~${randomXu * 100} VNĐ).\nBạn còn lại ${count - 1} lượt.`);
+                    alert(`Npc xin trả lời: Nhận được ${randomXu} Xu!`);
                     location.reload();
                 }
-            } catch (e) { alert("Lỗi kết nối hệ thống!"); }
-            btn.disabled = false;
+            } catch (e) { alert("Lỗi!"); }
         }
 
-        async function feedFish() {
-            const now = Date.now();
-            if (now - (parseInt(userData.last_feed) || 0) < 86400000) { alert("Npc xin trả lời: Cá còn no!"); return; }
-            const lvl = Math.floor((parseInt(userData.level_score) || 0) / 100) + 1;
-            let add = lvl === 1 ? (Math.floor(Math.random() * 10) + 1) : (lvl === 2 ? (Math.floor(Math.random() * 9) + 2) : (lvl === 3 ? (Math.floor(Math.random() * 10) + 2) : (Math.floor(Math.random() * 15) + 1)));
-            await updateData({ coins: parseInt(userData.coins) + add, level_score: (parseInt(userData.level_score) || 0) + 10, last_feed: now });
-            alert(`Npc xin trả lời: +10 XP và +${add} xu.`);
-            location.reload();
-        }
-
-        async function buyFood() {
-            const now = Date.now();
-            if (now - (parseInt(userData.last_buy) || 0) < 86400000) { alert("Npc xin trả lời: Mỗi ngày chỉ mua được 1 lần!"); return; }
-            if (parseInt(userData.coins) < 10) { alert("Không đủ xu!"); return; }
-            if(confirm("Dùng 10 xu mua thức ăn?")) {
-                await updateData({ coins: parseInt(userData.coins) - 10, level_score: (parseInt(userData.level_score) || 0) + 10, last_buy: now });
-                alert("Thành công! +10 XP."); location.reload();
-            }
-        }
-
-        async function updateData(setData) {
-            await fetch(FULL_URL, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: setData }) });
-        }
-
-        async function useGiftcode() {
-            const code = prompt("Nhập Giftcode:");
-            if(!code) return;
-            const valid = window.allGiftcodes.split(",").map(c => c.trim());
-            if(valid.includes(code)) {
-                const add = Math.floor(Math.random() * 20) + 1;
-                await updateData({ coins: parseInt(userData.coins) + add });
-                alert(`Npc xin trả lời: Nhận mã thành công +${add} xu!`); location.reload();
-            } else { alert("Mã sai!"); }
-        }
-
+        // Tích hợp các hàm Nuôi cá của bạn ở đây...
         init();
     </script>
 </body>
