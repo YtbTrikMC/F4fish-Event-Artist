@@ -47,7 +47,7 @@
     <div class="main-content">
         <div class="info-box" id="adminNotice">
             <b>📢 THÔNG BÁO ADMIN:</b><br>
-            - Giới hạn: Chỉ được nhấn nút quay 5 lần/ngày.<br>
+            - Giới hạn: Chỉ được nhấn nút quay 2 lần/ngày.<br>
             - Tỷ lệ: 0 Xu (60%), 1 Xu (33.5%), 10 Xu (6%), 50 Xu (0.5%).
         </div>
 
@@ -92,9 +92,9 @@
         let globalData = [];
 
         const caseConfig = [
-            { label: "0 XU", value: 0, weight: 60, class: "r-0" },    
-            { label: "1 XU", value: 1, weight: 33.5, class: "r-1" }, 
-            { label: "10 XU", value: 10, weight: 6, class: "r-10" },  
+            { label: "0 XU", value: 0, weight: 70, class: "r-0" },    
+            { label: "1 XU", value: 1, weight: 25, class: "r-1" }, 
+            { label: "10 XU", value: 10, weight: 4.5, class: "r-10" },  
             { label: "50 XU", value: 50, weight: 0.5, class: "r-50" } 
         ];
 
@@ -124,10 +124,10 @@
                 userData.last_op_date = today;
             }
 
-            const remains = 5 - (parseInt(userData.daily_op_count) || 0);
+            const remains = 2 - (parseInt(userData.daily_op_count) || 0);
             document.getElementById('totalSpinsDisplay').innerHTML = `
                 Tổng hòm đã mở: ${userData.total_spins || 0}<br>
-                <span style="color: ${remains > 0 ? '#2ecc71' : '#ff4757'}">Lượt bấm hôm nay: ${remains}/5</span>
+                <span style="color: ${remains > 0 ? '#2ecc71' : '#ff4757'}">Lượt bấm hôm nay: ${remains}/2</span>
             `;
 
             const isLocked = remains <= 0;
@@ -151,7 +151,7 @@
 
         async function spinCase(times) {
             let opCount = parseInt(userData.daily_op_count) || 0;
-            if (opCount >= 5) { alert("Npc xin trả lời: Hết lượt nhấn nút hôm nay!"); return; }
+            if (opCount >= 2) { alert("Npc xin trả lời: Hết lượt nhấn nút hôm nay!"); return; }
 
             let currentCoins = parseInt(userData.coins) || 0;
             if (currentCoins < times) { alert("Npc xin trả lời: Không đủ Xu!"); return; }
