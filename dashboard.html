@@ -5,7 +5,7 @@
     <title>Dashboard - Premium</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* --- STYLE GIỮ NGUYÊN TỪ BẢN PUBLIC --- */
+        /* --- STYLE GIỮ NGUYÊN --- */
         .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 22px; overflow: hidden; }
         .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
@@ -21,19 +21,6 @@
         .tab-btn.active { background: #3498db; color: white; }
         .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0 auto; max-width: 400px; border-radius: 0 0 5px 5px; }
         .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 14px; }
-
-        /* --- STYLE CASE OPENING --- */
-        .case-section { background: #1a1a1b; padding: 15px; border-radius: 12px; border: 2px solid #444; margin: 15px auto; max-width: 400px; color: white; text-align: center; }
-        #singleView { position: relative; width: 100%; height: 100px; background: #2b2b2b; overflow: hidden; display: flex; align-items: center; border-radius: 5px; margin-bottom: 10px; }
-        .pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #ff4757; z-index: 10; transform: translateX(-50%); }
-        #shuffler { display: flex; position: absolute; left: 0; }
-        .case-item { min-width: 90px; height: 90px; background: #333; border-bottom: 4px solid #ccc; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; margin-right: 2px; }
-        .r-1 { border-color: #4b69ff; color: #4b69ff; }
-        .r-0 { border-color: #576574; color: #8395a7; }
-        .r-10 { border-color: #d32ee6; color: #d32ee6; }
-        .r-50 { border-color: #eb4b4b; color: #eb4b4b; background: linear-gradient(to bottom, #333, #4b2b2b); }
-        .multi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; display: none; padding: 10px 0; }
-        #totalSpinsDisplay { color: #2ecc71; font-size: 12px; font-weight: bold; margin-bottom: 5px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -47,23 +34,8 @@
     <div class="main-content">
         <div class="info-box" id="adminNotice">
             <b>📢 THÔNG BÁO ADMIN:</b><br>
-            - Giới hạn: Chỉ được nhấn nút quay 2 lần/ngày.<br>
-            - Tỷ lệ: 0 Xu (60%), 1 Xu (33.5%), 10 Xu (6%), 100 Xu (0.5%).
-        </div>
-
-        <div class="case-section">
-            <h4 style="margin: 0; color: #f1c40f;">🎰 NPC CASE OPENING PRO</h4>
-            <div id="totalSpinsDisplay">Đang tải dữ liệu...</div>
-            <div id="singleView">
-                <div class="pointer"></div>
-                <div id="shuffler"></div>
-            </div>
-            <div id="multiView" class="multi-grid"></div>
-            <div id="caseStatus" style="font-size: 11px; margin-bottom: 10px; color: #aaa;">Sẵn sàng!</div>
-            <div style="display: flex; gap: 8px;">
-                <button id="btnSpin1" onclick="spinCase(1)" style="flex:1; background:#3498db; color:white; border:none; padding:8px; border-radius:5px; font-weight:bold; cursor:pointer;">QUAY 1 (1 XU)</button>
-                <button id="btnSpin10" onclick="spinCase(10)" style="flex:1; background:#f1c40f; color:black; border:none; padding:8px; border-radius:5px; font-weight:bold; cursor:pointer;">QUAY 10 (10 XU)</button>
-            </div>
+            - Chào mừng bạn quay trở lại!<br>
+            - Hãy sử dụng Giftcode để nhận thêm lượt mở quà.
         </div>
 
         <div class="lucky-box-section">
@@ -91,15 +63,6 @@
         let userData = JSON.parse(localStorage.getItem("currentUser"));
         let globalData = [];
 
-        const caseConfig = [
-            { label: "0 XU", value: 0, weight: 70, class: "r-0" },    
-            { label: "1 XU", value: 1, weight: 28, class: "r-1" }, 
-            { label: "10 XU", value: 10, weight: 1.5, class: "r-10" },  
-            { label: "50 XU", value: 50, weight: 0.5, class: "r-50" } 
-        ];
-
-        function getToday() { return new Date().toISOString().split('T')[0]; }
-
         async function init() {
             try {
                 const res = await fetch(p1);
@@ -117,152 +80,34 @@
             document.getElementById('userCoins').innerText = userData.coins;
             document.getElementById('userLevel').innerText = Math.floor((parseInt(userData.level_score) || 0) / 100) + 1;
             
-            // Logic Reset Ngày & Giới hạn bấm nút
-            const today = getToday();
-            if (userData.last_op_date !== today) {
-                userData.daily_op_count = 0;
-                userData.last_op_date = today;
-            }
-
-            const remains = 2 - (parseInt(userData.daily_op_count) || 0);
-            document.getElementById('totalSpinsDisplay').innerHTML = `
-                Tổng hòm đã mở: ${userData.total_spins || 0}<br>
-                <span style="color: ${remains > 0 ? '#2ecc71' : '#ff4757'}">Lượt bấm hôm nay: ${remains}/2</span>
-            `;
-
-            const isLocked = remains <= 0;
-            document.getElementById('btnSpin1').disabled = isLocked;
-            document.getElementById('btnSpin10').disabled = isLocked;
-            if(isLocked) document.getElementById('caseStatus').innerText = "Hết lượt bấm hôm nay!";
-
             const admin = globalData.find(u => u.username === "admin");
             document.getElementById('poolCoins').innerText = admin ? admin.coins : "0";
             document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
         }
 
-        function getRandItem() {
-            let rand = Math.random() * 100;
-            let sum = 0;
-            for (let item of caseConfig) {
-                sum += item.weight;
-                if (rand <= sum) return item;
-            }
-        }
-
-        async function spinCase(times) {
-            let opCount = parseInt(userData.daily_op_count) || 0;
-            if (opCount >= 2) { alert("Npc xin trả lời: Hết lượt nhấn nút hôm nay!"); return; }
-
-            let currentCoins = parseInt(userData.coins) || 0;
-            if (currentCoins < times) { alert("Npc xin trả lời: Không đủ Xu!"); return; }
-
-            document.getElementById('btnSpin1').disabled = true;
-            document.getElementById('btnSpin10').disabled = true;
-            
-            // Xử lý dữ liệu ngay lập tức
-            userData.coins = currentCoins - times;
-            userData.total_spins = (parseInt(userData.total_spins) || 0) + times; // Quay 10 cộng 10
-            userData.daily_op_count = opCount + 1; // Nhấn nút nào cũng cộng 1
-            
-            updateUI();
-
-            const status = document.getElementById('caseStatus');
-            const sView = document.getElementById('singleView');
-            const mView = document.getElementById('multiView');
-
-            if (times === 1) {
-                mView.style.display = "none";
-                sView.style.display = "flex";
-                status.innerText = "Đang quay...";
-                const shuffler = document.getElementById('shuffler');
-                shuffler.innerHTML = '';
-                shuffler.style.transition = "none";
-                shuffler.style.transform = "translateX(0)";
-
-                let finalItem;
-                for (let i = 0; i < 40; i++) {
-                    const data = getRandItem();
-                    if (i === 30) finalItem = data;
-                    const div = document.createElement('div');
-                    div.className = `case-item ${data.class}`;
-                    div.innerHTML = `<span>${data.label}</span>`;
-                    shuffler.appendChild(div);
-                }
-
-                setTimeout(() => {
-                    const itemW = 92; 
-                    const targetPos = -(30 * itemW) + (sView.offsetWidth / 2) - (itemW / 2);
-                    shuffler.style.transition = "transform 4s cubic-bezier(0.1, 0, 0.1, 1)";
-                    shuffler.style.transform = `translateX(${targetPos}px)`;
-
-                    setTimeout(async () => {
-                        userData.coins += finalItem.value;
-                        status.innerText = `Kết quả: ${finalItem.label}`;
-                        await saveToSheet();
-                        updateUI();
-                    }, 4100);
-                }, 50);
-            } else {
-                sView.style.display = "none";
-                mView.style.display = "grid";
-                mView.innerHTML = "";
-                status.innerText = "Đang khui 10 hòm...";
-                let totalWin = 0;
-                for (let i = 0; i < 10; i++) {
-                    const data = getRandItem();
-                    totalWin += data.value;
-                    setTimeout(() => {
-                        const div = document.createElement('div');
-                        div.className = `case-item ${data.class}`;
-                        div.style.minWidth = "auto"; div.style.height = "60px";
-                        div.innerHTML = `<span style='font-size:10px'>${data.label}</span>`;
-                        mView.appendChild(div);
-                    }, i * 150);
-                }
-                setTimeout(async () => {
-                    userData.coins += totalWin;
-                    status.innerText = `Tổng nhận: ${totalWin} Xu!`;
-                    await saveToSheet();
-                    updateUI();
-                }, 1800);
-            }
-        }
-
-        async function saveToSheet() {
-            localStorage.setItem("currentUser", JSON.stringify(userData));
-            await fetch(p1, {
-                method: "PUT",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ 
-                    condition: {username: userData.username}, 
-                    set: { 
-                        coins: userData.coins, 
-                        total_spins: userData.total_spins,
-                        daily_op_count: userData.daily_op_count,
-                        last_op_date: userData.last_op_date
-                    } 
-                })
-            });
-        }
-
-        // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
         async function openLuckyBox() {
             let count = parseInt(userData.lixi_count) || 0;
-            if (count <= 0) { alert("Hết lượt rồi!"); return; }
+            if (count <= 0) { alert("Npc xin trả lời: Hết lượt rồi!"); return; }
             const btn = document.getElementById('btnLixi');
             btn.disabled = true;
             try {
                 let randomXu = Math.floor(Math.random() * 81) + 20; 
-                if (confirm(`Mở quà nhận Xu?`)) {
+                if (confirm(`Sử dụng 1 lượt để mở quà may mắn?`)) {
                     const newEntry = `✔️ <b>${userData.username}</b> nhận ${randomXu} Xu`;
                     let updatedLogs = (globalData[0].lixi_log || "") + "|" + newEntry;
+                    
+                    // Cập nhật log
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "config_row"}, set: { lixi_log: updatedLogs } })});
+                    
                     userData.coins = (parseInt(userData.coins) || 0) + randomXu;
                     userData.lixi_count = count - 1;
+                    
+                    // Cập nhật user
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, lixi_count: userData.lixi_count } })});
-                    alert(`Npc xin trả lời: Nhận được ${randomXu} Xu!`);
+                    
+                    alert(`Npc xin trả lời: Bạn nhận được ${randomXu} Xu!`);
                     localStorage.setItem("currentUser", JSON.stringify(userData));
-                    init();
+                    init(); // Refresh data
                 }
             } catch (e) { alert("Lỗi kết nối!"); }
             btn.disabled = false;
@@ -285,9 +130,9 @@
         }
 
         async function useGiftcode() {
-            let code = prompt("Nhập mã:");
+            let code = prompt("Nhập Giftcode:");
             if(!code) return;
-            if(["TANTHU", "LIXI888"].includes(code.toUpperCase())) {
+            if(["TANTHU", "LIXI888", "NPCVIP"].includes(code.toUpperCase())) {
                 userData.lixi_count = (parseInt(userData.lixi_count) || 0) + 5;
                 await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { lixi_count: userData.lixi_count } })});
                 alert("Npc xin trả lời: +5 lượt mở quà!");
