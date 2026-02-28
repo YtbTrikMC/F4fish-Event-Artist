@@ -2,10 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Art</title>
+    <title>Dashboard - NPC Hệ Thống</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* GIỮ NGUYÊN STYLE CŨ */
+        /* --- STYLE GIỮ NGUYÊN --- */
         .level-container { width: 100%; background: #ddd; border-radius: 10px; margin: 10px 0; position: relative; height: 22px; overflow: hidden; }
         .level-bar { height: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60); width: 0%; transition: 0.5s; }
         .level-text { position: absolute; width: 100%; text-align: center; font-size: 12px; line-height: 22px; font-weight: bold; color: #000; z-index: 1; }
@@ -22,37 +22,38 @@
         .rank-list { list-style: none; padding: 10px; background: #fff; border: 1px solid #ddd; border-top: none; margin: 0 auto; max-width: 400px; border-radius: 0 0 5px 5px; }
         .rank-list li { padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 14px; }
 
-        /* STYLE MỚI CHO CASE OPENING */
+        /* --- STYLE CASE OPENING MỚI --- */
         .case-section { background: #1a1a1b; padding: 15px; border-radius: 12px; border: 2px solid #444; margin: 15px auto; max-width: 400px; color: white; text-align: center; }
         #singleView { position: relative; width: 100%; height: 100px; background: #2b2b2b; overflow: hidden; display: flex; align-items: center; border-radius: 5px; margin-bottom: 10px; }
         .pointer { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #ff4757; z-index: 10; transform: translateX(-50%); }
         #shuffler { display: flex; position: absolute; left: 0; }
         .case-item { min-width: 90px; height: 90px; background: #333; border-bottom: 4px solid #ccc; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; margin-right: 2px; }
         .r-1 { border-color: #4b69ff; color: #4b69ff; }
-        .r-0 { border-color: #8847ff; color: #8847ff; }
+        .r-0 { border-color: #576574; color: #8395a7; } /* Màu nhạt cho 0 xu */
         .r-10 { border-color: #d32ee6; color: #d32ee6; }
         .r-50 { border-color: #eb4b4b; color: #eb4b4b; background: linear-gradient(to bottom, #333, #4b2b2b); }
         .multi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; display: none; }
+        #totalSpinsDisplay { color: #2ecc71; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <marquee id="fixedMsg" style="background: #2980b9; color: white; padding: 5px; font-weight: bold;">Đang tải thông báo...</marquee>
+    <marquee id="fixedMsg" style="background: #2980b9; color: white; padding: 5px; font-weight: bold;">Đang tải...</marquee>
     
     <div class="header-bar">
         <div class="balance">Xu: <span id="userCoins">0</span> 🪙 | Level: <span id="userLevel">1</span></div>
-        <button class="gift-btn" onclick="useGiftcode()" style="background:#fbc531; border:none; padding:5px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">GIFTCODE</button>
+        <button class="gift-btn" onclick="useGiftcode()">GIFTCODE</button>
     </div>
 
     <div class="main-content">
         <div class="info-box" id="adminNotice">
             <b>📢 THÔNG BÁO ADMIN:</b><br>
-            - 1 Xu = 100 VNĐ. Đủ 200 Xu quy đổi 10k.<br>
-            - Case Opening: 1 Lượt = 1 Xu.
-            - Mỗi thứ Hai sẽ tiếp nhận đơn nhận tiền mặt.
+            - Tỷ lệ quay hòm đã được cập nhật cực khó!<br>
+            - Đủ 100 Xu quy đổi quà.
         </div>
 
         <div class="case-section">
-            <h4 style="margin: 0 0 10px 0; color: #f1c40f;">🎰 NPC CASE OPENING PRO</h4>
+            <h4 style="margin: 0; color: #f1c40f;">🎰 NPC CASE OPENING PRO</h4>
+            <div id="totalSpinsDisplay">Đã nghiện quay: 0 lượt</div>
             <div id="singleView">
                 <div class="pointer"></div>
                 <div id="shuffler"></div>
@@ -67,20 +68,20 @@
 
         <div class="lucky-box-section">
             <h2>🧧 BAO QUÀ MAY MẮN</h2>
-            <p>Quỹ tặng còn: <span id="poolCoins" style="font-weight:bold; color:#fbc531;">0</span> Xu</p>
+            <p>Quỹ tặng còn: <span id="poolCoins" style="color:#fbc531;">0</span> Xu</p>
             <button id="btnLixi" class="lucky-btn" onclick="openLuckyBox()">MỞ QUÀ NGAY</button>
             <p id="lixiStatus" style="font-size: 11px; margin-top: 5px; font-weight: bold;"></p>
         </div>
 
         <div class="history-box">
             <div class="history-header">📜 NHẬT KÝ NHẬN QUÀ</div>
-            <ul id="historyList" class="history-list"><li>Chưa có nhật ký...</li></ul>
+            <ul id="historyList" class="history-list"></ul>
         </div>
 
         <h3 style="text-align: center; margin-top: 20px;">🏆 BẢNG XẾP HẠNG</h3>
         <div class="rank-tabs">
             <button id="tabXu" class="tab-btn active" onclick="switchRank('xu')">TOP XU</button>
-            <button id="tabLixi" class="tab-btn" onclick="switchRank('lixi')">TOP LƯỢT QUÀ</button>
+            <button id="tabLixi" class="tab-btn" onclick="switchRank('lixi')">TOP QUÀ</button>
         </div>
         <ul id="leaderboardList" class="rank-list"></ul>
     </div>
@@ -90,12 +91,12 @@
         let userData = JSON.parse(localStorage.getItem("currentUser"));
         let globalData = [];
 
-        // TỶ LỆ CASE OPENING
+        // --- GIẢI PHẪU TỶ LỆ MỚI (0 XU CHIẾM 60%) ---
         const caseConfig = [
-            { label: "1 XU", value: 1, weight: 60, class: "r-1" },
-            { label: "0 XU", value: 0, weight: 30, class: "r-0" },
-            { label: "10 XU", value: 10, weight: 8, class: "r-10" },
-            { label: "50 XU", value: 50, weight: 2, class: "r-50" }
+            { label: "0 XU", value: 0, weight: 60, class: "r-0" },    // Trượt (60%)
+            { label: "1 XU", value: 1, weight: 33.5, class: "r-1" }, // Huề (33.5%)
+            { label: "10 XU", value: 10, weight: 6, class: "r-10" },  // Lãi (6%)
+            { label: "50 XU", value: 50, weight: 0.5, class: "r-50" } // Jackpot (0.5%)
         ];
 
         async function init() {
@@ -104,23 +105,24 @@
                 globalData = await res.json();
                 const fresh = globalData.find(u => u.username === userData.username);
                 if(fresh) { userData = fresh; localStorage.setItem("currentUser", JSON.stringify(userData)); }
-                document.getElementById('fixedMsg').innerText = globalData[0].marquee_text || "Chào mừng!";
+                document.getElementById('fixedMsg').innerText = globalData[0].marquee_text || "Chào mừng Npc!";
                 loadLogs();
                 updateUI();
                 switchRank('xu');
-            } catch (e) { console.error("Lỗi tải data"); }
+            } catch (e) { console.error("Lỗi khởi tạo"); }
         }
 
         function updateUI() {
             document.getElementById('userCoins').innerText = userData.coins;
+            document.getElementById('userLevel').innerText = Math.floor((parseInt(userData.level_score) || 0) / 100) + 1;
+            document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
+            // Cập nhật số lượt nghiện
+            document.getElementById('totalSpinsDisplay').innerText = `Đã nghiện quay: ${userData.total_spins || 0} lượt`;
+            
             const admin = globalData.find(u => u.username === "admin");
             document.getElementById('poolCoins').innerText = admin ? admin.coins : "0";
-            document.getElementById('lixiStatus').innerText = `Bạn còn ${userData.lixi_count || 0} lượt mở quà!`;
-            const level = Math.floor((parseInt(userData.level_score) || 0) / 100) + 1;
-            document.getElementById('userLevel').innerText = level;
         }
 
-        // --- LOGIC CASE OPENING ---
         function getRandItem() {
             let rand = Math.random() * 100;
             let sum = 0;
@@ -137,7 +139,9 @@
             document.getElementById('btnSpin1').disabled = true;
             document.getElementById('btnSpin10').disabled = true;
             
-            userData.coins = currentCoins - times; // Trừ phí trước
+            // TRỪ TIỀN VÀ TĂNG LƯỢT NGHIỆN NGAY LẬP TỨC
+            userData.coins = currentCoins - times;
+            userData.total_spins = (parseInt(userData.total_spins) || 0) + times;
             updateUI();
 
             const status = document.getElementById('caseStatus');
@@ -212,34 +216,39 @@
             await fetch(p1, {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins } })
+                body: JSON.stringify({ 
+                    condition: {username: userData.username}, 
+                    set: { 
+                        coins: userData.coins, 
+                        total_spins: userData.total_spins // Lưu lượt quay vào Sheet
+                    } 
+                })
             });
         }
 
-        // --- CÁC HÀM KHÁC GIỮ NGUYÊN ---
+        // --- HÀM MỞ QUÀ ---
         async function openLuckyBox() {
             let count = parseInt(userData.lixi_count) || 0;
-            if (count <= 0) { alert("Npc xin trả lời: Hết lượt rồi!"); return; }
+            if (count <= 0) { alert("Hết lượt rồi!"); return; }
             const btn = document.getElementById('btnLixi');
             btn.disabled = true;
             try {
                 let randomXu = Math.floor(Math.random() * 81) + 20; 
-                let money = randomXu * 100;
-                if (confirm(`Mở quà nhận Xu?`)) {
-                    const newEntry = `✔️ <b>${userData.username}</b> nhận ${randomXu} Xu (~${money}đ)`;
+                if (confirm(`Sử dụng 1 lượt để mở quà?`)) {
+                    const newEntry = `✔️ <b>${userData.username}</b> nhận ${randomXu} Xu`;
                     let updatedLogs = (globalData[0].lixi_log || "") + "|" + newEntry;
+                    
+                    // Cập nhật log và trừ tiền Admin đồng thời
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "config_row"}, set: { lixi_log: updatedLogs } })});
-                    const adminRes = await fetch(p1);
-                    const adminData = await adminRes.json();
-                    const admin = adminData.find(u=>u.username==="admin");
-                    await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: "admin"}, set: { coins: parseInt(admin.coins) - randomXu } })});
+                    
                     userData.coins = (parseInt(userData.coins) || 0) + randomXu;
                     userData.lixi_count = count - 1;
+                    
                     await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { coins: userData.coins, lixi_count: userData.lixi_count } })});
-                    alert(`Npc xin trả lời: Bạn nhận được ${randomXu} Xu (~${money}đ)!`);
+                    
+                    alert(`Npc xin trả lời: Nhận ${randomXu} Xu!`);
                     localStorage.setItem("currentUser", JSON.stringify(userData));
-                    globalData[0].lixi_log = updatedLogs;
-                    loadLogs(); updateUI();
+                    init();
                 }
             } catch (e) { alert("Lỗi kết nối!"); }
             btn.disabled = false;
@@ -258,18 +267,18 @@
             document.getElementById('tabXu').className = type === 'xu' ? 'tab-btn active' : 'tab-btn';
             document.getElementById('tabLixi').className = type === 'lixi' ? 'tab-btn active' : 'tab-btn';
             let sorted = [...globalData].sort((a, b) => (parseInt(b[type === 'xu' ? 'coins' : 'lixi_count']) || 0) - (parseInt(a[type === 'xu' ? 'coins' : 'lixi_count']) || 0));
-            list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${type === 'xu' ? u.coins + ' Xu' : (u.lixi_count || 0) + ' Lượt'}</b></li>`).join('');
+            list.innerHTML = sorted.slice(0, 10).map((u, i) => `<li><span>${i+1}. ${u.username}</span> <b>${u[type === 'xu' ? 'coins' : 'lixi_count'] || 0}</b></li>`).join('');
         }
 
         async function useGiftcode() {
-            let code = prompt("Nhập Giftcode:");
+            let code = prompt("Nhập mã:");
             if(!code) return;
-            if(["TANTHU", "LIXI888", "NPCVIP"].includes(code.toUpperCase())) {
+            if(["TANTHU", "LIXI888"].includes(code.toUpperCase())) {
                 userData.lixi_count = (parseInt(userData.lixi_count) || 0) + 5;
                 await fetch(p1, { method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ condition: {username: userData.username}, set: { lixi_count: userData.lixi_count } })});
-                alert("Npc xin trả lời: +5 lượt mở quà!");
+                alert("Npc xin trả lời: Nhận 5 lượt!");
                 updateUI();
-            } else { alert("Sai mã!"); }
+            } else { alert("Mã sai!"); }
         }
 
         init();
