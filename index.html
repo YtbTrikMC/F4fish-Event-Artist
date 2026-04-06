@@ -2,52 +2,93 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập - Artists</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Npc Music Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        #player-container {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Đăng nhập sai khóa ngay 10 phút</h2>
-        <input type="text" id="username" placeholder="Tài khoản">
-        <input type="password" id="password" placeholder="Mật khẩu">
-        <button id="loginBtn" onclick="login()">Dô web</button>
+
+    <h2>Trình phát nhạc YouTube của Npc</h2>
+    
+    <div id="player-container">
+        <div id="player"></div>
     </div>
 
+    <input type="text" id="videoUrl" placeholder="Dán link YouTube vào đây...">
+    <button onclick="loadVideo()">Phát nhạc</button>
+
     <script>
-        // Cập nhật API ID mới của bạn
-        const p1 = "h" + "tt" + "ps://";
-        const p2 = "api" + "." + "steinhq" + ".com";
-        const p3 = "/v1/storages/";
-        const p4 = "699" + "eda16" + "affba40a" + "6254160c"; 
-        const FULL_URL = p1 + p2 + p3 + p4 + "/Sheet1";
+        // 1. Tải API của YouTube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        async function login() {
-            const userInp = document.getElementById('username').value;
-            const passInp = document.getElementById('password').value;
-            
-            // Logic khóa 10 phút nếu sai 3 lần
-            if (localStorage.getItem('login_lock') > Date.now()) {
-                alert("Bạn bị khóa 10 phút!"); return;
-            }
+        var player;
+        function onYouTubeIframeAPIReady() {
+            // Khởi tạo player nhưng để trống ban đầu
+        }
 
-            alert("ĐỪNG SPAM NÚT ĐĂNG NHẬP, HÃY CHỜ NÓ LOADING");
-            document.getElementById('loginBtn').disabled = true;
+        function loadVideo() {
+            var url = document.getElementById('videoUrl').value;
+            var videoId = extractVideoID(url);
 
-            try {
-                const response = await fetch(`${FULL_URL}?search={"username":"${userInp}"}`);
-                const data = await response.json();
-
-                if (data.length > 0 && data[0].password === passInp) {
-                    localStorage.setItem("currentUser", JSON.stringify(data[0]));
-                    window.location.href = "dashboard.html";
+            if (videoId) {
+                if (player) {
+                    player.loadVideoById(videoId);
                 } else {
-                    let fails = (parseInt(localStorage.getItem('fail_count')) || 0) + 1;
-                    localStorage.setItem('fail_count', fails);
-                    if (fails >= 3) localStorage.setItem('login_lock', Date.now() + 600000);
-                    alert("Sai tài khoản hoặc mật khẩu!");
+                    player = new YT.Player('player', {
+                        height: '200',
+                        width: '350',
+                        videoId: videoId,
+                        events: {
+                            'onReady': onPlayerReady
+                        }
+                    });
                 }
-            } catch (error) { alert("Lỗi kết nối Stein! Hãy tắt Auth và để Editor."); }
-            document.getElementById('loginBtn').disabled = false;
+            } else {
+                alert("Link không hợp lệ bạn ơi!");
+            }
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+        // Hàm lấy ID video từ link
+        function extractVideoID(url) {
+            var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            return (match && match[2].length == 11) ? match[2] : false;
         }
     </script>
 </body>
