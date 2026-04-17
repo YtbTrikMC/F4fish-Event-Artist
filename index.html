@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn Tập Sinh Học - 63 Câu</title>
+    <title>Ôn Tập Sinh Học - 63 Câu - Do NTT dz làm:3</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
         .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
         .header { border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; font-weight: bold; color: #007bff; }
         .question { font-size: 1.15rem; line-height: 1.5; margin-bottom: 20px; color: #333; white-space: pre-line; }
-        .option { display: block; width: 100%; margin: 10px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; text-align: left; background: #fff; font-size: 1rem; transition: 0.2s; }
+        .option { display: block; width: 100%; margin: 10px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; text-align: left; background: #fff; font-size: 1rem; transition: 0.2s; box-sizing: border-box; }
         .option:hover { background: #f8f9fa; border-color: #007bff; }
         .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
         .wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
@@ -35,6 +35,7 @@
 
     <div id="result-ui" class="result-box" style="display: none;">
         <h2>KẾT QUẢ CỦA BẠN</h2>
+        <p>(Chỉ tính điểm các câu chọn đúng ngay lần đầu)</p>
         <div class="score" id="finalScore"></div>
         <div id="correctCount"></div>
         <div class="comment" id="commentText"></div>
@@ -43,75 +44,76 @@
 </div>
 
 <script>
-    // Dữ liệu 63 câu hỏi của bạn
+    // Toàn bộ 63 câu hỏi của bạn (giống như danh sách trước)
     const quizData = [
         {q: "Câu 1. Bằng chứng tiến hóa nào sau đây là bằng chứng sinh học phân tử ?", opts: ["A. Protein của các loài sinh vật đều cấu tạo từ 20 loại amino acid.", "B. Xương tay của người tương đồng với cấu trúc chi trước của mèo.", "C. Tất cả các loài sinh vật đều được cấu tạo từ tế bào.", "D. Xác sinh vật sống trong các thời đại trước được bảo quản trong các lớp băng."], correct: 0},
         {q: "Câu 2. Hiện nay, tất cả các cơ thể sinh vật từ đơn bào đến đa bào đều được cấu tạo từ tế bào. Đây là một trong những bằng chứng chứng tỏ:", opts: ["A. quá trình tiến hoá đồng quy của sinh giới (tiến hoá hội tụ).", "B. nguồn gốc thống nhất của các loài.", "C. vai trò của các yếu tố ngẫu nhiên đối với quá trình tiến hoá.", "D. sự tiến hoá không ngừng của sinh giới."], correct: 1},
         {q: "Câu 3. Đâu không phải là bằng chứng sinh học phân tử?", opts: ["A. Protein của loài đều cấu tạo từ khoảng 20 loại amino acid.", "B. Cơ thể sống đều đuợc cấu tạo từ tế bào.", "C. Mã di truyền của đa số các loài sinh vật đều có đặc điểm giống nhau.", "D. DNA của các loài sinh vật đều đuợc cấu tạo từ 4 nucleotide."], correct: 1},
-        {q: "Câu 4. Phân tích bảng dữ liệu gen mã hóa enzyme, có thể dự đoán về mối quan hệ họ hàng giữa các loài là:", opts: ["A. A và C gần gũi nhất, B và D xa nhau nhất.", "B. B và D gần gũi nhất, B và C xa nhau nhất.", "C. A và B gần gũi nhất, C và D xa nhau nhất.", "D. A và D gần gũi nhất, B và C xa nhau nhất."], correct: 1},
-        {q: "Câu 5. Căn cứ vào mức độ giống nhau DNA so với người, trật tự quan hệ họ hàng xa dần là:", opts: ["A. Người - Tinh tinh - khỉ Vervet - vượn Gibbon - khỉ Capuchin - khỉ Rhesus", "B. Người - Tinh tinh - vượn Gibbon - khỉ Rhesus - khỉ Vervet - khỉ Capuchin", "C. Người - Tinh tinh - khỉ Rhesus - vượn Gibbon - khỉ Capuchin - khỉ Vervet", "D. Người - Tinh tinh - vượn Gibbon - khỉ Vervet - khỉ Rhesus - khỉ Capuchin"], correct: 1},
-        {q: "Câu 6. Dựa trên cây tiến hóa, có bao nhiêu phát biểu đúng về mối quan hệ họ hàng?", opts: ["A. 2", "B. 3", "C. 4", "D. 5"], correct: 1},
-        {q: "Câu 1. Người đầu tiên đưa ra khái niệm biến dị cá thể là:", opts: ["A. Lamarck.", "B. Mendel.", "C. Morgan.", "D. Darwin."], correct: 3},
-        {q: "Câu 2. Theo Darwin, nguyên liệu chủ yếu cho chọn lọc tự nhiên là:", opts: ["A. thường biến.", "B. biến dị tổ hợp.", "C. đột biến.", "D. biến dị cá thể."], correct: 3},
-        {q: "Câu 3. Theo Darwin, kết quả của chọn lọc tự nhiên là:", opts: ["A. tạo nên nhiều loài sinh vật từ một loài ban đầu.", "B. sự đào thải tất cả các biến dị không thích nghi.", "C. sự sinh sản ưu thế của các cá thể thích nghi.", "D. tạo nên sự đa dạng trong sinh giới."], correct: 0},
-        {q: "Câu 4. Theo Darwin, động lực thúc đẩy chọn lọc tự nhiên là:", opts: ["A. sự cạnh tranh giữa các sinh vật (đấu tranh sinh tồn).", "B. đột biến nguồn nguyên liệu chủ yếu.", "C. thường biến.", "D. biến dị tổ hợp."], correct: 0},
-        {q: "Câu 5. Đóng góp quan trọng nhất của học thuyết Darwin là:", opts: ["A. giải thích được sự hình thành loài mới.", "B. đề xuất khái niệm biến dị cá thể.", "C. giải thích thành công sự hợp lí tương đối.", "D. phát hiện vai trò của chọn lọc tự nhiên và chọn lọc nhân tạo."], correct: 3},
-        {q: "Câu 6. Sâu ăn lá có màu xanh lục được hình thành do:", opts: ["A. đột biến xuất hiện ngẫu nhiên.", "B. tích lũy các biến dị cá thể màu xanh qua nhiều thế hệ.", "C. sâu tự biến đổi màu.", "D. ảnh hưởng trực tiếp của lá cây."], correct: 1},
-        {q: "Câu 1. Tiến hoá nhỏ là quá trình:", opts: ["A. hình thành các nhóm trên loài.", "B. duy trì ổn định kiểu gene.", "C. biến đổi tần số allele và thành phần kiểu gene.", "D. củng cố ngẫu nhiên các allele trung tính."], correct: 2},
-        {q: "Câu 2. Phát biểu đúng về dòng gene:", opts: ["A. luôn làm nghèo vốn gene.", "B. nhập cư mang đến allele mới làm phong phú vốn gene.", "C. nhập cư bằng xuất cư thì không đổi tần số kiểu gene.", "D. xuất cư chỉ đổi tần số allele."], correct: 1},
-        {q: "Câu 3. Nhóm người di cư đến hòn đảo lập quần thể mới có tần số allele khác biệt là:", opts: ["A. Chọn lọc tự nhiên.", "B. Đột biến.", "C. Dòng gene.", "D. Phiêu bạt di truyền."], correct: 1},
-        {q: "Câu 4. Sự thích nghi của một sinh vật là:", opts: ["A. thay đổi hình thái, sinh lí giúp tồn tại phát triển.", "B. biến đổi kiểu gene phù hợp.", "C. có kiểu gene phù hợp mọi điều kiện.", "D. chỉ biến đổi hình thái."], correct: 0},
-        {q: "Câu 5. Chuột lông vàng ở cát, xám đen ở đất xám. Ví dụ này mô tả:", opts: ["A. Đặc điểm thích nghi chỉ mang tính hợp lý tương đối.", "B. Đặc điểm thích nghi liên tục thay đổi.", "C. Giá trị thích nghi trung bình.", "D. Sinh vật tự điều chỉnh cho phù hợp."], correct: 0},
-        {q: "Câu 6. Ngăn cản giao phối hoặc đời con không hữu thụ là:", opts: ["A. cách li địa lí.", "B. cách li sinh thái.", "C. cách li sinh sản.", "D. cách li tập tính."], correct: 2},
-        {q: "Câu 7. Loài Cải bắp Raphanus brassica (2n=36) hình thành do:", opts: ["A. Con đường địa lí.", "B. Thời gian ngắn (lai xa và đa bội hóa).", "C. Không sống cùng môi trường loài cũ.", "D. Phổ biến ở động vật."], correct: 1},
-        {q: "Câu 8. Nhận định SAI về chọn lọc tự nhiên (hiện đại):", opts: ["A. Tác động trực tiếp lên từng allele riêng rẽ.", "B. Chống lại allele trội nhanh chóng đổi tần số.", "C. Chống lại allele lặn không bao giờ loại hết.", "D. Môi trường đổi một hướng thì tần số đổi một hướng."], correct: 0},
-        {q: "Câu 1. Kết quả của tiến hoá hóa học là:", opts: ["A. hình thành tế bào sơ khai.", "B. hình thành chất hữu cơ phức tạp.", "C. hình thành sinh vật đa bào.", "D. hình thành hệ sinh vật đa dạng."], correct: 1},
-        {q: "Câu 2. Hình thành hữu cơ từ vô cơ ở giai đoạn hóa học là nhờ:", opts: ["A. năng lượng nhân tạo.", "B. enzyme.", "C. nguồn năng lượng tự nhiên (sấm sét, tia cực tím).", "D. mưa kéo dài."], correct: 2},
-        {q: "Câu 3. Các giai đoạn phát sinh sự sống lần lượt là:", opts: ["A. hóa học -> tiền sinh học -> sinh học.", "B. hóa học -> sinh học -> tiền sinh học.", "C. tiền sinh học -> hóa học -> sinh học.", "D. sinh học -> tiền sinh học -> sinh học."], correct: 0},
-        {q: "Câu 4. Sự kiện KHÔNG diễn ra trong tiến hoá hoá học:", opts: ["A. Nucleotide tạo nucleic acid.", "B. Amino acid tạo polypeptide.", "C. Hình thành các tế bào sơ khai.", "D. Vô cơ tạo hữu cơ đơn giản."], correct: 2},
-        {q: "Câu 5. Phát biểu KHÔNG đúng về nguồn gốc sự sống:", opts: ["A. Gồm 3 giai đoạn: Hóa học, Tiền sinh học, Sinh học.", "B. Tiến hóa hóa học tạo hữu cơ từ vô cơ.", "C. Tiền sinh học tạo tế bào sơ khai.", "D. Tiến hóa sinh học tổng hợp hữu cơ từ vô cơ theo phương thức sinh học."], correct: 3},
-        {q: "Câu 6. Tại sao hiện nay không thể hình thành tế bào sơ khai tự nhiên?", opts: ["A. Thiếu hữu cơ trong đại dương.", "B. Bị phân hủy bởi oxygen tự do hoặc vi sinh vật.", "C. Thiếu năng lượng tổng hợp.", "D. Thiếu vô cơ nguyên thủy."], correct: 1},
-        {q: "Câu 1. Cơ sở chia lịch sử quả đất thành các đại, kỉ là:", opts: ["A. Thời gian hình thành.", "B. Lịch sử sinh vật.", "C. Biến đổi địa chất, khí hậu và hóa thạch.", "D. Khoáng sản trong lòng đất."], correct: 2},
-        {q: "Câu 2. Người ta chia phát triển trái đất thành:", opts: ["A. 5 đại 11 kỉ.", "B. 6 đại 11 kỉ.", "C. 6 đại 12 kỉ.", "D. 5 đại 12 kỉ."], correct: 0},
-        {q: "Câu 3. Loài người xuất hiện ở:", opts: ["A. Kỉ Đệ tứ, đại Tân sinh.", "B. Kỉ Phấn trắng, đại Trung sinh.", "C. Kỉ Đệ tam, đại Tân sinh.", "D. Kỉ Tam điệp, đại Trung sinh."], correct: 0},
-        {q: "Câu 4. Trình tự tiến hóa chi Homo là:", opts: ["A. Habilis -> Erectus -> Neanderthalensis -> Sapiens.", "B. Erectus -> Habilis -> Sapiens.", "C. Habilis -> Neanderthalensis -> Erectus -> Sapiens.", "D. Homo habilis -> Homo erectus -> Homo sapiens."], correct: 3},
-        {q: "Câu 5. Khẳng định KHÔNG đúng về Homo sapiens:", opts: ["A. Từ Erectus hình thành Sapiens.", "B. Người và vượn người tách nhau cách đây 5-7 triệu năm.", "C. Habilis có hộp sọ lớn hơn Erectus và biết dùng lửa.", "D. Loài đầu tiên chi Homo là Habilis."], correct: 2},
-        {q: "Câu 6. Phát biểu KHÔNG đúng:", opts: ["A. Tay người là sản phẩm của lao động.", "B. Lao động giúp thoát khỏi trình độ động vật.", "C. Phát sinh loài người từ cuối kỉ Đệ tứ.", "D. Tiếng nói phát sinh từ nhu cầu trao đổi kinh nghiệm."], correct: 2},
-        {q: "Câu 7. Đặc điểm CHƯA có ở vượn người hoá thạch:", opts: ["A. Đứng thẳng đi 2 chân.", "B. Biết dùng cành cây lấy thức ăn.", "C. Hình dạng kích thước giống người.", "D. Biểu lộ cảm xúc vui buồn."], correct: 1},
-        {q: "Câu 1. Môi trường sống bao gồm các nhân tố:", opts: ["A. vô sinh và hữu sinh ảnh hưởng trực tiếp.", "B. hữu sinh ảnh hưởng trực tiếp.", "C. bao quanh ảnh hưởng sự sinh trưởng, phát triển, tồn tại.", "D. hữu sinh ảnh hưởng trực tiếp hoặc gián tiếp."], correct: 2},
+        {q: "Câu 4. Cho biết gene mã hóa enzyme ở các loài khác nhau trình tự nucleotide. Mối quan hệ họ hàng là:", opts: ["A. A và C gần nhất, B và D xa nhất.", "B. B và D gần nhất, B và C xa nhất.", "C. A và B gần nhất, C và D xa nhất.", "D. A và D gần nhất, B và C xa nhất."], correct: 1},
+        {q: "Câu 5. Căn cứ kết quả DNA, mối quan hệ họ hàng xa dần giữa người và linh trưởng là:", opts: ["A. Người - Tinh tinh - khỉ Vervet - vượn Gibbon - khỉ Capuchin - khỉ Rhesus", "B. Người - Tinh tinh - vượn Gibbon - khỉ Rhesus - khỉ Vervet - khỉ Capuchin", "C. Người - Tinh tinh - khỉ Rhesus - vượn Gibbon - khỉ Capuchin - khỉ Vervet", "D. Người - Tinh tinh - vượn Gibbon - khỉ Vervet - khỉ Rhesus - khỉ Capuchin"], correct: 1},
+        {q: "Câu 6. Dựa trên cây tiến hóa, phát biểu đúng phản ánh mối quan hệ họ hàng là:", opts: ["A. 2", "B. 3", "C. 4", "D. 5"], correct: 1},
+        {q: "Câu 1. Người đầu tiên đưa ra khái niệm biến dị cá thể là", opts: ["A. Lamarck.", "B. Mendel.", "C. Morgan.", "D. Darwin."], correct: 3},
+        {q: "Câu 2. Theo Darwin, nguyên liệu chủ yếu cho chọn lọc tự nhiên là", opts: ["A. thường biến.", "B. biến dị tổ hợp.", "C. đột biến.", "D. biến dị cá thể."], correct: 3},
+        {q: "Câu 3. Theo Darwin, kết quả của chọn lọc tự nhiên là", opts: ["A. tạo nên nhiều loài sinh vật từ một loài ban đầu.", "B. sự đào thải tất cả các biến dị không thích nghi.", "C. sự sinh sản ưu thế của các cá thể thích nghi.", "D. tạo nên sự đa dạng trong sinh giới."], correct: 0},
+        {q: "Câu 4. Theo Darwin, động lực thúc đẩy chọn lọc tự nhiên là", opts: ["A. sự cạnh tranh giữa các sinh vật (đấu tranh sinh tồn).", "B. đột biến nguồn nguyên liệu chủ yếu.", "C. thường biến.", "D. biến dị tổ hợp."], correct: 0},
+        {q: "Câu 5. Đóng góp quan trọng nhất của học thuyết Darwin là", opts: ["A. giải thích được sự hình thành loài mới.", "B. đề xuất khái niệm biến dị cá thể.", "C. giải thích thành công sự hợp lí tương đối.", "D. phát hiện vai trò của chọn lọc tự nhiên và chọn lọc nhân tạo."], correct: 3},
+        {q: "Câu 6. Sâu ăn lá thường có màu xanh lục được hình thành do", opts: ["A. đột biến xuất hiện ngẫu nhiên.", "B. tích lũy các biến dị cá thể màu xanh lục qua nhiều thế hệ.", "C. sâu tự biến đổi màu.", "D. ảnh hưởng trực tiếp của lá cây."], correct: 1},
+        {q: "Câu 1. Theo thuyết tiến hoá tổng hợp thì tiến hoá nhỏ là quá trình", opts: ["A. hình thành các nhóm phân loại trên loài.", "B. duy trì ổn định thành phần kiểu gene.", "C. biến đổi tần số allele và thành phần kiểu gene.", "D. củng cố ngẫu nhiên những allele trung tính."], correct: 2},
+        {q: "Câu 2. Khi nói về dòng gene, phát biểu nào sau đây đúng?", opts: ["A. làm nghèo vốn gene, giảm đa dạng di truyền.", "B. nhập cư có thể mang đến những allele mới làm phong phú vốn gene.", "C. nhập cư bằng xuất cư thì không làm thay đổi tần số kiểu gene.", "D. xuất cư chỉ làm đổi tần số allele."], correct: 1},
+        {q: "Câu 3. Nhóm người di cư đến hòn đảo lập quần thể mới là kết quả của:", opts: ["A. Chọn lọc tự nhiên.", "B. Đột biến.", "C. Dòng gene.", "D. Phiêu bạt di truyền."], correct: 1},
+        {q: "Câu 4. Sự thích nghi của một sinh vật là", opts: ["A. sự thay đổi hình thái, giải phẫu, sinh lí phù hợp điều kiện sống.", "B. sự biến đổi kiểu gene phù hợp.", "C. khả năng của sinh vật có một kiểu gene phù hợp mọi điều kiện.", "D. chỉ có thể biến đổi hình thái."], correct: 0},
+        {q: "Câu 5. Chuột lông vàng ở cát, xám đen ở đất xám. Ví dụ này mô tả:", opts: ["A. Đặc điểm thích nghi chỉ mang tính hợp lý tương đối.", "B. Đặc điểm thích nghi liên tục thay đổi.", "C. Giá trị thích nghi trung bình.", "D. Tùy vào môi trường điều chỉnh đặc điểm."], correct: 0},
+        {q: "Câu 6. Ngăn cản cá thể giao phối hoặc không sinh ra đời con hữu thụ là:", opts: ["A. cách li địa lí.", "B. cách li sinh thái.", "C. cách li sinh sản.", "D. cách li tập tính."], correct: 2},
+        {q: "Câu 7. Loài Cải bắp Raphanus brassica (2n = 36) hình thành do:", opts: ["A. con đường địa lí.", "B. quá trình diễn ra trong thời gian ngắn (lai xa và đa bội hóa).", "C. không sống cùng môi trường với loài cũ.", "D. phổ biến ở động vật."], correct: 1},
+        {q: "Câu 8. Khi nói về chọn lọc tự nhiên, nhận định nào sau đây sai?", opts: ["A. Tác động trực tiếp lên từng allele riêng rẽ.", "B. Chống lại allele trội nhanh chóng đổi tần số allele.", "C. Chống lại allele lặn không bao giờ loại hết khỏi quần thể.", "D. Môi trường thay đổi theo một hướng thì tần số đổi theo một hướng."], correct: 0},
+        {q: "Câu 1. Kết quả của tiến hoá hóa học là", opts: ["A. hình thành tế bào sơ khai.", "B. hình thành chất hữu cơ phức tạp.", "C. hình thành sinh vật đa bào.", "D. hình thành hệ sinh vật đa dạng."], correct: 1},
+        {q: "Câu 2. Sự hình thành chất hữu cơ từ vô cơ ở giai đoạn hóa học nhờ:", opts: ["A. nguồn năng lượng nhân tạo.", "B. tác động của enzyme.", "C. tác dụng của các nguồn năng lượng tự nhiên.", "D. các trận mưa kéo dài."], correct: 2},
+        {q: "Câu 3. Sự sống trên Trái Đất phát triển lần lượt qua các giai đoạn:", opts: ["A. hóa học -> tiền sinh học -> sinh học.", "B. hóa học -> sinh học -> tiền sinh học.", "C. tiền sinh học -> hóa học -> sinh học.", "D. sinh học -> tiền sinh học -> sinh học."], correct: 0},
+        {q: "Câu 4. Sự kiện KHÔNG diễn ra trong giai đoạn tiến hoá hoá học?", opts: ["A. Nucleotide tạo nên nucleic acid.", "B. Amino acid tạo nên chuỗi polypeptide.", "C. Hình thành nên các tế bào sơ khai.", "D. Vô cơ hình thành nên hữu cơ đơn giản."], correct: 2},
+        {q: "Câu 5. Phát biểu KHÔNG đúng khi nói về nguồn gốc sự sống?", opts: ["A. Chia thành hóa học, tiền sinh học và sinh học.", "B. Tiến hóa hóa học hình thành hữu cơ từ vô cơ.", "C. Tiến hóa tiền sinh học hình thành tế bào sơ khai.", "D. Tiến hóa sinh học tổng hợp hữu cơ từ vô cơ theo phương thức sinh học."], correct: 3},
+        {q: "Câu 6. Tại sao hiện nay các đại phân tử hữu cơ không thể tiến hóa thành tế bào sơ khai?", opts: ["A. Không đủ phân tử hữu cơ trong đại dương.", "B. Sẽ bị phân hủy bởi oxygen tự do hoặc vi sinh vật.", "C. Không đủ năng lượng tổng hợp.", "D. Không có đủ chất vô cơ thời nguyên thủy."], correct: 1},
+        {q: "Câu 1. Cơ sở để chia lịch sử quả đất thành các đại, các kỉ?", opts: ["A. Thời gian hình thành.", "B. Lịch sử phát triển sinh vật.", "C. Biến đổi địa chất, khí hậu và hóa thạch.", "D. Hóa thạch và khoáng sản."], correct: 2},
+        {q: "Câu 2. Người ta chia giai đoạn phát triển của trái đất thành:", opts: ["A. 5 đại và 11 kỉ.", "B. 6 đại và 11 kỉ.", "C. 6 đại và 12 kỉ.", "D. 5 đại và 12 kỉ."], correct: 0},
+        {q: "Câu 3. Trong lịch sử phát triển, loài người xuất hiện ở:", opts: ["A. Kỉ Đệ tứ của đại Tân sinh.", "B. Kỉ Phấn trắng của đại Trung sinh.", "C. Kỉ Đệ tam của đại Tân sinh.", "D. Kỉ Tam điệp của đại Trung sinh."], correct: 0},
+        {q: "Câu 4. Trình tự tiến hóa hình thành các loài trong chi Homo là:", opts: ["A. Habilis -> Erectus -> Neanderthalensis -> Sapiens.", "B. Erectus -> Habilis -> Sapiens.", "C. Habilis -> Neanderthalensis -> Eretus -> Sapiens.", "D. Homo habilis -> Homo erectus -> Homo sapiens."], correct: 3},
+        {q: "Câu 5. Khẳng định KHÔNG đúng trong quá trình phát sinh Homo sapiens?", opts: ["A. Từ Erectus đã hình thành Sapiens.", "B. Người và vượn người tách nhau cách đây 5-7 triệu năm.", "C. Habilis có hộp sọ lớn hơn Erectus và biết dùng lửa.", "D. Loài xuất hiện đầu tiên chi Homo là Habilis."], correct: 2},
+        {q: "Câu 6. Phát biểu nào sau đây là KHÔNG đúng?", opts: ["A. Tay người là sản phẩm của quá trình lao động.", "B. Lao động làm con người thoát khỏi trình độ động vật.", "C. Quá trình phát sinh người bắt đầu từ cuối kỉ Đệ tứ.", "D. Tiếng nói phát sinh từ nhu cầu trao đổi kinh nghiệm."], correct: 2},
+        {q: "Câu 7. Đặc điểm nào sau đây CHƯA có ở vượn người hoá thạch?", opts: ["A. Đứng thẳng và đi bằng hai chân.", "B. Biết dùng cành cây để lấy thức ăn.", "C. Hình dạng kích thước tương đồng người.", "D. Biểu lộ cảm xúc vui buồn."], correct: 1},
+        {q: "Câu 1. Môi trường sống bao gồm tất cả các nhân tố:", opts: ["A. vô sinh và hữu sinh ảnh hưởng trực tiếp.", "B. hữu sinh ảnh hưởng trực tiếp.", "C. bao quanh ảnh hưởng sinh trưởng, tồn tại.", "D. hữu sinh ảnh hưởng trực tiếp hoặc gián tiếp."], correct: 2},
         {q: "Câu 2. Nhân tố sinh thái vô sinh là:", opts: ["A. Nấm.", "B. Cỏ.", "C. Xác động vật.", "D. Giun đất."], correct: 2},
         {q: "Câu 3. Nhân tố sinh thái hữu sinh là:", opts: ["A. Ánh sáng, nhiệt độ.", "B. Chế độ khí hậu.", "C. Con người và các sinh vật khác.", "D. Các sinh vật khác và ánh sáng."], correct: 2},
-        {q: "Câu 4. Giới hạn sinh thái là:", opts: ["A. khoảng giá trị nhiều nhân tố.", "B. khoảng giá trị một nhân tố mà sinh vật tồn tại, phát triển.", "C. không gian chứa tất cả nhân tố.", "D. giá trị cực đại của một nhân tố."], correct: 1},
-        {q: "Câu 5. Cá rô phi sống từ 5,6 - 42°C là ví dụ về quy luật:", opts: ["A. Tác động tổng hợp.", "B. Tác động không đồng đều.", "C. Tác động qua lại.", "D. Quy luật giới hạn sinh thái."], correct: 3},
-        {q: "Câu 6. Tại sao nhiệt độ tăng gây sốc nhiệt?", opts: ["A. Giảm oxy.", "B. Tăng trao đổi chất quá mức.", "C. Giảm khả năng duy trì phản ứng sinh hóa thiết yếu.", "D. Giảm lượng nước."], correct: 2},
-        {q: "Câu 7. Tại sao động vật máu lạnh bị ảnh hưởng nặng khi nhiệt độ đổi?", opts: ["A. Cần ổn định để duy trì chức năng.", "B. Điều chỉnh nhiệt độ cơ thể kém.", "C. Không chịu được mức nhiệt khác nhau.", "D. Không có cơ chế điều chỉnh nhiệt độ cơ thể."], correct: 1},
+        {q: "Câu 4. Giới hạn sinh thái là:", opts: ["A. khoảng giá trị nhiều nhân tố.", "B. khoảng giá trị một nhân tố sinh vật tồn tại phát triển.", "C. không gian chứa tất cả nhân tố.", "D. giá trị cực đại của một nhân tố."], correct: 1},
+        {q: "Câu 5. Ví dụ Cá rô phi sống từ 5,6 - 42°C nói lên quy luật:", opts: ["A. Tác động tổng hợp.", "B. Tác động không đồng đều.", "C. Tác động qua lại.", "D. Quy luật giới hạn sinh thái."], correct: 3},
+        {q: "Câu 6. Tại sao nhiệt độ tăng gây sốc nhiệt?", opts: ["A. Giảm oxy.", "B. Tăng trao đổi chất quá mức.", "C. Giảm khả năng duy trì phản ứng sinh hóa.", "D. Giảm lượng nước."], correct: 2},
+        {q: "Câu 7. Tại sao động vật máu lạnh bị ảnh hưởng nặng khi nhiệt độ đổi?", opts: ["A. Cần ổn định để duy trì chức năng.", "B. Khả năng điều chỉnh nhiệt độ kém.", "C. Không có khả năng chịu đựng mức nhiệt khác.", "D. Không có cơ chế điều chỉnh nhiệt độ."], correct: 1},
         {q: "Câu 8. Có bao nhiêu ví dụ mô tả nhịp sinh học?", opts: ["A. 2.", "B. 3.", "C. 4.", "D. 5."], correct: 1},
-        {q: "Câu 1. Ruồi nhà nhiều vào mùa hè là biến động:", opts: ["A. Chu kì năm.", "B. Không phải biến động.", "C. Chu kì mùa.", "D. Không chu kì."], correct: 2},
-        {q: "Câu 2. Kiểu phân bố phổ biến nhất:", opts: ["A. Ngẫu nhiên.", "B. Theo nhóm.", "C. Đồng đều.", "D. Theo độ tuổi."], correct: 1},
-        {q: "Câu 3. Thứ tự kích thước quần thể LỚN dần:", opts: ["A. Bọ dừa, nhái, chuột, thỏ, sói, voi.", "B. Voi, thỏ, sói, chuột, nhái, bọ dừa.", "C. Nhái, chuột, bọ dừa, sói, thỏ, voi.", "D. Voi, chó sói, thỏ, chuột cống, nhái bén, bọ dừa."], correct: 3},
-        {q: "Câu 4. Đặc điểm có ở một quần thể là:", opts: ["A. (2), (3), (4) và (5).", "B. (1), (2), (4) và (7).", "C. (3), (4), (5) và (6).", "D. (4), (5), (6) và (7)."], correct: 0},
-        {q: "Câu 5. Ví dụ cạnh tranh trong quần thể:", opts: ["A. Thông liền rễ.", "B. Bồ nông xếp hàng.", "C. Cá mập con ăn trứng chưa nở.", "D. Chó rừng bắt trâu rừng."], correct: 2},
-        {q: "Câu 6. Thả thêm rong vào hồ cá cạnh tranh gay gắt để:", opts: ["A. Giảm sự cạnh tranh.", "B. Tăng oxy.", "C. Làm thức ăn.", "D. Giữ pH."], correct: 0},
-        {q: "Câu 7. Biến động số lượng KHÔNG theo chu kì:", opts: ["A. Ếch chết do mùa đông rét đột ngột.", "B. Chim cu gáy xuất hiện mùa lúa.", "C. Cáo tăng theo chu kì 3-4 năm.", "D. Sâu hại mùa xuân."], correct: 0},
+        {q: "Câu 1. Ruồi nhà xuất hiện nhiều vào mùa hè là biến động:", opts: ["A. Chu kì năm.", "B. Không phải biến động.", "C. Chu kì mùa.", "D. Không theo chu kì."], correct: 2},
+        {q: "Câu 2. Kiểu phân bố phổ biến nhất trong tự nhiên:", opts: ["A. Ngẫu nhiên.", "B. Theo nhóm.", "C. Đồng đều.", "D. Theo độ tuổi."], correct: 1},
+        {q: "Câu 3. Thứ tự theo kích thước quần thể LỚN dần là:", opts: ["A. Bọ dừa, nhái, chuột, thỏ, sói, voi.", "B. Voi, thỏ, sói, chuột, nhái, bọ dừa.", "C. Nhái, chuột, bọ dừa, sói, thỏ, voi.", "D. Voi, chó sói, thỏ, chuột cống, nhái bén, bọ dừa."], correct: 3},
+        {q: "Câu 4. Những đặc điểm nào có thể có ở một quần thể?", opts: ["A. (2), (3), (4) và (5).", "B. (1), (2), (4) và (7).", "C. (3), (4), (5) và (6).", "D. (4), (5), (6) và (7)."], correct: 0},
+        {q: "Câu 5. Ví dụ thể hiện mối quan hệ cạnh tranh trong quần thể?", opts: ["A. Thông nhựa liền rễ.", "B. Bồ nông xếp hàng.", "C. Cá mập con ăn trứng chưa nở.", "D. Chó rừng cùng bắt trâu."], correct: 2},
+        {q: "Câu 6. Thả rong vào hồ cá cạnh tranh gay gắt nhằm:", opts: ["A. Giảm sự cạnh tranh giữa 2 loài.", "B. Tăng hàm lượng oxi.", "C. Làm nguồn thức ăn.", "D. Giữ pH ổn định."], correct: 0},
+        {q: "Câu 7. Biến động số lượng cá thể KHÔNG theo chu kì?", opts: ["A. Ếch chết do mùa đông rét đột ngột.", "B. Chim cu gáy mùa lúa.", "C. Cáo tăng chu kì 3-4 năm.", "D. Sâu hại mùa xuân."], correct: 0},
         {q: "Câu 8. Tảo biển sinh sản tăng ban ngày, giảm ban đêm là:", opts: ["A. Nhịp chu kì ngày đêm.", "B. Biến động chu kì ngày đêm.", "C. Biến động không chu kì.", "D. Thường biến."], correct: 1},
-        {q: "Câu 1. Quần xã là:", opts: ["A. Tập hợp cùng loài.", "B. Tập hợp khác loài cùng sống một không gian.", "C. Tập hợp khác loài cùng khu vực thời điểm.", "D. Tập hợp khác loài, cùng không gian, vào thời điểm nhất định."], correct: 3},
-        {q: "Câu 2. Đặc trưng cơ bản của quần xã là:", opts: ["A. Thành phần loài, lứa tuổi.", "B. Độ phong phú, phân bố.", "C. Thành phần loài, sinh sản tử vong.", "D. Thành phần loài, sự phân bố, chức năng dinh dưỡng."], correct: 3},
-        {q: "Câu 3. Mức độ phong phú về số loài là:", opts: ["A. độ nhiều.", "B. độ đa dạng.", "C. độ thường gặp.", "D. sự phổ biến."], correct: 1},
-        {q: "Câu 4. Loài ưu thế có vai trò quan trọng vì:", opts: ["A. số lượng nhiều.", "B. sức sống mạnh, sinh khối lớn.", "C. tiêu diệt loài khác.", "D. số lượng nhiều, sinh khối lớn, hoạt động mạnh."], correct: 3},
-        {q: "Câu 5. Quan hệ hỗ trợ trong quần xã gồm:", opts: ["A. cộng sinh, hợp tác, tương trợ.", "B. cộng gộp, hợp tác, hội sinh.", "C. cộng sinh, hợp tác, hội sinh.", "D. tương trợ, hợp tác, hội sinh."], correct: 2},
-        {q: "Câu 6. Rận hút máu chó là:", opts: ["A. hội sinh.", "B. cộng sinh.", "C. hợp tác.", "D. kí sinh - vật chủ."], correct: 3},
-        {q: "Câu 7. Sư tử ăn linh dương là:", opts: ["A. hợp tác.", "B. hỗ trợ.", "C. cạnh tranh.", "D. động vật ăn thịt - con mồi."], correct: 3},
-        {q: "Câu 8. Ví dụ về cạnh tranh:", opts: ["A. Giun sán trong lợn.", "B. Cỏ dại và lúa.", "C. Khuẩn lam và động vật xung quanh.", "D. Thỏ và sói."], correct: 1},
-        {q: "Câu 9. Một loài có lợi, một loài không lợi cũng không hại là:", opts: ["A. Cộng sinh.", "B. Hội sinh.", "C. Hợp tác.", "D. Ức chế."], correct: 1},
-        {q: "Câu 10. Quan hệ hỗ trợ biểu hiện ở:", opts: ["A. cộng sinh, hội sinh, hợp tác.", "B. quần tụ bầy đàn.", "C. kí sinh, ăn thịt, ức chế.", "D. cộng sinh, hội sinh, kí sinh."], correct: 0},
-        {q: "Câu 11. Ví dụ về cạnh tranh:", opts: ["A. Giun sán trong lợn.", "B. Cỏ dại và lúa trên cánh đồng.", "C. Phong lan trên cây gỗ.", "D. Thỏ và sói."], correct: 1},
-        {q: "Câu 12. Sơ đồ (+)/(-) là mối quan hệ:", opts: ["A. Ức chế và kí sinh.", "B. Cạnh tranh và ăn thịt.", "C. Cộng sinh, ức chế.", "D. Kí sinh - vật chủ và động vật ăn thực vật."], correct: 3},
-        {q: "Câu 13. Loài ngoại lai là loài:", opts: ["A. Xuất hiện ở khu vực vốn không phải môi trường tự nhiên.", "B. Sinh sống một khu vực nhất định.", "C. Di chuyển định kì.", "D. Có tính trạng chung hình thái."], correct: 0},
-        {q: "Câu 14. Loài ngoại lai xâm hại là:", opts: ["A. lấn chiếm nơi sinh sống hoặc gây hại loài bản địa.", "B. có lợi loài bản địa.", "C. cung cấp dinh dưỡng loài bản địa.", "D. bảo vệ loài bản địa."], correct: 0}
+        {q: "Câu 1: Quần xã là:", opts: ["A. Tập hợp cùng loài.", "B. Tập hợp khác loài cùng không gian xác định.", "C. Tập hợp khác loài cùng khu vực thời điểm nhất định.", "D. Tập hợp khác loài, cùng không gian xác định, vào thời điểm nhất định."], correct: 3},
+        {q: "Câu 2: Các đặc trung cơ bản của quần xã là:", opts: ["A. Thành phần loài, mật độ.", "B. Độ phong phú, sự phân bố.", "C. Thành phần loài, sinh sản tử vong.", "D. Thành phần loài, sự phân bố, chức năng dinh dưỡng."], correct: 3},
+        {q: "Câu 3: Mức độ phong phú về số loài trong quần xã là:", opts: ["A. độ nhiều.", "B. độ đa dạng.", "C. độ thường gặp.", "D. sự phổ biến."], correct: 1},
+        {q: "Câu 4: Loài ưu thế có vai trò quan trọng do:", opts: ["A. số lượng cá thể nhiều.", "B. sức sống mạnh, sinh khối lớn.", "C. có khả năng tiêu diệt loài khác.", "D. số lượng nhiều, sinh khối lớn, hoạt động mạnh."], correct: 3},
+        {q: "Câu 5: Quan hệ hỗ trợ trong quần xã bao gồm:", opts: ["A. cộng sinh, hợp tác, tương trợ.", "B. cộng gộp, hợp tác, hội sinh.", "C. cộng sinh, hợp tác, hội sinh.", "D. tương trợ, hợp tác, hội sinh."], correct: 2},
+        {q: "Câu 6: Loài rận sống trên da chó hút máu là:", opts: ["A. hội sinh.", "B. cộng sinh.", "C. hợp tác.", "D. kí sinh - vật chủ."], correct: 3},
+        {q: "Câu 7: Sư tử bắt linh dương ăn thịt thuộc quan hệ:", opts: ["A. hợp tác.", "B. hỗ trợ.", "C. cạnh tranh.", "D. động vật ăn thịt và con mồi."], correct: 3},
+        {q: "Câu 8: Ví dụ về mối quan hệ cạnh tranh là:", opts: ["A. giun sán trong lợn.", "B. cỏ dại và lúa.", "C. khuẩn lam sống cùng động vật.", "D. thỏ và chó sói."], correct: 1},
+        {q: "Câu 9: Một loài có lợi, một loài không lợi cũng không hại là:", opts: ["A. Cộng sinh.", "B. Hội sinh.", "C. Hợp tác.", "D. Ức chế."], correct: 1},
+        {q: "Câu 10: Quan hệ hỗ trợ trong quần xã biểu hiện ở:", opts: ["A. cộng sinh, hội sinh, hợp tác.", "B. quần tụ bầy đàn.", "C. kí sinh, ăn thịt, ức chế.", "D. cộng sinh, hội sinh, kí sinh."], correct: 0},
+        {q: "Câu 11: Ví dụ về cạnh tranh là:", opts: ["A. Giun sán trong lợn.", "B. Cỏ dại và lúa trên cánh đồng.", "C. Phong lan trên cây gỗ.", "D. Thỏ và chó sói."], correct: 1},
+        {q: "Câu 12: Sơ đồ (+)/(-) biểu diễn mối quan hệ:", opts: ["A. Ức chế và kí sinh.", "B. Cạnh tranh và ăn thịt.", "C. Cộng sinh, ức chế.", "D. Kí sinh - vật chủ và động vật ăn thực vật."], correct: 3},
+        {q: "Câu 13: Loài ngoại lai là loài sinh vật:", opts: ["A. Xuất hiện nơi không phải môi trường tự nhiên của nó.", "B. Sinh sống một khu vực địa lý nhất định.", "C. Di chuyển định kì.", "D. Có tính trạng chung hình thái."], correct: 0},
+        {q: "Câu 14: Loài ngoại lai xâm hại là:", opts: ["A. lấn chiếm nơi sinh sống hoặc gây hại loài bản địa.", "B. có lợi loài bản địa.", "C. cung cấp dinh dưỡng.", "D. bảo vệ loài bản địa."], correct: 0}
     ];
 
     let currentIdx = 0;
-    let correctCount = 0;
+    let scoreCount = 0; // Điểm tính theo câu đúng ngay lần đầu
+    let hasFailedCurrent = false; // Đánh dấu xem câu hiện tại đã bấm sai chưa
 
     function renderQuiz() {
         if (currentIdx >= quizData.length) {
@@ -119,6 +121,7 @@
             return;
         }
 
+        hasFailedCurrent = false; // Reset trạng thái cho câu mới
         const q = quizData[currentIdx];
         document.getElementById('progress').innerText = `Câu hỏi ${currentIdx + 1} / ${quizData.length}`;
         document.getElementById('questionText').innerText = q.q;
@@ -142,7 +145,12 @@
 
         if (index === correctIdx) {
             btn.classList.add('correct');
-            correctCount++;
+            
+            // Nếu chưa từng bấm sai ở câu này, mới được cộng điểm
+            if (!hasFailedCurrent) {
+                scoreCount++;
+            }
+
             msg.innerText = "Chính xác!";
             msg.style.color = "green";
             
@@ -156,7 +164,8 @@
             }, 800);
         } else {
             btn.classList.add('wrong');
-            msg.innerText = "Chưa đúng, thử lại nhé!";
+            hasFailedCurrent = true; // Đánh dấu là đã bấm sai câu này
+            msg.innerText = "Chưa đúng, hãy chọn lại tới khi đúng!";
             msg.style.color = "red";
         }
     }
@@ -165,19 +174,19 @@
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
 
-        const rawScore = (correctCount / quizData.length) * 10;
+        const rawScore = (scoreCount / quizData.length) * 10;
         const finalScore = rawScore.toFixed(2);
         
         document.getElementById('finalScore').innerText = finalScore + " điểm";
-        document.getElementById('correctCount').innerText = `Bạn đã làm đúng ${correctCount} / ${quizData.length} câu.`;
+        document.getElementById('correctCount').innerText = `Đúng ngay lần đầu: ${scoreCount} / ${quizData.length} câu.`;
 
         let comment = "Cố gắng thêm chút nữa nhé!";
-        if (correctCount === 63) {
-            comment = "Vô thi đúng full trắc nghiệm haa";
-        } else if (correctCount >= 60) {
-            comment = "Cũng chất đấy chứ";
-        } else if (correctCount >= 50) {
-            comment = "Cũng ra gì phết";
+        if (scoreCount === 63) {
+            comment = "vô thi đúng full trắc nghiệm haa";
+        } else if (scoreCount >= 60) {
+            comment = "cũng chất đấy chứ";
+        } else if (scoreCount >= 50) {
+            comment = "cũng ra gì phết";
         }
 
         document.getElementById('commentText').innerText = comment;
@@ -188,4 +197,3 @@
 
 </body>
 </html>
-
