@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Ôn Tập Sinh Học - NASA Edition</title>
+    <style>
+        :root {
+            --nasa-blue: #0b3d91;
+            --nasa-red: #fc3d21;
+            --hover-blue: #154ba3;
+            --bg-color: #0b192e; /* Màu nền tối không gian */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
+            background-size: 550px 550px; /* Hiệu ứng sao nhẹ */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            color: white;
+            background-color: var(--nasa-blue);
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 250px;
+        }
+
+        .nav-button:hover {
+            background-color: var(--hover-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(11, 61, 145, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Nút màu đỏ cho khác biệt */
+        .btn-ds {
+            background-color: var(--nasa-red);
+        }
+
+        .btn-ds:hover {
+            background-color: #ff523b;
+            box-shadow: 0 10px 20px rgba(252, 61, 33, 0.4);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Trung Tâm Điều Phối Ôn Tập</h1>
+        
+        <div class="button-group">
+            <a href="tn.html" class="nav-button">
+                Trắc Nghiệm Sinh Học
+            </a>
+            
+            <a href="ds.html" class="nav-button btn-ds">
+                Đúng Sai Sinh Học
+            </a>
+        </div>
+
+        <div class="footer">
+            Thiết kế bởi Npc - NASA Developer Team 2026
+        </div>
+    </div>
+
+</body>
+</html>
+
