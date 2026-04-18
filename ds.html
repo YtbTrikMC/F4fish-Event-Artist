@@ -3,291 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Đúng Sai Sinh Học</title>
+    <title>Đúng Sai Sinh Học</title>
     <style>
         :root {
             --nasa-blue: #0b3d91;
             --nasa-red: #fc3d21;
-            --bg-color: #f0f2f5;
+            --bg-color: #f0f4f8;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            padding: 20px;
-            line-height: 1.6;
         }
 
         #quiz-container {
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             max-width: 900px;
             width: 100%;
         }
 
-        h1 { color: var(--nasa-blue); text-align: center; border-bottom: 3px solid var(--nasa-blue); padding-bottom: 10px; text-transform: uppercase; }
+        h1 { color: var(--nasa-blue); text-align: center; text-transform: uppercase; border-bottom: 3px solid var(--nasa-blue); padding-bottom: 10px; }
 
-        .question-box { display: none; margin-bottom: 20px; }
-        .active { display: block; animation: slideIn 0.4s ease-out; }
+        .progress { color: #555; font-weight: bold; margin-bottom: 15px; text-align: right; }
 
-        .progress-bar { font-weight: bold; color: #666; margin-bottom: 10px; }
+        .question-box { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: #fff;
-            overflow: hidden;
-            border-radius: 8px;
-        }
+        .desc-box { background: #f8f9fa; border-left: 5px solid var(--nasa-blue); padding: 15px; margin: 15px 0; font-style: italic; }
 
-        table, th, td { border: 1px solid #dee2e6; text-align: center; padding: 12px; }
-        th { background-color: var(--nasa-blue); color: white; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: var(--nasa-blue); color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
 
-        .desc-text { background: #e9ecef; padding: 15px; border-left: 5px solid var(--nasa-blue); border-radius: 4px; margin: 15px 0; font-style: italic; }
+        .options-grid { display: grid; gap: 15px; margin-top: 20px; }
+        .option-item { border: 1px solid #ccc; padding: 15px; border-radius: 10px; background: #fff; }
 
-        .options-grid { display: grid; gap: 20px; margin-top: 20px; }
-        .option-item { background: #fff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 10px; transition: 0.3s; }
-        .option-item:hover { border-color: var(--nasa-blue); }
-
-        .btn-group { display: flex; gap: 15px; margin-top: 10px; }
-        button { flex: 1; padding: 10px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.3s; }
-
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-true { background: #28a745; color: white; }
         .btn-false { background: #dc3545; color: white; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        #result-area { text-align: center; font-size: 1.2rem; font-weight: bold; margin-top: 20px; min-height: 30px; color: var(--nasa-red); }
+        #status-message { text-align: center; font-weight: bold; min-height: 25px; margin-top: 20px; color: var(--nasa-red); }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div id="quiz-container">
-    <h1>Hệ thống Trắc nghiệm Đúng/Sai - Sinh học 12</h1>
-    <div id="progress" class="progress-bar"></div>
-    <div id="questions-wrapper"></div>
-    <div id="result-area"></div>
+    <h1>SINH HỌC: ĐÚNG-SAI</h1>
+    <div id="progress" class="progress"></div>
+    <div id="quiz-content"></div>
+    <div id="status-message"></div>
 </div>
 
 <script>
 const quizData = [
     {
         q: "Câu 1. Tỷ lệ % các amino acid sai khác nhau ở chuỗi polypeptide anpha trong phân tử Hemoglobin:",
-        table: `<table><tr><th>Loài</th><th>Cá mập</th><th>Cá chép</th><th>Kỳ nhông</th><th>Chó</th><th>Người</th></tr>
-        <tr><td>Cá mập</td><td>0%</td><td>59,4%</td><td>61,4%</td><td>56,8%</td><td>53,2%</td></tr>
-        <tr><td>Cá chép</td><td>-</td><td>0%</td><td>53,2%</td><td>47,9%</td><td>48,6%</td></tr>
-        <tr><td>Kỳ nhông</td><td>-</td><td>-</td><td>0%</td><td>46,1%</td><td>44,0%</td></tr>
-        <tr><td>Chó</td><td>-</td><td>-</td><td>-</td><td>0%</td><td>16,3%</td></tr>
-        <tr><td>Người</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0%</td></tr></table>`,
-        subQs: ["a) Đây là bằng chứng sinh học phân tử","b) Cá chép có quan hệ họ hàng xa nhất với người","c) Dựa trên bằng chứng này ta có thể xác định được mối quan hệ họ hàng gần xa giữa các loài","d) Trật tự đúng về mối quan hệ họ hàng giữa các loài là :người -> Chó -> Kì Giông -> Cá chép -> Cá mập."],
-        answers: [true, false, true, true]
+        table: `<table><tr><th>Loài</th><th>Cá mập</th><th>Cá chép</th><th>Kỳ nhông</th><th>Chó</th><th>Người</th></tr><tr><td>Cá mập</td><td>0%</td><td>59,4%</td><td>61,4%</td><td>56,8%</td><td>53,2%</td></tr><tr><td>Cá chép</td><td>-</td><td>0%</td><td>53,2%</td><td>47,9%</td><td>48,6%</td></tr><tr><td>Kỳ nhông</td><td>-</td><td>-</td><td>0%</td><td>46,1%</td><td>44,0%</td></tr><tr><td>Chó</td><td>-</td><td>-</td><td>-</td><td>0%</td><td>16,3%</td></tr><tr><td>Người</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0%</td></tr></table>`,
+        subQs: ["a) Đây là bằng chứng sinh học phân tử", "b) Cá chép có quan hệ họ hàng xa nhất với người", "c) Dựa trên bằng chứng này ta có thể xác định được mối quan hệ họ hàng gần xa giữa các loài", "d) Trật tự đúng về mối quan hệ họ hàng giữa các loài là :người -> Chó -> Kì Giông -> Cá chép -> Cá mập."],
+        ans: [true, false, true, true]
     },
     {
-        q: "Câu 2. Sự khác biệt về số lượng amino acid trong cytochrome C so với người:",
-        table: `<table><tr><th>Loài sinh vật</th><th>Số lượng amino acid khác so với ở người</th></tr>
-        <tr><td>Tinh tinh</td><td>0</td></tr><tr><td>Khỉ Rhessus</td><td>1</td></tr>
-        <tr><td>Ruồi giấm</td><td>25</td></tr><tr><td>Nấm men</td><td>40</td></tr></table>`,
-        subQs: ["a) Bằng chứng dùng làm căn cứ xác định quan hệ là bằng chứng sinh học tế bào.","b) Có 2 loài sinh vật thuộc nhóm linh trưởng.","c) Ở nấm men, tất cả các phân tử sinh học đều có số lượng amino acid khác so với người là 40.","d) Giữa người và tinh tinh không khác biệt chứng tỏ chung tổ tiên nhưng thời gian chưa đủ đột biến."],
-        answers: [false, true, false, true]
+        q: "Câu 2. Sự khác biệt về số lượng amino acid trong cytochrome C ở một số loài so với người:",
+        table: `<table><tr><th>Loài</th><th>Số lượng amino acid khác so với người</th></tr><tr><td>Tinh tinh</td><td>0</td></tr><tr><td>Khỉ Rhessus</td><td>1</td></tr><tr><td>Ruồi giấm</td><td>25</td></tr><tr><td>Nấm men</td><td>40</td></tr></table>`,
+        subQs: ["a) Đây là bằng chứng sinh học tế bào.", "b) Có 2 loài thuộc nhóm linh trưởng.", "c) Ở nấm men, tất cả phân tử sinh học đều khác người 40.", "d) Tinh tinh và người không khác biệt là bằng chứng chung tổ tiên, nhưng thời gian tiến hóa chưa đủ lớn để đột biến tạo khác biệt."],
+        ans: [false, true, false, true]
     },
     {
         q: "Câu 3. Đặc điểm thích nghi của loài cá tuyết Nam cực (họ Channichthyidae):",
-        desc: "Máu thiếu hemoglobin, trao đổi chất chậm, biến nhiệt, thu nhận O2 chủ yếu qua da.",
-        subQs: ["a) Đây là bằng chứng sinh học phân tử chứng tỏ cá tuyết có nguồn gốc từ loài cá có hemogolbin.","b) Nhiệt độ nước tăng thì nhiệt độ cơ thể cá tăng.","c) Khi nhiệt độ thấp, độ nhớt của máu giảm, mất tế bào hồng cầu giúp điều hòa lại dòng chảy của máu.","d) Nếu bắt cá tuyết con nuôi ở vùng biển nhiệt đới chúng có thể sống được nhưng hình thái thay đổi."],
-        answers: [true, true, false, false]
+        desc: "Không hồng cầu, không hemoglobin, gene globin bị đột biến thành gene giả. Biến nhiệt, sống ở -2°C, O2 cao, hấp thụ qua da.",
+        subQs: ["a) Đây là bằng chứng sinh học phân tử chứng tỏ cá tuyết có nguồn gốc từ loài cá có hemogolbin.", "b) Nhiệt độ nước tăng thì nhiệt độ cơ thể cá tăng.", "c) Khi nhiệt độ thấp, độ nhớt máu giảm, mất hồng cầu giúp điều hòa dòng chảy.", "d) Nuôi ở vùng nhiệt đới cá có thể sống nhưng hình thái sẽ thay đổi."],
+        ans: [true, true, false, false]
     },
     {
-        q: "Câu 4. Ba loài sẻ ăn hạt trên quần đảo Galapagos theo học thuyết Darwin:",
-        subQs: ["a) Kích thước mỏ thay đổi bởi áp lực CLTN giúp giảm cạnh tranh ở đảo chung.","b) Sự phân li ổ sinh thái dinh dưỡng giúp chúng có thể chung sống với nhau.","c) Kích thước hạt là nguyên nhân trực tiếp gây ra những biến đổi về kích thước mỏ.","d) Khác biệt mỏ giữa đảo chung và đảo riêng là kết quả CLTN theo các hướng khác nhau."],
-        answers: [true, true, false, true]
+        q: "Câu 4. Ba loài sẻ cùng ăn hạt trên quần đảo Galapagos:",
+        desc: "Đảo chung: 3 loài mỏ khác nhau để giảm cạnh tranh. Đảo riêng: mỏ khác so với khi ở đảo chung.",
+        subQs: ["a) Kích thước mỏ thay đổi do áp lực CLTN giúp giảm cạnh tranh.", "b) Phân li ổ sinh thái dinh dưỡng giúp chúng chung sống.", "c) Kích thước hạt là nguyên nhân trực tiếp gây biến đổi mỏ.", "d) Khác biệt mỏ đảo chung - đảo riêng là kết quả CLTN theo hướng khác nhau."],
+        ans: [true, true, false, true]
     },
     {
-        q: "Câu 5. Sự xuất hiện bướm sâu đo (Biston betularia) màu đen tại Manchester:",
-        subQs: ["a) Biến dị màu đen đã xuất hiện ngẫu nhiên từ trước trong quần thể ban đầu.","b) Khi thân cây nhuộm đen, biến dị màu đen là có lợi và được CLTN giữ lại.","c) Do bướm ăn thức ăn bị nhuộm đen nên cơ thể bị nhuộm đen.","d) Môi trường thân cây đen đã làm phát sinh các biến dị cá thể có màu đen."],
-        answers: [true, true, false, false]
+        q: "Câu 5. Loài bướm Biston betularia ở vùng Manchester (Anh):",
+        desc: "Trước ô nhiễm: bướm trắng ưu thế. Sau ô nhiễm (khói bụi đen): bướm đen tăng nhanh.",
+        subQs: ["a) Biến dị đen đã xuất hiện ngẫu nhiên từ trước.", "b) Thân cây đen làm biến dị đen có lợi và được CLTN giữ lại.", "c) Bướm ăn thức ăn đen nên cơ thể bị nhuộm đen.", "d) Môi trường đen làm phát sinh biến dị cá thể màu đen."],
+        ans: [true, true, false, false]
     },
     {
-        q: "Câu 6. Độ cao mỏ chim sẻ Geospiza trên quần đảo Galapagos qua thời gian dài:",
-        subQs: ["a) Khi sống riêng, loài G.fortis có độ cao mỏ rất khác biệt so với loài G. fuliginosa.","b) Khi sống chung, G.fortis ăn hạt to, G. fuliginosa ăn hạt nhỏ.","c) Cạnh tranh thức ăn là nguyên nhân chính gây ra sự phân hoá mỏ giữa 2 loài.","d) Khi sống riêng, G. fuliginosa có sự đa dạng mỏ lớn hơn so với G.fortis."],
-        answers: [false, true, true, false]
+        q: "Câu 6. Độ cao mỏ chim sẻ (G.fortis và G. fuliginosa):",
+        desc: "Hình A: Sống chung (mỏ phân hóa). Hình B, C: Sống riêng (mỏ tương tự nhau). Độ cao mỏ tỉ lệ thuận với kích thước hạt.",
+        subQs: ["a) Khi sống riêng, G.fortis có mỏ rất khác G. fuliginosa.", "b) Khi sống chung, G.fortis ăn hạt to, G. fuliginosa ăn hạt nhỏ.", "c) Cạnh tranh thức ăn là nguyên nhân chính gây phân hóa mỏ.", "d) Khi sống riêng, G. fuliginosa đa dạng mỏ hơn G.fortis."],
+        ans: [false, true, true, false]
     },
     {
-        q: "Câu 7. Hiện tượng muỗi kháng thuốc xịt muỗi sau nhiều lần xử lý:",
-        subQs: ["a) Quần thể muỗi vốn đa dạng nên có những kiểu gene thích nghi không bị đào thải.","b) Việc xịt muỗi gây ra sự chọn lọc, làm tăng tần số allele kháng thuốc.","c) Loài muỗi mới có khả năng kháng thuốc đã di cư tới thay thế loài cũ.","d) Thuốc diệt muỗi tác động tới DNA để tạo nên gene kháng thuốc."],
-        answers: [true, true, false, false]
+        q: "Câu 7. Hiện tượng muỗi kháng thuốc xịt mới:",
+        subQs: ["a) Quần thể đa dạng nên có kiểu gene thích nghi không bị đào thải.", "b) Xịt muỗi gây chọn lọc, tăng tần số allele kháng thuốc.", "c) Loài muỗi mới di cư tới thay thế loài bị diệt.", "d) Thuốc diệt tác động DNA tạo gene kháng thuốc."],
+        ans: [true, true, false, false]
     },
     {
-        q: "Câu 8. Nghiên cứu biến đổi kích thước mỏ chim sẻ Geospiza fortis (1976-1978):",
-        subQs: ["a) Kích thước các loại hạt là nguyên nhân trực tiếp gây biến đổi kích thước mỏ.","b) Tiến hoá đang diễn ra qua sự thay đổi tần số allele và kiểu gene.","c) Chim sẻ có đặc điểm thích nghi mỏ và đặc điểm này có tính hợp lí tương đối.","d) Nếu mưa nhiều trở lại, chim mỏ nhỏ sẽ có lợi thế và mỏ trung bình sẽ giảm xuống."],
-        answers: [false, true, true, true]
+        q: "Câu 8. Chim sẻ Geospiza fortis (1976-1978):",
+        desc: "1976: mỏ 9,4mm. 1977: hạn hán, hạt mềm chết. 80% chim mỏ nhỏ chết. 1978: mỏ 10,2mm.",
+        subQs: ["a) Kích thước hạt là nguyên nhân trực tiếp gây biến đổi mỏ.", "b) Tiến hoá đang diễn ra qua thay đổi tần số allele.", "c) Đặc điểm mỏ có tính hợp lí tương đối.", "d) Nếu mưa nhiều, hạt mềm trở lại, mỏ trung bình sẽ giảm xuống."],
+        ans: [false, true, true, true]
     },
     {
-        q: "Câu 9. Ảnh hưởng ô nhiễm đến bướm (Bảng 17.1):",
-        table: `<table><tr><th>Khu vực</th><th>Tỉ lệ bướm bị ăn thịt - Sáng</th><th>Tỉ lệ bướm bị ăn thịt - Tối</th></tr>
-        <tr><td>Rừng không ô nhiễm</td><td>13,7%</td><td>86,3%</td></tr>
-        <tr><td>Rừng bị ô nhiễm</td><td>74,1%</td><td>25,9%</td></tr></table>`,
-        subQs: ["a) Ở rừng không ô nhiễm, chim ăn các loại bướm như nhau.","b) Chim dùng thị giác để tìm kiếm thức ăn.","c) Trong rừng ô nhiễm, bướm màu tối có ưu thế sống sót và sinh sản hơn.","d) Khi ô nhiễm, quần thể bướm tăng cường tạo ra các biến dị thân tối nhiều hơn."],
-        answers: [false, true, true, true]
+        q: "Câu 9. Tỉ lệ bướm bị chim ăn thịt (Bảng 17.1):",
+        table: `<table><tr><th>Khu vực</th><th>Bướm sáng (%)</th><th>Bướm tối (%)</th></tr><tr><td>Rừng sạch</td><td>13,7</td><td>86,3</td></tr><tr><td>Rừng ô nhiễm</td><td>74,1</td><td>25,9</td></tr></table>`,
+        subQs: ["a) Rừng sạch chim ăn 2 loại bướm như nhau.", "b) Chim dùng thị giác tìm mồi.", "c) Rừng ô nhiễm, bướm tối ưu thế sống sót.", "d) Khi ô nhiễm, quần thể tạo biến dị tối nhiều hơn sáng."],
+        ans: [false, true, true, true]
     },
     {
         q: "Câu 10. Nguồn gốc sự sống:",
-        subQs: ["a) Trình tự: Tiến hoá hoá học -> Tiến hoá sinh học -> Tiến hoá tiền sinh học.","b) Tiến hoá hoá học là giai đoạn hình thành những tế bào sống đầu tiên.","c) Tiến hoá tiền sinh học là giai đoạn hình thành các tế bào sơ khai (protobiont).","d) Tiến hoá sinh học diễn ra đến nay và không chịu tác động của nhân tố tiến hoá."],
-        answers: [false, false, true, false]
+        subQs: ["a) Trình tự: Hoá học -> Sinh học -> Tiền sinh học.", "b) Hoá học là giai đoạn tạo tế bào sống đầu tiên.", "c) Tiền sinh học tạo ra tế bào sơ khai (protobiont).", "d) Sinh học không chịu tác động của nhân tố tiến hoá."],
+        ans: [false, false, true, false]
     },
     {
         q: "Câu 11. Tiến hóa hóa học:",
-        subQs: ["a) Quá trình hình thành chất hữu cơ mới chỉ là giả thuyết, chưa được chứng minh thực nghiệm.","b) Năng lượng tự nhiên giúp hình thành amino acid, nucleotide từ chất vô cơ.","c) Hợp chất hữu cơ phức tạp nặng hơn, theo mưa rơi xuống biển.","d) Có sự tổng hợp chất hữu cơ từ vô cơ theo phương thức hóa học."],
-        answers: [false, true, true, true]
+        subQs: ["a) Chỉ là giả thuyết, chưa chứng minh thực nghiệm.", "b) Năng lượng tự nhiên hình thành amino acid từ vô cơ.", "c) Chất hữu cơ phức tạp theo mưa rơi xuống biển.", "d) Tổng hợp hữu cơ từ vô cơ theo phương thức hóa học."],
+        ans: [false, true, true, true]
     },
     {
-        q: "Câu 12. Các giai đoạn tiến hóa:",
-        subQs: ["a) Chất hữu cơ trong thiên thạch chứng tỏ tiến hóa hóa học có thể ngoài Trái Đất.","b) Tìm kiếm sự sống hành tinh khác dựa trên giả thuyết tiến hóa hóa học.","c) Tiến hóa hóa học và sinh học là hai quá trình hoàn toàn độc lập.","d) Chất hữu cơ đơn giản chỉ có thể tạo ra trong phòng thí nghiệm."],
-        answers: [true, true, false, false]
+        q: "Câu 12. Các giai đoạn tiến hóa (Tiếp theo):",
+        subQs: ["a) Hữu cơ trong thiên thạch chứng tỏ tiến hóa hóa học có ngoài Trái Đất.", "b) Tìm sự sống hành tinh khác dựa trên giả thuyết tiến hóa hóa học.", "c) Hoá học và sinh học hoàn toàn độc lập.", "d) Hữu cơ đơn giản chỉ tạo được trong phòng thí nghiệm."],
+        ans: [true, true, false, false]
     },
     {
         q: "Câu 13. Nguồn gốc loài người (DNA ti thể và NST Y):",
-        subQs: ["a) Di truyền theo dòng mẹ/bố nên dễ theo dõi giới tính.","b) DNA NST thường quá lớn nên khó nhân dòng hơn ti thể/NST Y.","c) Hệ gene ti thể/NST Y đột biến cao hơn nên phù hợp nghiên cứu loài gần gũi.","d) Không trao đổi chéo giúp ước lượng chính xác thời điểm phát sinh."],
-        answers: [false, false, false, true]
+        subQs: ["a) Dòng mẹ và dòng bố giúp dễ theo dõi giới tính.", "b) DNA NST thường lớn nên khó nhân dòng hơn.", "c) Tốc độ đột biến cao hơn phù hợp nghiên cứu loài gần gũi.", "d) Không trao đổi chéo giúp ước lượng chính xác thời điểm phát sinh."],
+        ans: [false, false, false, true]
     },
     {
-        q: "Câu 14. Đại địa chất và sự tuyệt chủng:",
-        subQs: ["a) Có sự biến đổi mạnh mẽ về địa chất và khí hậu.","b) Mỗi đại đại diện giai đoạn riêng với sinh vật đặc trưng.","c) Sinh vật sống sót phát sinh loài mới là tiến hóa tiền sinh học.","d) Chứng minh sự thích nghi chỉ có tính tương đối."],
-        answers: [true, true, false, true]
+        q: "Câu 14. Đại và kỉ địa chất:",
+        subQs: ["a) Có biến đổi mạnh về địa chất và khí hậu.", "b) Mỗi đại có sinh vật đặc trưng riêng.", "c) Phát sinh loài mới sau tuyệt chủng là tiến hóa tiền sinh học.", "d) Chứng minh thích nghi có tính tương đối."],
+        ans: [true, true, false, true]
     },
     {
-        q: "Câu 15. Lịch sử phát triển sinh giới (Đại Trung sinh...):",
-        subQs: ["a) Trải qua 5 đại, bắt đầu từ Đại Thái cổ.","b) Nguyên nhân duy nhất tuyệt chủng là nơi sống bị hủy hoại.","c) Sau tuyệt chủng là giai đoạn bùng nổ loài mới chiếm ổ sinh thái trống.","d) Thời đại bò sát là Đại Tân sinh (Mesozoic)."],
-        answers: [true, false, true, false]
+        q: "Câu 15. Lịch sử Trái Đất và sinh vật đặc trưng:",
+        subQs: ["a) Trải qua 5 đại, bắt đầu từ Thái cổ.", "b) Tuyệt chủng chỉ do nơi sống bị hủy hoại.", "c) Sau tuyệt chủng là bùng nổ loài mới chiếm ổ sinh thái.", "d) Thời đại bò sát là Đại Tân sinh."],
+        ans: [true, false, true, false]
     },
     {
-        q: "Câu 16. Các nhân tố sinh thái:",
-        subQs: ["a) Là tất cả yếu tố môi trường ảnh hưởng đến đời sống sinh vật.","b) Gồm nhân tố vô sinh (khí hậu, nước...) và hữu sinh (sinh vật, con người...).","c) Vô sinh phụ thuộc mật độ, hữu sinh không phụ thuộc mật độ.","d) CO2 dưới 0,01% thì quang hợp không diễn ra."],
-        answers: [true, true, false, true]
+        q: "Câu 16. Nhân tố sinh thái:",
+        subQs: ["a) Là yếu tố môi trường ảnh hưởng trực tiếp/gián tiếp.", "b) Gồm vô sinh và hữu sinh.", "c) Vô sinh phụ thuộc mật độ, hữu sinh không phụ thuộc.", "d) CO2 < 0,01% thì quang hợp không diễn ra."],
+        ans: [true, true, false, true]
     },
     {
         q: "Câu 17. Ảnh hưởng của ánh sáng:",
-        subQs: ["a) Ánh sáng phân bố đều, không thay đổi theo vị trí địa lí.","b) Ảnh hưởng cường độ quang hợp và độ dài ngày đêm ảnh hưởng phát triển.","c) Giúp động vật định hướng không gian và tập tính.","d) Động vật đêm có cơ quan thị giác rất phát triển."],
-        answers: [false, true, true, true]
+        subQs: ["a) Phân bố đều, không theo vị trí địa lí.", "b) Ảnh hưởng quang hợp và độ dài ngày đêm.", "c) Giúp động vật định hướng không gian.", "d) Động vật đêm có thị giác phát triển (cú lợn, gấu mèo)."],
+        ans: [false, true, true, true]
     },
     {
         q: "Câu 18. Nhịp sinh học 24 giờ:",
-        subQs: ["a) Là phản ứng nhịp nhàng với sự thay đổi chu kì của nhân tố sinh thái.","b) Lá cây họ Đậu mở sáng khép tối.","c) Hình thành dưới tác động qua lại của các sinh vật trong quần thể.","d) Chu kì tế bào cũng là một loại nhịp sinh học."],
-        answers: [true, true, false, true]
+        subQs: ["a) Phản ứng nhịp nhàng với chu kì nhân tố sinh thái.", "b) Lá họ Đậu mở sáng khép tối.", "c) Hình thành do tác động qua lại các loài trong quần thể.", "d) Chu kì tế bào là nhịp sinh học."],
+        ans: [true, true, false, true]
     },
     {
-        q: "Câu 19. Mật độ cá thể quần thể:",
-        subQs: ["a) Khi mật độ giảm tối thiểu thì sức sinh sản tăng tối đa.","b) Mật độ không đánh giá được mức độ suy vong hay phát triển.","c) Khi mật độ giảm nhanh thì sức sinh sản tăng.","d) Mật độ luôn cố định theo thời gian."],
-        answers: [false, false, true, false]
+        q: "Câu 19. Mật độ cá thể:",
+        subQs: ["a) Mật độ giảm tối thiểu thì sinh sản tăng tối đa.", "b) Không đánh giá được suy vong hay phát triển.", "c) Mật độ giảm nhanh thì sức sinh sản tăng.", "d) Luôn cố định theo thời gian."],
+        ans: [false, false, true, false]
     },
     {
-        q: "Câu 20. Nhóm tuổi của quần thể:",
-        subQs: ["a) Nhóm đang sinh sản luôn nhiều hơn nhóm trước sinh sản.","b) Cấu trúc tuổi thay đổi theo mùa và vùng phân bố.","c) Nhóm sau sinh sản ít hơn trước/đang sinh sản là quần thể đang phát triển.","d) Quần thể suy vong nếu nhóm trước/đang sinh sản ít hơn sau sinh sản."],
-        answers: [false, true, true, true]
+        q: "Câu 20. Nhóm tuổi quần thể:",
+        subQs: ["a) Nhóm đang sinh sản luôn nhiều hơn trước sinh sản.", "b) Cấu trúc tuổi thay đổi theo chu kì mùa.", "c) Sau sinh sản < trước/đang sinh sản là quần thể phát triển.", "d) Suy vong nếu trước/đang sinh sản < sau sinh sản."],
+        ans: [false, true, true, true]
     },
     {
-        q: "Câu 21. Kích thước quần thể thú (A, B, C, D):",
-        table: `<table><tr><th>Quần thể</th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
-        <tr><td>Diện tích (ha)</td><td>100</td><td>120</td><td>80</td><td>90</td></tr>
-        <tr><td>Mật độ (c/ha)</td><td>22</td><td>25</td><td>26</td><td>21</td></tr></table>`,
-        subQs: ["a) Quần thể D có kích thước nhỏ nhất.","b) Kích thước quần thể A lớn hơn C.","c) Nếu B tăng 5%/năm thì mật độ sau 1 năm là 26,25.","d) Nếu C tăng 5%/năm thì quần thể tăng thêm 152 cá thể."],
-        answers: [true, true, true, false]
+        q: "Câu 21. Kích thước 4 quần thể thú (A, B, C, D):",
+        table: `<table><tr><th>Quần thể</th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>Diện tích (ha)</td><td>100</td><td>120</td><td>80</td><td>90</td></tr><tr><td>Mật độ (c/ha)</td><td>22</td><td>25</td><td>26</td><td>21</td></tr></table>`,
+        subQs: ["a) Quần thể D nhỏ nhất.", "b) Kích thước A > C.", "c) B tăng 5%/năm thì mật độ là 26,25.", "d) C tăng 5%/năm thì tăng thêm 152 cá thể."],
+        ans: [true, true, true, false]
     },
     {
-        q: "Câu 22. Quan hệ tôm vệ sinh và lươn:",
-        desc: "Tôm chui vào miệng lươn ăn ký sinh trùng.",
-        subQs: ["a) Đây là mối quan hệ cộng sinh (hai bên có lợi).","b) Tương tự quan hệ vi khuẩn và tảo trong địa y.","c) Đây là quan hệ hỗ trợ khác loài trong quần xã.","d) Đây là quan hệ hội sinh."],
-        answers: [true, false, true, false]
+        q: "Câu 22. Tôm vệ sinh và lươn:",
+        subQs: ["a) Quan hệ hai bên cùng có lợi.", "b) Tương tự vi khuẩn và tảo trong địa y.", "c) Là quan hệ hỗ trợ khác loài.", "d) Là quan hệ hội sinh."],
+        ans: [true, false, true, false]
     },
     {
-        q: "Câu 23. Hiện tượng thủy triều đỏ:",
-        desc: "Tảo nở hoa gây hại cho nghêu, trai, sò và con người.",
-        subQs: ["a) Ví dụ của quan hệ ký sinh.","b) Sinh vật này sinh trưởng gây hại cho sinh vật khác.","c) Một loài có lợi và nhiều loài bị hại.","d) Đây là quan hệ khống chế sinh học."],
-        answers: [false, true, false, false]
+        q: "Câu 23. Hiện tượng thủy triều đỏ (tảo nở hoa):",
+        subQs: ["a) Ví dụ quan hệ ký sinh.", "b) Sinh vật này gây hại sinh vật khác.", "c) Một loài có lợi, nhiều loài bị hại.", "d) Là khống chế sinh học."],
+        ans: [false, true, false, false]
     }
 ];
 
 let currentIdx = 0;
 
-function renderQuestion() {
-    const wrapper = document.getElementById('questions-wrapper');
-    wrapper.innerHTML = '';
-    const data = quizData[currentIdx];
+function render() {
+    const content = document.getElementById('quiz-content');
+    const item = quizData[currentIdx];
+    document.getElementById('progress').innerText = `Câu ${currentIdx + 1} / ${quizData.length}`;
     
-    document.getElementById('progress').innerText = `Câu hỏi: ${currentIdx + 1} / ${quizData.length}`;
-    
-    const qDiv = document.createElement('div');
-    qDiv.className = 'question-box active';
-    
-    let html = `<h3>${data.q}</h3>`;
-    if (data.desc) html += `<div class="desc-text">${data.desc}</div>`;
-    if (data.table) html += data.table;
-    
+    let html = `<div class="question-box active"><h3>${item.q}</h3>`;
+    if(item.desc) html += `<div class="desc-box">${item.desc}</div>`;
+    if(item.table) html += item.table;
     html += `<div class="options-grid">`;
-    data.subQs.forEach((sub, sIdx) => {
-        html += `
-            <div class="option-item">
-                <p>${sub}</p>
-                <div class="btn-group">
-                    <button class="btn-true" onclick="checkSub(${sIdx}, true, this)">ĐÚNG</button>
-                    <button class="btn-false" onclick="checkSub(${sIdx}, false, this)">SAI</button>
-                </div>
-            </div>`;
-    });
-    html += `</div>`;
     
-    qDiv.innerHTML = html;
-    wrapper.appendChild(qDiv);
-    document.getElementById('result-area').innerText = "";
+    item.subQs.forEach((s, i) => {
+        html += `<div class="option-item"><p>${s}</p>
+        <div class="btn-group">
+            <button class="btn-true" onclick="check(${i}, true, this)">ĐÚNG</button>
+            <button class="btn-false" onclick="check(${i}, false, this)">SAI</button>
+        </div></div>`;
+    });
+    html += `</div></div>`;
+    content.innerHTML = html;
+    document.getElementById('status-message').innerText = "";
 }
 
-function checkSub(subIdx, userVal, btn) {
-    const correct = quizData[currentIdx].answers[subIdx];
-    const parent = btn.parentElement;
-
-    if (userVal === correct) {
-        btn.style.boxShadow = "0 0 15px #28a745";
-        Array.from(parent.children).forEach(b => b.disabled = true);
-        checkNextStep();
+function check(subIdx, val, btn) {
+    const isCorrect = quizData[currentIdx].ans[subIdx] === val;
+    if(isCorrect) {
+        btn.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+        btn.style.opacity = "1";
+        btn.style.boxShadow = "0 0 10px gold";
+        checkAllDone();
     } else {
+        document.getElementById('status-message').innerText = "Sai rồi ! Thử lại ý này nhé.";
         btn.style.background = "#000";
-        document.getElementById('result-area').innerText = "SAI RỒI! Hãy chọn lại ý này.";
         setTimeout(() => {
-            btn.style.background = userVal ? "#28a745" : "#dc3545";
-            document.getElementById('result-area').innerText = "";
+            btn.style.background = val ? "#28a745" : "#dc3545";
+            document.getElementById('status-message').innerText = "";
         }, 800);
     }
 }
 
-function checkNextStep() {
-    const activeBox = document.querySelector('.question-box');
-    const total = activeBox.querySelectorAll('.btn-group').length;
-    const disabled = activeBox.querySelectorAll('button:disabled').length / 2;
-
-    if (disabled === total) {
-        document.getElementById('result-area').style.color = "#28a745";
-        document.getElementById('result-area').innerText = "TUYỆT VỜI! Đang chuyển sang câu tiếp theo...";
+function checkAllDone() {
+    const buttons = document.querySelectorAll('.btn-group button');
+    const disabled = Array.from(buttons).filter(b => b.disabled).length;
+    if(disabled === quizData[currentIdx].subQs.length * 2) {
+        document.getElementById('status-message').style.color = "#28a745";
+        document.getElementById('status-message').innerText = "CHÍNH XÁC! Đang chuyển dữ liệu...";
         setTimeout(() => {
             currentIdx++;
-            if (currentIdx < quizData.length) {
-                renderQuestion();
-            } else {
-                document.getElementById('questions-wrapper').innerHTML = "<h2 style='text-align:center;'>BẠN ĐÃ HOÀN THÀNH TẤT CẢ CÂU HỎI!</h2>";
-                document.getElementById('result-area').innerText = "Dữ liệu xác nhận: Bạn là thiên tài Sinh học!";
-            }
+            if(currentIdx < quizData.length) render();
+            else document.getElementById('quiz-container').innerHTML = "<h1>HOÀN THÀNH!</h1><p style='text-align:center'>Dữ liệu xác nhận bạn đã vượt qua</p>";
         }, 1500);
     }
 }
 
-// Khởi chạy
-renderQuestion();
+render();
 </script>
-
 </body>
 </html>
