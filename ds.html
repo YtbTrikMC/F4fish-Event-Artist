@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đúng Sai Sinh Học</title>
+    <title>Đúng Sai Sinh Học Ôn Tập Cuối Kì</title>
     <style>
         :root {
             --nasa-blue: #0b3d91;
             --nasa-red: #fc3d21;
-            --bg-color: #f0f4f8;
+            --bg-color: #f4f7f9;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
@@ -22,174 +22,176 @@
 
         #quiz-container {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 900px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            max-width: 950px;
             width: 100%;
         }
 
-        h1 { color: var(--nasa-blue); text-align: center; text-transform: uppercase; border-bottom: 3px solid var(--nasa-blue); padding-bottom: 10px; }
+        h1 { color: var(--nasa-blue); text-align: center; border-bottom: 4px solid var(--nasa-blue); padding-bottom: 15px; }
 
-        .progress { color: #555; font-weight: bold; margin-bottom: 15px; text-align: right; }
+        .progress-info { color: #888; text-align: right; font-weight: bold; margin-bottom: 10px; }
 
-        .question-box { display: none; }
-        .active { display: block; animation: fadeIn 0.5s; }
+        .question-box { display: none; line-height: 1.6; }
+        .active { display: block; animation: fadeIn 0.4s; }
 
-        .desc-box { background: #f8f9fa; border-left: 5px solid var(--nasa-blue); padding: 15px; margin: 15px 0; font-style: italic; }
+        .full-question-text { 
+            background: #fff; 
+            border: 1px solid #eee; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-left: 6px solid var(--nasa-blue);
+            font-size: 1.05rem;
+            color: #333;
+        }
 
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: var(--nasa-blue); color: white; }
-        tr:nth-child(even) { background: #f2f2f2; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
+        th { background: #f8f9fa; color: var(--nasa-blue); }
 
-        .options-grid { display: grid; gap: 15px; margin-top: 20px; }
-        .option-item { border: 1px solid #ccc; padding: 15px; border-radius: 10px; background: #fff; }
+        .options-container { display: grid; gap: 15px; }
+        .option-card { background: #fdfdfd; border: 1px solid #ddd; padding: 15px; border-radius: 12px; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-true { background: #28a745; color: white; }
-        .btn-false { background: #dc3545; color: white; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-true { background: #2ecc71; color: white; }
+        .btn-false { background: #e74c3c; color: white; }
+        button:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        #status-message { text-align: center; font-weight: bold; min-height: 25px; margin-top: 20px; color: var(--nasa-red); }
+        #msg { text-align: center; font-weight: bold; margin-top: 25px; min-height: 30px; color: var(--nasa-red); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="quiz-container">
-    <h1>SINH HỌC: ĐÚNG-SAI</h1>
-    <div id="progress" class="progress"></div>
-    <div id="quiz-content"></div>
-    <div id="status-message"></div>
+    <h1>SINH HỌC ĐÚNG SAI</h1>
+    <div id="progress" class="progress-info"></div>
+    <div id="quiz-area"></div>
+    <div id="msg"></div>
 </div>
 
 <script>
-const quizData = [
+const data = [
     {
-        q: "Câu 1. Tỷ lệ % các amino acid sai khác nhau ở chuỗi polypeptide anpha trong phân tử Hemoglobin:",
-        table: `<table><tr><th>Loài</th><th>Cá mập</th><th>Cá chép</th><th>Kỳ nhông</th><th>Chó</th><th>Người</th></tr><tr><td>Cá mập</td><td>0%</td><td>59,4%</td><td>61,4%</td><td>56,8%</td><td>53,2%</td></tr><tr><td>Cá chép</td><td>-</td><td>0%</td><td>53,2%</td><td>47,9%</td><td>48,6%</td></tr><tr><td>Kỳ nhông</td><td>-</td><td>-</td><td>0%</td><td>46,1%</td><td>44,0%</td></tr><tr><td>Chó</td><td>-</td><td>-</td><td>-</td><td>0%</td><td>16,3%</td></tr><tr><td>Người</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0%</td></tr></table>`,
-        subQs: ["a) Đây là bằng chứng sinh học phân tử", "b) Cá chép có quan hệ họ hàng xa nhất với người", "c) Dựa trên bằng chứng này ta có thể xác định được mối quan hệ họ hàng gần xa giữa các loài", "d) Trật tự đúng về mối quan hệ họ hàng giữa các loài là :người -> Chó -> Kì Giông -> Cá chép -> Cá mập."],
+        fullText: "Câu 1. Tỷ lệ % các amino acid sai khác nhau ở chuỗi polypeptide anpha trong phân tử Hemoglobin thể hiện ở bảng sau: Dựa vào thông tin trên hãy xác định các nội dung sau là đúng hay sai?",
+        table: `<table><tr><th>Loài</th><th>Cá mập</th><th>Cá chép</th><th>Kỳ nhông</th><th>Chó</th><th>Người</th></tr><tr><td>Cá mập</td><td>0%</td><td>59,4%</td><td>61,4%</td><td>56,8%</td><td>53,2%</td></tr><tr><td>Cá chép</td><td>0%</td><td>53,2%</td><td>47,9%</td><td>48,6%</td></tr><tr><td>Kỳ nhông</td><td>0%</td><td>46,1%</td><td>44,0%</td></tr><tr><td>Chó</td><td>0%</td><td>16,3%</td></tr><tr><td>Người</td><td>0%</td></tr></table>`,
+        sub: ["a) Đây là bằng chứng sinh học phân tử", "b) Cá chép có quan hệ họ hàng xa nhất với người", "c) Dựa trên bằng chứng này ta có thể xác định được mối quan hệ họ hàng gần xa giữa các loài", "d) Trật tự đúng về mối quan hệ họ hàng giữa các loài là :người -> Chó -> Kì Giông -> Cá chép -> Cá mập."],
         ans: [true, false, true, true]
     },
     {
-        q: "Câu 2. Sự khác biệt về số lượng amino acid trong cytochrome C ở một số loài so với người:",
-        table: `<table><tr><th>Loài</th><th>Số lượng amino acid khác so với người</th></tr><tr><td>Tinh tinh</td><td>0</td></tr><tr><td>Khỉ Rhessus</td><td>1</td></tr><tr><td>Ruồi giấm</td><td>25</td></tr><tr><td>Nấm men</td><td>40</td></tr></table>`,
-        subQs: ["a) Đây là bằng chứng sinh học tế bào.", "b) Có 2 loài thuộc nhóm linh trưởng.", "c) Ở nấm men, tất cả phân tử sinh học đều khác người 40.", "d) Tinh tinh và người không khác biệt là bằng chứng chung tổ tiên, nhưng thời gian tiến hóa chưa đủ lớn để đột biến tạo khác biệt."],
+        fullText: "Câu 2. Bảng bên dưới thể hiện sự khác biệt về số lượng amino acid trong cytochrome C ở một số loài sinh vật so với người: Dựa vào bảng trên, mỗi nhận định sau đây là Đúng hay Sai?",
+        table: `<table><tr><th>Loài sinh vật</th><th>Số lượng amino acid khác so với người</th></tr><tr><td>Tinh tinh</td><td>0</td></tr><tr><td>Khỉ Rhessus</td><td>1</td></tr><tr><td>Ruồi giấm</td><td>25</td></tr><tr><td>Nấm men</td><td>40</td></tr></table>`,
+        sub: ["a) Bằng chứng dùng làm căn cứ để xác định mối quan hệ họ hàng trong thông tin trên là bằng chứng sinh học tế bào.", "b) Có 2 loài sinh vật được so sánh về sự khác biệt số lượng amino acid trong cytochrome C là thuộc nhóm linh trưởng.", "c) Ở nấm men, tất cả các phân tử sinh học đều có số lượng amino acid khác so với ở người là 40.", "d) Giữa người và tinh tinh không có sự khác biệt về số lượng amino acid trong cytochrome C là bằng chứng chứng tỏ người và tinh tinh xuất phát từ một tổ tiên chung, nhưng thời gian tiến hóa chứa đủ lớn để để đột biến gene tạo ra sự khác biệt."],
         ans: [false, true, false, true]
     },
     {
-        q: "Câu 3. Đặc điểm thích nghi của loài cá tuyết Nam cực (họ Channichthyidae):",
-        desc: "Không hồng cầu, không hemoglobin, gene globin bị đột biến thành gene giả. Biến nhiệt, sống ở -2°C, O2 cao, hấp thụ qua da.",
-        subQs: ["a) Đây là bằng chứng sinh học phân tử chứng tỏ cá tuyết có nguồn gốc từ loài cá có hemogolbin.", "b) Nhiệt độ nước tăng thì nhiệt độ cơ thể cá tăng.", "c) Khi nhiệt độ thấp, độ nhớt máu giảm, mất hồng cầu giúp điều hòa dòng chảy.", "d) Nuôi ở vùng nhiệt đới cá có thể sống nhưng hình thái sẽ thay đổi."],
+        fullText: "Câu 3. Loài cá tuyết Nam cực (họ Channichthyidae) có hoạt động và trao đổi chất rất chậm. Chúng là nhóm động vật có xương sống duy nhất không chứa hồng cầu và sắc tố hemoglobin. Trong hệ gene của cá tuyết, gene β-globin và gene α-globin bị đột biến thành gene giả, không tham gia tổng hợp hemoglobin. Cá tuyết thuộc nhóm động vật biến nhiệt. Máu cá tuyết thiếu hemoglobin giúp có thích nghi tốt trong điều kiện vùng Nam cực nhiệt độ lạnh ( -20C và nồng độ O2 cao. Cá tuyết thu nhận O2 chủ yếu bằng cơ chế khuếch tán trực tiếp vào máu. Cá tuyết có diện tích mang nhỏ nên hoạt động trao đổi khí chủ yếu qua da. Một lượng lớn mạch máu nhỏ dưới da giúp cá nhận đủ O2 để khuếch tán. Dựa vào thông tin trên, mỗi nhận định sau đây là Đúng hay Sai?",
+        sub: ["a) Đây là bằng chứng sinh học phân tử chứng tỏ cá tuyết có nguồn gốc từ loài cá có hemogolbin.", "b) Nhiệt độ nước tăng thì nhiệt độ cơ thể cá tăng.", "c) Khi nhiệt độ thấp, độ nhớt của máu giảm, mất tế bào hồng cầu giúp điều hòa lại dòng chảy của máu.", "d) Nếu bắt cá tuyết con và nuôi ở vùng biển nhiệt đới cá tuyết có thể sống được nhưng nhiều đặc điểm hình thái sẽ bị thay đổi."],
         ans: [true, true, false, false]
     },
     {
-        q: "Câu 4. Ba loài sẻ cùng ăn hạt trên quần đảo Galapagos:",
-        desc: "Đảo chung: 3 loài mỏ khác nhau để giảm cạnh tranh. Đảo riêng: mỏ khác so với khi ở đảo chung.",
-        subQs: ["a) Kích thước mỏ thay đổi do áp lực CLTN giúp giảm cạnh tranh.", "b) Phân li ổ sinh thái dinh dưỡng giúp chúng chung sống.", "c) Kích thước hạt là nguyên nhân trực tiếp gây biến đổi mỏ.", "d) Khác biệt mỏ đảo chung - đảo riêng là kết quả CLTN theo hướng khác nhau."],
+        fullText: "Câu 1. Trên quần đảo Galapagos có 3 loài sẻ cùng ăn hạt: - Ở một hòn đảo (đảo chung) có cả 3 loài sẻ cùng sinh sống, kích thước mỏ của 3 loài này rất khác nhau nên chúng sử dụng các loại hạt có kích thước khác nhau, phù hợp với kích thước mỏ của mỗi loài. - Ở các hòn đảo khác (các đảo riêng), mỗi hòn đảo chỉ có một trong ba loài sẻ này sinh sống, kích thước mỏ của các cá thể thuộc mỗi loài lại khác với kích thước mỏ của các cá thể cùng loài đang sinh sống ở hòn đảo chung. Theo học thuyết Darwin , mỗi nhận định sau là đúng hay sai?",
+        sub: ["a) Kích thước mỏ có sự thay đổi bởi áp lực chọn lọc tự nhiên dẫn đến giảm bớt sự cạnh tranh giữa 3 loài sẻ cùng sống ở hòn đảo chung.", "b) Sự phân li ổ sinh thái dinh dưỡng của 3 loài sẻ trên hòn đảo chung giúp chúng có thể chung sống với nhau.", "c) Kích thước khác nhau của các loại hạt mà 3 loài sẻ này sử dụng làm thức ăn ở hòn đảo chung là nguyên nhân trực tiếp gây ra những biến đổi về kích thước mỏ của cả 3 loài sẻ.", "d) Sự khác biệt về kích thước mỏ giữa các cá thể đang sinh sống ở hòn đảo chung so với các cá thể cùng loài đang sinh sống ở hòn đảo riêng là kết quả của quá trình chọn lọc tự nhiên theo các hướng khác nhau."],
         ans: [true, true, false, true]
     },
     {
-        q: "Câu 5. Loài bướm Biston betularia ở vùng Manchester (Anh):",
-        desc: "Trước ô nhiễm: bướm trắng ưu thế. Sau ô nhiễm (khói bụi đen): bướm đen tăng nhanh.",
-        subQs: ["a) Biến dị đen đã xuất hiện ngẫu nhiên từ trước.", "b) Thân cây đen làm biến dị đen có lợi và được CLTN giữ lại.", "c) Bướm ăn thức ăn đen nên cơ thể bị nhuộm đen.", "d) Môi trường đen làm phát sinh biến dị cá thể màu đen."],
+        fullText: "Câu 2. Trong rừng cây bạch dương ở vùng Manchester (Anh), có loài bướm sâu đo Biston betularia có màu trắng chiếm ưu thế, nhưng khi công nghiệp phát triển khói bụi gây ô nhiễm thì người ta thấy xuất hiện bướm đen với số lượng ngày càng nhiều. Khi giải thích về sự xuất hiện bướm sâu đo bạch dương màu đen, theo thuyết tiến hoá của Darwin, mỗi nhận định sau đây là Đúng hay Sai?",
+        sub: ["a) Biến dị màu đen ở bướm sâu đo bạch dương đã xuất hiện một cách ngẫu nhiên từ trước trong quần thể ban đầu.", "b) Khi môi trường sống thay đổi là thân cây bạch dương bị nhuộm đen do khói bụi than thì biến dị màu đen là biến dị có lợi và được chọn lọc tự nhiên giữa lại.", "c) Khi thân cây bạch dương bị nhuộm đen do khói bụi than, nhiều cá thể bướm đã sử dụng thức ăn bị nhuộm đen nên đã làm cho cơ thể bị nhuộm đen.", "d) Môi trường sống là các thân cây bạch dương bị nhuộm đen đã làm phát sinh các biến dị cá thể có màu đen trên cơ thể sâu đo bạch dương."],
         ans: [true, true, false, false]
     },
     {
-        q: "Câu 6. Độ cao mỏ chim sẻ (G.fortis và G. fuliginosa):",
-        desc: "Hình A: Sống chung (mỏ phân hóa). Hình B, C: Sống riêng (mỏ tương tự nhau). Độ cao mỏ tỉ lệ thuận với kích thước hạt.",
-        subQs: ["a) Khi sống riêng, G.fortis có mỏ rất khác G. fuliginosa.", "b) Khi sống chung, G.fortis ăn hạt to, G. fuliginosa ăn hạt nhỏ.", "c) Cạnh tranh thức ăn là nguyên nhân chính gây phân hóa mỏ.", "d) Khi sống riêng, G. fuliginosa đa dạng mỏ hơn G.fortis."],
+        fullText: "Câu 3. Hình bên mô tả về độ cao mỏ khác nhau giữa các nhóm cá thể của 2 loài chim ăn hạt và thuộc quần đảo Galapagos qua thời gian dài trong 2 trường hợp: Khi sống chung trên một đảo (hình A) và sống riêng trên 2 đảo (Hình B, C). Biết rằng độ cao mỏ chim có mối tương quan thuận với kích thước hạt. Theo lí thuyết mỗi phát biểu sau đây về 2 loài là đúng hay sai?",
+        sub: ["a) Khi sống riêng, loài G.fortis có độ cao mỏ rất khác biệt so với loài G. fuliginosa.", "b) Khi sống chung, loài G.fortis thích nghi với ăn hạt to, loài G. fuliginosa thích nghi với ăn hạt nhỏ.", "c) Khi sống chung sự cạnh tranh về thức ăn là nguyên nhân chính gây ra sự phân hoá về độ cao mỏ giữa 2 loài.", "d) Khi sống riêng, loài G. fuliginosa có sự đa dạng về độ cao mỏ lớn hơn so với loài G.fortis."],
         ans: [false, true, true, false]
     },
     {
-        q: "Câu 7. Hiện tượng muỗi kháng thuốc xịt mới:",
-        subQs: ["a) Quần thể đa dạng nên có kiểu gene thích nghi không bị đào thải.", "b) Xịt muỗi gây chọn lọc, tăng tần số allele kháng thuốc.", "c) Loài muỗi mới di cư tới thay thế loài bị diệt.", "d) Thuốc diệt tác động DNA tạo gene kháng thuốc."],
+        fullText: "Câu 1. Người ta đã dùng một loại thuốc xịt muỗi mới để diệt muỗi. Việc xịt muỗi được lặp lại vài tháng một lần. Lần xịt đầu tiên đã diệt được gần như hết các con muỗi nhưng sau đó thì quần thể muỗi cứ tăng dần kích thước. Mỗi lần xịt sau đó chỉ diệt được rất ít muỗi. Mỗi nhận định sau đây là đúng hay sai về những điều đã xảy ra?",
+        sub: ["a) Quần thể muỗi vốn đa dạng về kiểu gene, kiểu hình nên khi xịt thuốc đã có những kiểu gene thích nghi nên không bị đào thải.", "b) Việc xịt muỗi gây ra sự chọn lọc, từ đó làm tăng tần số allele kháng thuốc trong quần thể.", "c) Loài muỗi mới có khả năng kháng thuốc đã di cư tới vùng đó thay thế cho loài đã bị diệt.", "d) Thuốc diệt muỗi đã tác động tới DNA của muỗi để tạo nên muỗi có gene kháng thuốc."],
         ans: [true, true, false, false]
     },
     {
-        q: "Câu 8. Chim sẻ Geospiza fortis (1976-1978):",
-        desc: "1976: mỏ 9,4mm. 1977: hạn hán, hạt mềm chết. 80% chim mỏ nhỏ chết. 1978: mỏ 10,2mm.",
-        subQs: ["a) Kích thước hạt là nguyên nhân trực tiếp gây biến đổi mỏ.", "b) Tiến hoá đang diễn ra qua thay đổi tần số allele.", "c) Đặc điểm mỏ có tính hợp lí tương đối.", "d) Nếu mưa nhiều, hạt mềm trở lại, mỏ trung bình sẽ giảm xuống."],
+        fullText: "Câu 2. Ở quần đảo Galapagos thuộc vùng Nam Mỹ, loài chim sẻ Geospiza fortis có kích thước mỏ đa dạng và phù hợp với các loại hạt cây mà chúng ăn: chim sẻ có mỏ nhỏ thường ăn hạt nhỏ, mềm; chim sẻ có mỏ lớn ăn các hạt to, cứng. Trong một nghiên cứu, kích thước mỏ trung bình của quần thể chim sẻ đo được năm 1976 là 9,4 mm. Năm 1977, một đợt hạn hán kéo dài làm phần lớn các cây có hạt nhỏ, mềm bị chết do chịu hạn kém. Trong thời gian đó, khoảng 80% chim sẻ bị chết, chủ yếu là chim ăn hạt nhỏ, mềm có mỏ nhỏ. Đến năm 1978, quần thể chim sẻ này có kích thước mỏ trung bình là 10,2 mm. Mỗi nhận định sau đây là đúng hay sai về loài chim sẻ này?",
+        sub: ["a) Kích thước khác nhau của các loại hạt mà các loài chim sẻ sử dụng làm thức ăn ở trên quần đảo là nguyên nhân trực tiếp gây ra biến đổi về kích thước mỏ.", "b) Tiến hoá đang diễn ra ở quần thể chim sẻ trên đảo Galapagos. Qua thời gian, có sự thay đổi tần số allele và tần số kiểu gene dẫn đến sự thay đổi trong đặc điểm di truyền của quần thể.", "c) Chim sẻ có đặc điểm thích nghi liên quan đến kích thước mỏ và đặc điểm thích nghi này có tính hợp lí tương đối.", "d) Nếu hiện tượng mưa nhiều xuất hiện trở lại ở khu vực này, cây có hạt nhỏ, mềm sinh trưởng trở lại, các chim sẻ có kích thước mỏ nhỏ sẽ có lợi thế sinh tồn hơn. Do đó, sau một vài năm, kích thước mỏ trung bình của quần thể chim sẻ sẽ giảm xuống gần với mức ban đầu hoặc thậm chí thấp hơn nếu chọn lọc tự nhiên tiếp tục diễn ra."],
         ans: [false, true, true, true]
     },
     {
-        q: "Câu 9. Tỉ lệ bướm bị chim ăn thịt (Bảng 17.1):",
-        table: `<table><tr><th>Khu vực</th><th>Bướm sáng (%)</th><th>Bướm tối (%)</th></tr><tr><td>Rừng sạch</td><td>13,7</td><td>86,3</td></tr><tr><td>Rừng ô nhiễm</td><td>74,1</td><td>25,9</td></tr></table>`,
-        subQs: ["a) Rừng sạch chim ăn 2 loại bướm như nhau.", "b) Chim dùng thị giác tìm mồi.", "c) Rừng ô nhiễm, bướm tối ưu thế sống sót.", "d) Khi ô nhiễm, quần thể tạo biến dị tối nhiều hơn sáng."],
+        fullText: "Câu 3. Trong một cánh rừng gần khu công nghiệp, khói đen từ các nhà máy làm thay đổi môi trường trong rừng. Khi theo dõi ảnh hưởng của ô nhiễm môi trường trong cảnh rừng đối với sự hình thành đặc điểm thích nghi (màu sắc thân) của một loài bướm, đối chứng là khu vực rừng cách xa nhà máy, các nhà khoa học thu được số liệu như trong Bảng 17.1. Các phát biểu sau đây về bảng số liệu này là Đúng hay Sai?",
+        table: `<table><tr><th>Khu vực thí nghiệm</th><th>Bướm sáng (%)</th><th>Bướm tối (%)</th></tr><tr><td>Rừng không bị ô nhiễm</td><td>13,7</td><td>86,3</td></tr><tr><td>Rừng bị ô nhiễm</td><td>74,1</td><td>25,9</td></tr></table>`,
+        sub: ["a) Ở cánh rừng không bị ô nhiễm, chim ăn thịt các loại bướm như nhau.", "b) Chim dùng thị giác để tìm kiếm thức ăn.", "c) Trong khu rừng bị ô nhiêm, bướm có màu sắc tối có nhiều ưu thể về sống sót và sinh sản hơn.", "d) Khi rừng bị ô nhiễm, quần thể bướm tăng cường tạo ra cac biến dị màu sắc thân tối nhiều hơn thân có màu sắc sáng."],
         ans: [false, true, true, true]
     },
     {
-        q: "Câu 10. Nguồn gốc sự sống:",
-        subQs: ["a) Trình tự: Hoá học -> Sinh học -> Tiền sinh học.", "b) Hoá học là giai đoạn tạo tế bào sống đầu tiên.", "c) Tiền sinh học tạo ra tế bào sơ khai (protobiont).", "d) Sinh học không chịu tác động của nhân tố tiến hoá."],
+        fullText: "Câu 1. Khi nói về nguồn gốc của sự sống, các phát biểu sau đây đúng hay sai?",
+        sub: ["a) Sự sống được phát sinh qua các giai đoạn theo trình tự sau: Tiến hoá hoá học → Tiến hoá sinh học → Tiến hoá tiền sinh học.", "b) Tiến hoá hoá học là giai đoạn hình thành nên những tế bào sống đầu tiên.", "c) Tiến hoá tiền sinh học là giai đoạn hình thành nên các tế bào sơ khai (protobiont).", "d) Tiến hoá sinh học được diễn ra cho đến ngày nay hình thành nên các loài sinh vật và không chịu tác động của các nhân tố tiến hoá."],
         ans: [false, false, true, false]
     },
     {
-        q: "Câu 11. Tiến hóa hóa học:",
-        subQs: ["a) Chỉ là giả thuyết, chưa chứng minh thực nghiệm.", "b) Năng lượng tự nhiên hình thành amino acid từ vô cơ.", "c) Chất hữu cơ phức tạp theo mưa rơi xuống biển.", "d) Tổng hợp hữu cơ từ vô cơ theo phương thức hóa học."],
+        fullText: "Câu 2. Khi nói về tiến hóa hóa học, các phát biểu sau đây đúng hay sai?",
+        sub: ["a) Quá trình hình thành các chất hữu cơ bằng con đường hóa học mới chỉ là giả thuyết, chưa được chứng minh bằng thực nghiệm.", "b) Do tác dụng của các nguồn năng lượng tự nhiên mà từ các chất vô cơ hình thành nên những hợp chất hữu cơ đơn giản đến phức tạp như amino acid, nucleotide.", "c) Các hợp chất hữu cơ càng phức tạp sẽ càng nặng, theo các cơn mưa kéo dài hàng nghìn năm thuở đó mà rơi xuống biển.", "d) Có sự tổng hợp các chất hữu cơ từ các chất vô cơ theo phương thức hóa học."],
         ans: [false, true, true, true]
     },
     {
-        q: "Câu 12. Các giai đoạn tiến hóa (Tiếp theo):",
-        subQs: ["a) Hữu cơ trong thiên thạch chứng tỏ tiến hóa hóa học có ngoài Trái Đất.", "b) Tìm sự sống hành tinh khác dựa trên giả thuyết tiến hóa hóa học.", "c) Hoá học và sinh học hoàn toàn độc lập.", "d) Hữu cơ đơn giản chỉ tạo được trong phòng thí nghiệm."],
+        fullText: "Câu 3. Khi nói về các giai đoạn tiến hóa, cho biết các nhận định nào sau đây đúng hay sai?",
+        sub: ["a) Sự xuất hiện của các hợp chất hữu cơ trong các thiên thạch chứng tỏ quá trình tiến hóa hóa học có thể xảy ra ở ngoài Trái Đất.", "b) Việc tìm kiếm sự sống trên các hành tinh khác dựa trên giả thuyết về tiến hóa hóa học.", "c) Tiến hóa hóa học và tiến hóa sinh học là hai quá trình hoàn toàn độc lập.", "d) Các chất hữu cơ đơn giản chỉ có thể được tạo ra trong phòng thí nghiệm."],
         ans: [true, true, false, false]
     },
     {
-        q: "Câu 13. Nguồn gốc loài người (DNA ti thể và NST Y):",
-        subQs: ["a) Dòng mẹ và dòng bố giúp dễ theo dõi giới tính.", "b) DNA NST thường lớn nên khó nhân dòng hơn.", "c) Tốc độ đột biến cao hơn phù hợp nghiên cứu loài gần gũi.", "d) Không trao đổi chéo giúp ước lượng chính xác thời điểm phát sinh."],
+        fullText: "Câu 1. Khi nghiên cứu địa điểm phát sinh loài người, nhiều ý kiến ủng hộ cho giả thuyết loài người hiện đại sinh ra ở châu Phi rồi phát tán sang các châu lục khác. Các nhà khoa học đã dựa vào các nghiên cứu về DNA ti thể và vùng không tương đồng trên NST Y để chứng minh giả thuyết. Các giải thích sau đây về việc tại sao lại sử dụng DNA ti thể và vùng không tương đồng trên NST Y để chứng minh giả thuyết trên là đúng hay sai?",
+        sub: ["a) Đây là các vùng thuộc hệ gene di truyền theo dòng mẹ và dòng bố, nên dễ dàng theo dõi và phân tích ở từng giới tính đực và cái.", "b) Vùng DNA tương đồng trên các NST thường có kích thước rất lớn nên khó nhân dòng và phân tích hơn so với DNA ti thể và NST Y.", "c) Hệ gene ti thể và vùng không tương đồng trên NST Y có tốc độ đột biến cao hơn so với vùng tương đồng trên các NST thường, nên phù hợp hơn cho các nghiên cứu tiến hoá ở các loài gần gũi.", "d) Đây là các vùng DNA thường không xảy ra trao đổi chéo và biến dị tổ hợp qua thụ tinh. Vì vậy, hầu hết mọi biến đổi đều do đột biến sinh ra; điều này giúp ước lượng chính xác thời điểm phát sinh các chủng tộc và loài."],
         ans: [false, false, false, true]
     },
     {
-        q: "Câu 14. Đại và kỉ địa chất:",
-        subQs: ["a) Có biến đổi mạnh về địa chất và khí hậu.", "b) Mỗi đại có sinh vật đặc trưng riêng.", "c) Phát sinh loài mới sau tuyệt chủng là tiến hóa tiền sinh học.", "d) Chứng minh thích nghi có tính tương đối."],
+        fullText: "Câu 2. “Các nhà địa chất học chia lịch sử của Trái Đất thành các đại và kỉ địa chất. Ranh giới giữa các đại hoặc các kỉ thường là các giai đoạn có những biến đổi của Trái Đất làm cho sinh vật bị tuyệt chủng hàng loạt và sau đó là bắt đầu một giai đoạn tiến hoá mới của các sinh vật sống sót. Các sinh vật sống sót tiến hoá và bước vào giai đoạn bùng nổ, phát sinh các loài mới và chiếm lĩnh các ổ sinh thái còn trống”. Mỗi phát biểu sau đúng hay sai khi nói về hiện tượng trên?",
+        sub: ["a) Ở các giai đoạn này có sự biến đổi mạnh mẽ về địa chất và khí hậu.", "b) Mỗi đại địa chất đại diện cho một giai đoạn riêng biệt trong lịch sử của Trái Đất với các sinh vật đặc trưng.", "c) Các sinh vật sống sót tiến hoá và phát sinh các loài mới là giai đoạn tiến hóa tiền sinh học.", "d) Hiện tượng trên chứng minh sự thích nghi của các loài chỉ có tính tương đối."],
         ans: [true, true, false, true]
     },
     {
-        q: "Câu 15. Lịch sử Trái Đất và sinh vật đặc trưng:",
-        subQs: ["a) Trải qua 5 đại, bắt đầu từ Thái cổ.", "b) Tuyệt chủng chỉ do nơi sống bị hủy hoại.", "c) Sau tuyệt chủng là bùng nổ loài mới chiếm ổ sinh thái.", "d) Thời đại bò sát là Đại Tân sinh."],
+        fullText: "Câu 3. “Sự phát triển của sinh vật trải qua năm đại, bắt đầu từ Đại Thái cổ (Archean). Mỗi đại địa chất đại diện cho một giai đoạn riêng biệt trong lịch sử của Trái Đất với các sinh vật đặc trưng. Ví dụ: Đại Trung sinh (Mesozoic) còn được gọi là “thời đại của bò sát” vì có rất nhiều hoá thạch của bò sát, kể cả khủng long được tìm thấy vào thời kì này. Hồ sơ hoá thạch cho thấy đại đa số các loài sinh vật đã từng sống nay đã bị tuyệt chủng. Lí do dẫn đến tuyệt chủng các loài sinh vật là nơi sống bị huỷ hoại hoặc môi trường sống bị thay đổi, không còn thích hợp. Trong một số trường hợp, sự phát sinh mạnh mẽ của một loài cũng có thể dẫn đến sự diệt vong của loài khác”. Mỗi phát biểu sau đúng hay sai khi nói về hiện tượng trên?",
+        sub: ["a) Sự phát triển của sinh vật trên Trái Đất trải qua 5 đại, bắt đầu từ Đại Thái cổ.", "b) Nguyên nhân duy nhất dẫn đến tuyệt chủng các loài sinh vật là nơi sống bị huỷ hoại hoặc môi trường sống bị thay đổi, không còn thích hợp.", "c) Sau mỗi lần tuyệt chủng hàng loạt, những sinh vật sống sót bước vào giai đoạn bùng nổ, phát sinh các loài mới và chiếm lĩnh các ổ sinh thái còn trống.", "d) Thời đại của bò sát là Đại Tân sinh (Mesozoic) vì rất nhiều hóa thạch của bò sát được tìm thấy vào thời kì này."],
         ans: [true, false, true, false]
     },
     {
-        q: "Câu 16. Nhân tố sinh thái:",
-        subQs: ["a) Là yếu tố môi trường ảnh hưởng trực tiếp/gián tiếp.", "b) Gồm vô sinh và hữu sinh.", "c) Vô sinh phụ thuộc mật độ, hữu sinh không phụ thuộc.", "d) CO2 < 0,01% thì quang hợp không diễn ra."],
+        fullText: "Câu 1. Khi nói về các nhân tố sinh thái, phát biểu nào sau đây đúng hay sai?",
+        sub: ["a) Là tất cả những yếu tố của môi trường có ảnh hưởng trực tiếp hoặc gián tiếp đến đời sống sinh vật.", "b) Gồm nhân tố sinh thái vô sinh (khí hậu, thổ nhưỡng, nước) và nhân tố sinh thái hữu sinh (sinh vật, con người, các mối quan hệ giữa các cá thể).", "c) Các nhân tố sinh thái vô sinh tác động phụ thuộc vào mật độ cá thể của loài, nhân tố hữu sinh tác động không phụ thuộc vào mật độ.", "d) Nếu nồng độ CO2 trong không khí dưới 0,01% thì quá trình quang hợp ở thực vật không diễn ra dù mật độ cá thể cao hay thấp, hiệu suất săn mồi của động vật ăn thịt sẽ giảm khi mật độ cá thể của con mồi quá thấp hoặc quá cao."],
         ans: [true, true, false, true]
     },
     {
-        q: "Câu 17. Ảnh hưởng của ánh sáng:",
-        subQs: ["a) Phân bố đều, không theo vị trí địa lí.", "b) Ảnh hưởng quang hợp và độ dài ngày đêm.", "c) Giúp động vật định hướng không gian.", "d) Động vật đêm có thị giác phát triển (cú lợn, gấu mèo)."],
+        fullText: "Câu 2. Các nhận định sau đây là đúng hay sai khi nói về ảnh hưởng của nhân tố ánh ánh sáng đến đời sống sinh vật?",
+        sub: ["a) Ánh sáng phân bố đều trên bề mặt của Trái đất, thay đổi không theo vị trí địa lí.", "b) Đối với thực vật, ánh sáng ảnh hưởng đến cường độ quang hợp của thực vật, độ dài ngày và đêm ảnh hưởng đến sự phát triển ở thực vật.", "c) Đối với động vật, ánh sáng giúp chúng có khả năng định hướng trong không gian, ảnh hưởng đến tập tính và cấu tạo của động vật.", "d) Các loài động vật hoạt động vào ban ngày (ong, thằn lằn,...) có cơ quan tiếp nhận ánh sáng phát triển; động vật hoạt động về đêm hoặc nơi thiếu ánh sáng có cơ quan thị giác rất phát triển (cú lợn, gấu mèo,…)."],
         ans: [false, true, true, true]
     },
     {
-        q: "Câu 18. Nhịp sinh học 24 giờ:",
-        subQs: ["a) Phản ứng nhịp nhàng với chu kì nhân tố sinh thái.", "b) Lá họ Đậu mở sáng khép tối.", "c) Hình thành do tác động qua lại các loài trong quần thể.", "d) Chu kì tế bào là nhịp sinh học."],
+        fullText: "Câu 3. “Nhịp sinh học điều chỉnh nhiều quá trình trao đổi chất và sinh lý theo nhịp điệu, với chu kỳ tự nhiên khoảng 24 giờ. Hầu như tất cả các hành vi và hoạt động sinh lý của sự sống, bao gồm vi khuẩn, nấm, thực vật, ruồi giấm, cá, chuột và con người, đều tuân theo nhịp sinh học 24 giờ, chẳng hạn như hành vi ăn uống của động vật có vú, mô hình ngủ/thức, hormone và hệ thống miễn dịch.”- (Trích Bài báo khoa học từ trang Web www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/biological-rhythm). Các nhận định sau đây là đúng hay sai về nhịp sinh học?",
+        sub: ["a) Những phản ứng một cách nhịp nhàng của cơ thể sinh vật với sự thay đổi có tính chu kì của các nhân tố sinh thái được gọi là nhịp sinh học.", "b) Lá ở cây họ Đậu mở ra vào buổi sáng và khép lại vào buổi tối.", "c) Nhịp sinh học được hình thành trong quá trình phát triển của quần thể, dưới tác động qua lại của các sinh vật.", "d) Chu kì phân chia của tế bào – chu kì tế bào."],
         ans: [true, true, false, true]
     },
     {
-        q: "Câu 19. Mật độ cá thể:",
-        subQs: ["a) Mật độ giảm tối thiểu thì sinh sản tăng tối đa.", "b) Không đánh giá được suy vong hay phát triển.", "c) Mật độ giảm nhanh thì sức sinh sản tăng.", "d) Luôn cố định theo thời gian."],
+        fullText: "Câu 1. Khi nói về mật độ cá thể của quần thể, các phát biểu sau đây là đúng hay sai?",
+        sub: ["a) Khi mật độ giảm tới mức tối thiểu thì sức sinh sản tăng tới mức tối đa.", "b) Mật độ cá thể của quần thể không đánh giá được mức độ suy vong hay phát triển của một quần thể.", "c) Khi mật độ cá thể của quần thể giảm nhanh thì sức sinh sản tăng.", "d) Mật độ cá thể trong quần thể luôn cố định theo thời gian."],
         ans: [false, false, true, false]
     },
     {
-        q: "Câu 20. Nhóm tuổi quần thể:",
-        subQs: ["a) Nhóm đang sinh sản luôn nhiều hơn trước sinh sản.", "b) Cấu trúc tuổi thay đổi theo chu kì mùa.", "c) Sau sinh sản < trước/đang sinh sản là quần thể phát triển.", "d) Suy vong nếu trước/đang sinh sản < sau sinh sản."],
+        fullText: "Câu 2. Khi nói về nhóm tuổi của quần thể, các kết luận nào sau đây là đúng hay sai?",
+        sub: ["a) Ở tất cả các quần thể, nhóm tuổi đang sinh sản luôn có số lượng cá thể nhiều hơn nhóm tuổi sinh sản.", "b) Cấu trúc tuổi của quần thể thường thay đổi theo chu kì mùa. Ở loài nào có vùng phân bố rộng thì thường có cấu trúc tuổi phức tạp hơn loài có vùng phân bố hẹp.", "c) Khi số lượng cá thể của nhóm tuổi sau sinh sản ít hơn số lượng cá thể của nhóm tuổi trước sinh sản và đang sinh sản thì quần thể đang phát triển.", "d) Quần thể sẽ suy vong nếu số lượng cá thể ở nhóm tuổi trước sinh sản và đang sinh sản ít hơn số lượng cá thể ở nhóm sau sinh sản."],
         ans: [false, true, true, true]
     },
     {
-        q: "Câu 21. Kích thước 4 quần thể thú (A, B, C, D):",
+        fullText: "Câu 3. Giả sử 4 quần thể của một loài thú được kí hiệu là A, B, C, D có diện tích khu phân bố và mật độ cá thể như sau: Cho biết diện tích khu phân bố của 4 quần thể không thay đổi, không có hiện tượng xuất cư và nhập cư. Theo lí thuyết, có bao nhiêu phát biểu sau đây đúng?",
         table: `<table><tr><th>Quần thể</th><th>A</th><th>B</th><th>C</th><th>D</th></tr><tr><td>Diện tích (ha)</td><td>100</td><td>120</td><td>80</td><td>90</td></tr><tr><td>Mật độ (c/ha)</td><td>22</td><td>25</td><td>26</td><td>21</td></tr></table>`,
-        subQs: ["a) Quần thể D nhỏ nhất.", "b) Kích thước A > C.", "c) B tăng 5%/năm thì mật độ là 26,25.", "d) C tăng 5%/năm thì tăng thêm 152 cá thể."],
+        sub: ["a) Quần thể D có kích thước nhỏ nhất.", "b) Kích thước quần thể A lớn hơn kích thước quần thể C.", "c) Nếu kích thước quần thể B tăng 5%/năm thì sau 1 năm mật độ cá thể của quần thể này là 26,25 cá thể/ha.", "d) Nếu kích thước quần thể C tăng 5%/năm thì sau 1 năm quần thể này tăng thêm 152 cá thể."],
         ans: [true, true, true, false]
     },
     {
-        q: "Câu 22. Tôm vệ sinh và lươn:",
-        subQs: ["a) Quan hệ hai bên cùng có lợi.", "b) Tương tự vi khuẩn và tảo trong địa y.", "c) Là quan hệ hỗ trợ khác loài.", "d) Là quan hệ hội sinh."],
+        fullText: "Câu 1: “Loài tôm vệ sinh, một loài liều lĩnh một cách điên rồ. Chúng cả gan leo vào cái miệng đầy răng nhọn hoắt lởm chởm của những con lươn, đào bới quanh răng chúng để tìm thức ăn. Đây là tập quán kiếm ăn đã có từ lâu đời của loài tôm này, chúng chuyên ăn những ký sinh trùng trong miệng của các loài lươn và cá.” – (Theo khoahoc.tv). Mỗi nhận định sau đây là Đúng hay Sai khi nói về mối quan hệ giữa loài tôm vệ sinh và loài lươn này?",
+        sub: ["a) Đây là mối quan hệ hai bên cùng có lợi.", "b) Quan hệ giữa vi khuẩn và tảo đơn bào thành địa y cũng tương tự như quan hệ của loài tôm vệ sinh và loài lươn trên.", "c) Đây là mối quan hệ hỗ trợ giữa 2 loài khác nhau trong quần xã.", "d) Đây là quan hệ hội sinh."],
         ans: [true, false, true, false]
     },
     {
-        q: "Câu 23. Hiện tượng thủy triều đỏ (tảo nở hoa):",
-        subQs: ["a) Ví dụ quan hệ ký sinh.", "b) Sinh vật này gây hại sinh vật khác.", "c) Một loài có lợi, nhiều loài bị hại.", "d) Là khống chế sinh học."],
+        fullText: "Câu 2: “Thủy triều đỏ” là tên gọi khi vùng biển có hiện tượng nở hoa bùng phát của tảo. Khi tảo nở hoa ảnh hưởng xấu đến hàng loạt động vật giáp xác thân mềm như nghêu, trai, sò, vẹm, hầu. Những động vật thân mềm xuất xứ từ vùng này có nguy cơ tiềm ẩn cho con người khi sử dụng làm thức ăn, vì bản thân chúng có thể chứa độc tố từ tảo độc. Mỗi nhận định sau đây là Đúng hay Sai khi nói về hiện tượng “thủy triều đỏ”?",
+        sub: ["a) Hiện tượng “thủy triều đỏ” là ví dụ của quan hệ ký sinh.", "b) Sự tồn tại và sinh trưởng của sinh vật này gây hại đến sự tồn tại và sinh trưởng của sinh vật khác.", "c) Mối quan hệ này cho thấy một loài có lợi và nhiều loài bị hại.", "d) Đây là quan hệ khống chế sinh học."],
         ans: [false, true, false, false]
     }
 ];
@@ -197,54 +199,53 @@ const quizData = [
 let currentIdx = 0;
 
 function render() {
-    const content = document.getElementById('quiz-content');
-    const item = quizData[currentIdx];
-    document.getElementById('progress').innerText = `Câu ${currentIdx + 1} / ${quizData.length}`;
+    const area = document.getElementById('quiz-area');
+    const item = data[currentIdx];
+    document.getElementById('progress').innerText = `Câu ${currentIdx + 1} / ${data.length}`;
     
-    let html = `<div class="question-box active"><h3>${item.q}</h3>`;
-    if(item.desc) html += `<div class="desc-box">${item.desc}</div>`;
-    if(item.table) html += item.table;
-    html += `<div class="options-grid">`;
+    let html = `<div class="question-box active">
+        <div class="full-question-text">${item.fullText}</div>
+        ${item.table || ''}
+        <div class="options-container">`;
     
-    item.subQs.forEach((s, i) => {
-        html += `<div class="option-item"><p>${s}</p>
+    item.sub.forEach((s, i) => {
+        html += `<div class="option-card"><p>${s}</p>
         <div class="btn-group">
             <button class="btn-true" onclick="check(${i}, true, this)">ĐÚNG</button>
             <button class="btn-false" onclick="check(${i}, false, this)">SAI</button>
         </div></div>`;
     });
     html += `</div></div>`;
-    content.innerHTML = html;
-    document.getElementById('status-message').innerText = "";
+    area.innerHTML = html;
+    document.getElementById('msg').innerText = "";
 }
 
 function check(subIdx, val, btn) {
-    const isCorrect = quizData[currentIdx].ans[subIdx] === val;
-    if(isCorrect) {
+    const correct = data[currentIdx].ans[subIdx] === val;
+    if(correct) {
         btn.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+        btn.style.boxShadow = "0 0 15px gold";
         btn.style.opacity = "1";
-        btn.style.boxShadow = "0 0 10px gold";
-        checkAllDone();
+        checkFinish();
     } else {
-        document.getElementById('status-message').innerText = "Sai rồi ! Thử lại ý này nhé.";
+        document.getElementById('msg').innerText = "Sai rồi! Hãy chọn lại ý này.";
         btn.style.background = "#000";
         setTimeout(() => {
-            btn.style.background = val ? "#28a745" : "#dc3545";
-            document.getElementById('status-message').innerText = "";
-        }, 800);
+            btn.style.background = val ? "#2ecc71" : "#e74c3c";
+            document.getElementById('msg').innerText = "";
+        }, 700);
     }
 }
 
-function checkAllDone() {
-    const buttons = document.querySelectorAll('.btn-group button');
-    const disabled = Array.from(buttons).filter(b => b.disabled).length;
-    if(disabled === quizData[currentIdx].subQs.length * 2) {
-        document.getElementById('status-message').style.color = "#28a745";
-        document.getElementById('status-message').innerText = "CHÍNH XÁC! Đang chuyển dữ liệu...";
+function checkFinish() {
+    const btns = document.querySelectorAll('.btn-group button:disabled');
+    if(btns.length === data[currentIdx].sub.length * 2) {
+        document.getElementById('msg').style.color = "#2ecc71";
+        document.getElementById('msg').innerText = "CHÍNH XÁC! Chuyển câu tiếp theo...";
         setTimeout(() => {
             currentIdx++;
-            if(currentIdx < quizData.length) render();
-            else document.getElementById('quiz-container').innerHTML = "<h1>HOÀN THÀNH!</h1><p style='text-align:center'>Dữ liệu xác nhận bạn đã vượt qua</p>";
+            if(currentIdx < data.length) render();
+            else document.getElementById('quiz-container').innerHTML = "<h1>HOÀN THÀNH BÀI TẬP!</h1><p style='text-align:center'>Bạn đã hoàn thành xuất sắc.</p>";
         }, 1500);
     }
 }
