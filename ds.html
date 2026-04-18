@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Quiz System - Trắc Nghiệm Tiến Hóa & Sinh Thái</title>
+    <style>
+        :root {
+            --nasa-blue: #0b3d91;
+            --nasa-red: #fc3d21;
+            --bg-color: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 { color: var(--nasa-blue); text-align: center; border-bottom: 2px solid var(--nasa-blue); padding-bottom: 10px; }
+
+        .question-box { display: none; margin-bottom: 20px; }
+        .active { display: block; animation: fadeIn 0.5s; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        table, th, td { border: 1px solid #ddd; text-align: center; padding: 10px; }
+        th { background-color: var(--nasa-blue); color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-item {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 5px; }
+        
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .btn-true { background: #28a745; color: white; }
+        .btn-false { background: #dc3545; color: white; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #result-area {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 20px;
+            color: var(--nasa-red);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <h1>NASA BIO-GENIUS QUIZ</h1>
+    <div id="questions-wrapper">
+        </div>
+    <div id="result-area"></div>
+</div>
+
+<script>
+const quizData = [
+    {
+        q: "Câu 1. Tỷ lệ % các amino acid sai khác nhau ở chuỗi polypeptide anpha trong phân tử Hemoglobin:",
+        table: `<table>
+            <tr><th>Loài</th><th>Cá mập</th><th>Cá chép</th><th>Kỳ nhông</th><th>Chó</th><th>Người</th></tr>
+            <tr><td>Cá mập</td><td>0%</td><td>59,4%</td><td>61,4%</td><td>56,8%</td><td>53,2%</td></tr>
+            <tr><td>Cá chép</td><td>-</td><td>0%</td><td>53,2%</td><td>47,9%</td><td>48,6%</td></tr>
+            <tr><td>Kỳ nhông</td><td>-</td><td>-</td><td>0%</td><td>46,1%</td><td>44,0%</td></tr>
+            <tr><td>Chó</td><td>-</td><td>-</td><td>-</td><td>0%</td><td>16,3%</td></tr>
+            <tr><td>Người</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0%</td></tr>
+        </table>`,
+        subQs: [
+            "a) Đây là bằng chứng sinh học phân tử",
+            "b) Cá chép có quan hệ họ hàng xa nhất với người",
+            "c) Dựa trên bằng chứng này ta có thể xác định được mối quan hệ họ hàng gần xa giữa các loài",
+            "d) Trật tự đúng về mối quan hệ họ hàng giữa các loài là: người -> Chó -> Kì Giông -> Cá chép -> Cá mập"
+        ],
+        answers: [true, false, true, true]
+    },
+    {
+        q: "Câu 2. Bảng thể hiện sự khác biệt về số lượng amino acid trong cytochrome C so với người:",
+        table: `<table>
+            <tr><th>Loài sinh vật</th><th>Số lượng amino acid khác so với người</th></tr>
+            <tr><td>Tinh tinh</td><td>0</td></tr>
+            <tr><td>Khỉ Rhessus</td><td>1</td></tr>
+            <tr><td>Ruồi giấm</td><td>25</td></tr>
+            <tr><td>Nấm men</td><td>40</td></tr>
+        </table>`,
+        subQs: [
+            "a) Bằng chứng dùng làm căn cứ là bằng chứng sinh học tế bào.",
+            "b) Có 2 loài sinh vật thuộc nhóm linh trưởng.",
+            "c) Ở nấm men, tất cả các phân tử sinh học đều khác người là 40.",
+            "d) Người và tinh tinh không khác biệt chứng tỏ chung tổ tiên nhưng thời gian chưa đủ để đột biến tạo khác biệt."
+        ],
+        answers: [false, true, false, true]
+    },
+    {
+        q: "Câu 3 (Thú). Xác định kích thước quần thể dựa trên mật độ:",
+        table: `<table>
+            <tr><th>Quần thể</th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+            <tr><td>Diện tích (ha)</td><td>100</td><td>120</td><td>80</td><td>90</td></tr>
+            <tr><td>Mật độ (cá thể/ha)</td><td>22</td><td>25</td><td>26</td><td>21</td></tr>
+        </table>`,
+        subQs: [
+            "a) Quần thể D có kích thước nhỏ nhất.",
+            "b) Kích thước quần thể A lớn hơn kích thước quần thể C.",
+            "c) Nếu B tăng 5%/năm thì sau 1 năm mật độ là 26,25.",
+            "d) Nếu C tăng 5%/năm thì sau 1 năm tăng thêm 152 cá thể."
+        ],
+        answers: [true, true, true, false]
+    }
+    // Bạn có thể thêm toàn bộ các câu hỏi còn lại vào mảng này tương tự mẫu trên
+];
+
+let currentQuestionIndex = 0;
+let userAnswers = [];
+
+function initQuiz() {
+    const wrapper = document.getElementById('questions-wrapper');
+    quizData.forEach((data, index) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = `question-box ${index === 0 ? 'active' : ''}`;
+        qDiv.id = `q-${index}`;
+        
+        let subQsHtml = '';
+        data.subQs.forEach((sub, subIdx) => {
+            subQsHtml += `
+                <div class="option-item">
+                    <p>${sub}</p>
+                    <div class="btn-group">
+                        <button class="btn-true" onclick="checkSub(${index}, ${subIdx}, true, this)">ĐÚNG</button>
+                        <button class="btn-false" onclick="checkSub(${index}, ${subIdx}, false, this)">SAI</button>
+                    </div>
+                </div>`;
+        });
+
+        qDiv.innerHTML = `
+            <h3>${data.q}</h3>
+            ${data.table || ''}
+            <div class="options-grid">${subQsHtml}</div>
+        `;
+        wrapper.appendChild(qDiv);
+    });
+}
+
+function checkSub(qIdx, subIdx, val, btn) {
+    const correct = quizData[qIdx].answers[subIdx];
+    const parent = btn.parentElement;
+    
+    // Vô hiệu hóa các nút trong nhóm sau khi chọn
+    Array.from(parent.children).forEach(b => b.disabled = true);
+
+    if (val === correct) {
+        btn.style.boxShadow = "0 0 10px #28a745";
+        checkAllDone(qIdx);
+    } else {
+        btn.style.background = "#000";
+        document.getElementById('result-area').innerText = "Sai rồi! Hãy thử lại câu này.";
+        setTimeout(() => {
+            Array.from(parent.children).forEach(b => b.disabled = false);
+            btn.style.background = val ? "#28a745" : "#dc3545";
+            document.getElementById('result-area').innerText = "";
+        }, 1000);
+    }
+}
+
+function checkAllDone(qIdx) {
+    const currentBox = document.getElementById(`q-${qIdx}`);
+    const totalButtons = currentBox.querySelectorAll('button').length;
+    const disabledButtons = currentBox.querySelectorAll('button:disabled').length;
+
+    if (totalButtons === disabledButtons) {
+        document.getElementById('result-area').innerText = "Chính xác! Đang chuyển câu...";
+        setTimeout(() => {
+            document.getElementById(`q-${qIdx}`).classList.remove('active');
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                document.getElementById(`q-${currentQuestionIndex}`).classList.add('active');
+                document.getElementById('result-area').innerText = "";
+            } else {
+                document.getElementById('result-area').innerHTML = "Chúc mừng Npc! Bạn đã hoàn thành xuất sắc bài tập của NASA!";
+            }
+        }, 1500);
+    }
+}
+
+initQuiz();
+</script>
+
+</body>
+</html>
