@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Lịch Sử - 74 Câu Cơ Bản</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 800px; }
+        .header { border-bottom: 3px solid #007bff; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; font-weight: bold; color: #333; }
+        .question { font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; color: #2c3e50; font-weight: 500; }
+        .option { display: block; width: 100%; margin: 12px 0; padding: 15px; border: 2px solid #dee2e6; border-radius: 10px; cursor: pointer; text-align: left; background: #fff; font-size: 1rem; transition: all 0.3s; box-sizing: border-box; }
+        .option:hover { background: #f1f3f5; border-color: #007bff; transform: translateY(-2px); }
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
+        .wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        #message { height: 40px; margin-top: 15px; font-weight: bold; text-align: center; font-size: 1.1rem; }
+        .result-box { text-align: center; padding: 40px 20px; }
+        .score { font-size: 4rem; color: #007bff; margin: 20px 0; font-weight: 800; }
+        .comment { font-size: 1.5rem; color: #28a745; margin-bottom: 30px; font-style: italic; }
+        button.retry-btn { padding: 15px 35px; background: #007bff; color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.3s; }
+        button.retry-btn:hover { background: #0056b3; box-shadow: 0 5px 15px rgba(0,123,255,0.4); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-ui">
+        <div class="header">
+            <span>Ôn Tập Lịch Sử 12</span>
+            <span id="progress">Đang tải câu hỏi...</span>
+        </div>
+        <div class="question" id="questionText"></div>
+        <div id="optionsGroup"></div>
+        <div id="message"></div>
+    </div>
+
+    <div id="result-ui" class="result-box" style="display: none;">
+        <h1>KẾT QUẢ CUỐI CÙNG</h1>
+        <p style="color: #666;">(Điểm chỉ tính cho các câu trả lời đúng ngay lần đầu tiên)</p>
+        <div class="score" id="finalScore"></div>
+        <div id="correctCount" style="font-size: 1.2rem; margin-bottom: 10px;"></div>
+        <div class="comment" id="commentText"></div>
+        <button class="retry-btn" onclick="location.reload()">Làm lại bài thi</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {q: "Câu 1. Hoạt động đối ngoại của Đảng Cộng sản Đông Dương trong giai đoạn 1930-1940 là", opts: ["A. duy trì liên lạc với Quốc tế Vô sản, các đảng xã hội và phong trào vô sản ở các nước.", "B. thể hiện sự ủng hộ các nước thuộc phe Đồng mình và các nước xã hội chủ nghĩa.", "C. duy trì liên lạc với Quốc tế Cộng sản, các Đảng Cộng sản và phong trào vô sản ở các nước.", "D. thể hiện sự ủng hộ Liên Xô, các nước xã hội chủ nghĩa và các nước thuộc phe Đồng mình."], correct: 2},
+        {q: "Câu 2. Năm 1911, từ Sài Gòn Nguyễn Tất Thành lên con tàu La-tu-sơ Tơ-rê-vin bắt đầu", opts: ["A. tham gia phong trào công nhân quốc tế.", "B. đi tìm hiểu hoạt động của Quốc tế III.", "C. tham gia phong trào du học sinh của Phan Bội Châu.", "D. hành trình tìm đường cứu nước."], correct: 3},
+        {q: "Câu 3. Năm 2007, Việt Nam chính thức gia nhập tổ chức nào dưới đây?", opts: ["A. Tổ chức thương mại thế giới (WTO).", "B. Diễn đàn hợp tác kinh tế châu Á – Thái Bình Dương (APEC).", "C. Khu vực mậu dịch tự do ASEAN (AFTA).", "D. Hiệp hội các quốc gia Đông Nam Á (ASEAN)."], correct: 0},
+        {q: "Câu 4. Một trong những tổ chức được Nguyễn Ái Quốc thành lập khi ở nước ngoài giai đoạn từ (1911-1930) là", opts: ["A. Mặt trận Tổ quốc Việt Nam.", "B. Mặt trận Việt-Miên-Lào.", "C. Hội liên hiệp thuộc địa.", "D. Điền Quế Việt liên minh."], correct: 2},
+        {q: "Câu 5. Văn kiện nào sau đây được Nguyễn Ái Quốc thay mặt những người Việt Nam yêu nước ở Pháp gửi đến Hội nghị Véc-xai năm 1919?", opts: ["A. Đường Kách mệnh.", "B. Yêu sách của nhân dân An Nam.", "C. Tuyên ngôn Quốc tế Nhân quyền.", "D. Bản án chế độ thực dân Pháp."], correct: 1},
+        {q: "Câu 6. Năm 1908, Phan Bội Châu đã tham gia thành lập tổ chức nào sau đây?", opts: ["A. Hội liên hiệp thuộc địa.", "B. Mặt trận Việt-Miên-Lào.", "C. Điền Quế Việt liên minh.", "D. Mặt trận Tổ quốc Việt Nam."], correct: 2},
+        {q: "Câu 7. Nội dung nào sau đây nhận định sai về ý nghĩa ra đời của Đảng Cộng sản Việt Nam?", opts: ["A. Là kết quả cuộc đấu tranh dân tộc và giai cấp trong những năm 20 của thế kỉ XX.", "B. Là sự kết hợp giữa phong trào cộng sản quốc tế và tư tưởng dân chủ tư sản phương Tây.", "C. Kết hợp phong trào công nhân và phong trào yêu nước Việt Nam trong thời kì mới.", "D. Có sự kết hợp chặt chẽ giữa chủ nghĩa Mác – Lê-nin và tư tưởng Nguyễn Ái Quốc."], correct: 1},
+        {q: "Câu 8. Hoạt động của Nguyễn Ái Quốc - Hồ Chí Minh trong những năm 1920- 1930 không có nội dung nào sau đây?", opts: ["A. Bồi dưỡng cán bộ cách mạng và sáng lập Đảng Cộng sản Việt Nam.", "B. Trở về nước trực tiếp lãnh đạo cuộc vận động giải phóng dân tộc.", "C. Lựa chọn con đường cứu nước theo khuynh hướng cách mạng vô sản.", "D. Chuẩn bị các điều kiện cho việc thành lập Đảng Cộng sản Việt Nam."], correct: 1},
+        {q: "Câu 9. Năm 1991, Việt Nam có hoạt động đối ngoại nổi bật nào sau đây?", opts: ["A. Việt Nam và Hoa Kì đã bình thường hóa quan hệ ngoại giao.", "B. Việt Nam gia nhập Tổ chức Thương mại Thế giới (WTO).", "C. Việt Nam và Trung Quốc bình thường hóa quan hệ ngoại giao.", "D. Phát triển quan hệ đối tác chiến lược toàn diện với Nhật Bản."], correct: 2},
+        {q: "Câu 10. Trong giai đoạn (1975 - 1985), Việt Nam không thực hiện hoạt động đối ngoại nào sau đây?", opts: ["A. Bình thường hóa quan hệ ngoại giao với Mĩ.", "B. Tham gia tích cực Phong trào Không liên kết.", "C. Đẩy mạnh hợp tác toàn diện với Liên Xô.", "D. Cải thiện quan hệ với các nước Đông Nam Á."], correct: 0},
+        {q: "Câu 11. Năm 1919, Nguyễn Ái Quốc gửi bản Yêu sách của nhân dân An Nam đến Hội nghị Véc-xai để", opts: ["A. đòi chủ quyền và toàn vẹn lãnh thổ cho Việt Nam.", "B. đòi quyền độc lập cho dân tộc Việt Nam.", "C. yêu cầu Pháp cải cách chế độ ở Việt Nam.", "D. đòi quyền lợi cho dân tộc Việt Nam."], correct: 3},
+        {q: "Câu 12. Một trong những hoạt động đối ngoại của Việt Nam đối với Trung Quốc trong giai đoạn 1975-1985 là", opts: ["A. thương lượng để Trung Quốc tăng cường viện trợ.", "B. đàm phán giải quyết vấn đề xung đột biên giới.", "C. hội nghị thượng đỉnh bàn về vấn đề của ASEAN.", "D. đàm phán về việc khai thác chung nguồn khi đốt."], correct: 1},
+        {q: "Câu 13. Trong giai đoạn (1975 - 1985), hoạt động đối ngoại của Việt Nam diễn ra trong bối cảnh nào sau đây?", opts: ["A. Thế bao vây, cấm vận Việt Nam đã được dỡ bỏ.", "B. Cuộc kháng chiến chống Mĩ diễn ra quyết liệt.", "C. Việt Nam đã hoàn thành thống nhất về lãnh thổ.", "D. Miền Bắc xây dựng thành công chủ nghĩa xã hội."], correct: 2},
+        {q: "Câu 14. Nội dung phản ánh không đúng biểu hiện của việc đẩy mạnh quan hệ và hợp hợp tác với các nước Đông Nam Á trong giai đoạn 1975-1986 là", opts: ["A. giúp đỡ Campuchia chống lại Khơ-me Đỏ.", "B. đối thoại với các nước thành viên ASEAN.", "C. kí với Lào Hiệp ước hữu nghị và hợp tác.", "D. tham gia Hiệp định thương mại tự do ASEAN."], correct: 3},
+        {q: "Câu 15. Một trong những nhiệm vụ của hoạt động đối ngoại của Việt Nam trong giai đoạn 1965-1975 là", opts: ["A. tố cáo tội ác của chiến tranh xâm lược.", "B. đòi Mỹ, Diệm thi hành hiệp định Paris.", "C. đòi quyền tự do dân sinh và dân chủ.", "D. bảo vệ chủ quyền trên biển Đông của ta."], correct: 0},
+        {q: "Câu 16. Trong thời kì 1930 – 1945, Hồ Chí Minh có đóng góp nào sau đây với cách mạng Việt Nam?", opts: ["A. Lãnh đạo nhân dân hoàn thành các mục tiêu chiến lược của cách mạng.", "B. Giải quyết thành công các mâu thuẫn cơ bản trong xã hội Việt Nam.", "C. Sáng lập tổ chức cách mạng quyết định vận mệnh của quốc gia dân tộc.", "D. Truyền bá tư tưởng tiến bộ, bảo vệ vững chắc chính quyền công nông."], correct: 2},
+        {q: "Câu 17. Nguyên nhân thúc đẩy Nguyễn Ái Quốc ra đi tìm đường cứu nước, giải phóng dân tộc năm 1911 là", opts: ["A. Đáp ứng yêu cầu của cách mạng Việt Nam.", "B. Mâu thuẫn dân tộc bắt đầu phát triển gay gắt.", "C. Ảnh hưởng của phong trào cách mạng thế giới.", "D. Hạn chế của các con đường cứu nước trước đó."], correct: 0},
+        {q: "Câu 18. Nội dung nào sau đây không phải là truyền thống quý báu của dân tộc Việt Nam?", opts: ["A. Đoàn kết.", "B. Quân phiệt.", "C. Dũng cảm.", "D. Yêu nước."], correct: 1},
+        {q: "Câu 19. Nội dung nào dưới đây không phải là hoạt động đối ngoại của Việt Nam trong giai đoạn 1975 – 1985?", opts: ["A. Thiết lập quan hệ với các tổ chức quốc tế và các nước khác.", "B. đưa đất nước thoát khỏi tình trạng khủng hoảng.", "C. Thúc đẩy quan hệ với các nước Đông Nam Á.", "D. Hợp tác toàn diện với các nước xã hội chủ nghĩa."], correct: 1},
+        {q: "Câu 20. Sự kiện quốc tế ảnh hưởng tích cực đến cách mạng Việt Nam từ sau Chiến tranh thế giới nhất?", opts: ["A. Những tổn thất lớn của Pháp trong Chiến tranh thế giới thứ nhất.", "B. Sự vươn lên mạnh mẽ của Mĩ sau Chiến tranh thế giới thứ nhất.", "C. Nước Pháp lâm vào khủng hoảng kinh tế, chính trị trầm trọng.", "D. Sự thành công của Cách mạng tháng Mười Nga năm 1917."], correct: 3},
+        {q: "Câu 21. Sự kiện bản Yêu sách của nhân dân An Nam không được Hội nghị Vécxai chấp nhận (tháng 6-1919) để lại bài học kinh nghiệm nào sau đây cho phong trào giải phóng dân tộc Việt Nam?", opts: ["A. Để giải phóng dân tộc không được dựa vào sự giúp đỡ của bên ngoài.", "B. Nội lực là yếu tố quyết định trong cuộc đấu tranh giành quyền dân tộc.", "C. Muốn giải phóng dân tộc phải có sự ủng hộ của nhân dân chính quốc.", "D. Các diễn đàn quốc tế không thể giải quyết được vấn đề dân tộc."], correct: 1},
+        {q: "Câu 22. Chủ tịch Hồ Chí Minh xuất thân trong một gia đình", opts: ["A. bần cố nông.", "B. nhà nho yêu nước.", "C. tư sản dân tộc.", "D. tiểu tư sản trí thức."], correct: 1},
+        {q: "Câu 23. Tại Hội nghị thành lập Đảng Cộng sản Việt Nam (đầu năm 1930), vai trò nào sau đây của Nguyễn Ái Quốc thể hiện sự vận dụng sáng tạo chủ nghĩa Mác – Lê-nin ở Việt Nam?", opts: ["A. Xác định giai cấp lãnh đạo.", "B. Xác định phương hướng tiến lên.", "C. Xác định lực lượng nòng cốt", "D. Xác định lực lượng cách mạng."], correct: 3},
+        {q: "Câu 24. Tờ báo nào do Nguyễn Ái Quốc làm chủ nhiệm kiêm chủ bút trong thời gian hoạt động ở Pháp (1917 – 1923)?", opts: ["A. Người cùng khổ.", "B. Sự Thật.", "C. Nhân đạo.", "D. Thanh niên."], correct: 0},
+        {q: "Câu 25. Thực tiễn các phong trào yêu nước chống thực dân Pháp cuối thế kỉ XIX đến những năm đầu thế kỉ XX ở Việt Nam thất bại chứng tỏ", opts: ["A. yêu cầu cấp thiết hàng đầu của lịch sử dân tộc chưa được giải quyết.", "B. con đường đấu tranh vũ trang không phù hợp với truyền thống dân tộc.", "C. các trí thức phong kiến không có vai trò gì trong lịch sử dân tộc.", "D. muốn cứu nước, giải phóng dân tộc phải đi theo cách mạng vô sản."], correct: 0},
+        {q: "Câu 26. Nội dung nào sau đây thể hiện vai trò của Nguyễn Ái Quốc tại Hội nghị thành lập Đảng Cộng sản Việt Nam năm 1930?", opts: ["A. Soạn thảo Chính cương vắn tắt và Sách lược vắn tắt.", "B. Thành lập một chính đảng cho nhân dân ba nước Đông Dương.", "C. Bầu Bộ Chính trị Ban chấp hành Trung ương Đảng lâm thời.", "D. Soạn thảo Chính cương chính thức và Sách lược chính thức."], correct: 0},
+        {q: "Câu 27. Năm 1995, Việt Nam có hoạt động đối ngoại nổi bật nào sau đây?", opts: ["A. Phát triển quan hệ đối tác chiến lược toàn diện với Ấn Độ.", "B. Việt Nam và Liên Xô kí Hiệp ước hữu nghị và hợp tác.", "C. Việt Nam gia nhập Tổ chức Thương mại Thế giới (WTO).", "D. Việt Nam và Hoa Kì bình thường hóa quan hệ ngoại giao."], correct: 3},
+        {q: "Câu 28. Một trong những hoạt động đối ngoại của Nguyễn Ái Quốc trong giai đoạn 1918- 1920 là", opts: ["A. gửi bảng Điều trần gửi Hội nhân quyền ở Paris (Pháp)", "B. gửi bản yêu sách của nhân dân An Nam đến hội nghị Vécxai (Pháp)", "C. tham gia sáng lập đảng Cộng sản Liên Xô và đảng Cộng sản Pháp", "D. tham gia sáng lập Việt Nam Quang phục Hội"], correct: 1},
+        {q: "Câu 29. Từ năm 1975 - 1985, các hoạt động đối ngoại của Việt Nam chú trọng phát triển quan hệ hữu nghị với quốc gia nào sau đây?", opts: ["A. Lào.", "B. Malaysia.", "C. Brunây.", "D. Thái Lan."], correct: 0},
+        {q: "Câu 30. Một trong những nguyên nhân Việt Nam luôn coi trọng mối quan hệ và hợp tác với Liên Xô là", opts: ["A. cần liên kết với Liên Xô để chống Trung Quốc.", "B. viện trợ kinh tế, quân sự, ủng hộ về chính trị.", "C. đồng ý đứng dưới cái ô hạt nhân của Liên Xô.", "D. dựa vào ưu thế của Liên Xô để đánh Khơ-me Đỏ."], correct: 1},
+        {q: "Câu 31. Năm 1919, Nguyễn Ái Quốc có hoạt động đối ngoại nào sau đây?", opts: ["A. Tham dự Đại hội Tua, bỏ phiếu tán thành gia nhập Quốc tế III.", "B. Sang Liên Xô dự lễ tang Lênin, nghiên cứu chủ nghĩa Mác.", "C. Tham gia đoàn cố vấn cao cấp của Liên Xô đến Trung Quốc.", "D. Gửi bản yêu sách của Nhân dân An Nam đến Hội nghị Véc-xai."], correct: 3},
+        {q: "Câu 32. Từ năm 1986 đến nay, Việt Nam không thực hiện hoạt động đối ngoại nào sau đây?", opts: ["A. Đẩy mạnh quan hệ, kí Hiệp ước hữu nghị và hợp tác với Liên Xô.", "B. Gia nhập, đóng góp tích cực cho các tổ chức, diễn đàn quốc tế.", "C. Hợp tác hiệu quả để giải quyết các vấn đề mang tính toàn cầu.", "D. Đẩy mạnh hoạt động đối ngoại với các đối tác truyền thống."], correct: 0},
+        {q: "Câu 33. Nhiệm vụ cấp bách nhất đặt ra cho dân tộc Việt Nam trong những năm cuối thế kỉ XIX đầu thế kỉ XX là", opts: ["A. đòi quyền tự do bầu cử.", "B. giành độc lập dân tộc.", "C. đòi dân sinh dân chủ.", "D. giành ruộng đất cho dân cày."], correct: 1},
+        {q: "Câu 34. Một trong những nguyên nhân lý giải Nguyễn Tất Thành quyết định sang phương Tây để tìm đường cứu nước?", opts: ["A. Phương Tây có nhiều trường đại học danh tiếng.", "B. Tìm hiểu các nước phương Tây là như thế nào.", "C. Mục đích chính là ra đi để lao động, kiếm sống.", "D. Con đường đi sang phương Tây dễ dàng hơn."], correct: 1},
+        {q: "Câu 35. Trong giai đoạn 1941 – 1945, chủ trương và chính sách đối ngoại của Đảng Cộng sản Đông Dương được thể hiện chủ yếu thông qua tổ chức nào sau đây?", opts: ["A. Quốc tế Cộng sản.", "B. Ban Chỉ huy hải ngoại.", "C. Mặt trận Việt Minh.", "D. Mặt trận Liên Việt."], correct: 2},
+        {q: "Câu 36. Sự kiện Nguyễn Ái Quốc tham gia sáng lập Hội Liên hiệp thuộc địa đã", opts: ["A. đưa đến sự hỗ trợ của các nước châu Âu đối với Việt Nam.", "B. đưa đến sự hỗ trợ của khối Liên hiệp Pháp đối với cách mạng Việt Nam.", "C. góp phần đưa Việt Nam trở thành quốc gia lãnh đạo phong trào giải phóng thuộc địa.", "D. góp phần xác lập mối liên hệ giữa cách mạng Việt Nam với cách mạng thế giới."], correct: 3},
+        {q: "Câu 37. Trong quá trình chuẩn bị về tư tưởng, chính trị để thành lập Đảng Cộng Việt Nam (1919-1929), Nguyễn Ái Quốc có vai trò nổi bật nào sau đây?", opts: ["A. Ra báo Thanh niên để phục vụ cho Hội Liên hiệp các dân tộc bị áp bức ở Á Đông.", "B. Viết Cương lĩnh chính trị trước khi sáng lập Hội Việt Nam Cách mạng Thanh niên.", "C. Thành lập tổ chức cộng sản trên cơ sở phong trào công nhân đã đầu tranh tự giác.", "D. Xây dựng lí luận cách mạng giải phóng dân tộc kết hợp với giải phóng giai cấp."], correct: 3},
+        {q: "Câu 38. Nội dung phản ánh không đúng biểu hiện của việc đẩy mạnh quan hệ hợp hợp tác với các nước Đông Nam Á trong giai đoạn 1975 - 1986 là", opts: ["A. giúp đỡ Campuchia chống lại Khơme đỏ.", "B. kí với Lào Hiệp ước Hữu nghị và hợp tác.", "C. tham gia Hiệp định thương mại tự do ASEAN.", "D. đối thoại với các nước thành viên ASEAN."], correct: 2},
+        {q: "Câu 39. Một trong những tổ chức mà Nguyễn Ái Quốc đã gia nhập trong quá trình tìm đường cứu nước (1911-1941) là", opts: ["A. Đảng Cộng sản Mỹ.", "B. Đảng xã hội Pháp.", "C. Đảng Cộng sản Đức.", "D. Đảng Dân chủ Mỹ."], correct: 1},
+        {q: "Câu 40. Từ năm 1986 đến nay, Việt Nam có hoạt động đối ngoại chủ yếu nào sau đây?", opts: ["A. Giúp đỡ Mianma chống lại chế độ diệt chủng Khơme đỏ.", "B. Việt Nam kí với Lào bản Hiệp ước Hữu nghị và hợp tác.", "C. Phát triển quan hệ đối tác với tất cả các nước trên thế giới.", "D. Tổ chức thành công nhiều hoạt động của tổ chức ASEAN."], correct: 3},
+        {q: "Câu 41. Năm 1978, Việt Nam gia nhập tổ chức nào sau đây?", opts: ["A. Hội đồng tương trợ kinh tế (SEV).", "B. Hiệp ước Bắc Đại Tây Dương (NATO).", "C. Hiệp hội các quốc gia Đông Nam Á (ASEAN)", "D. Liên minh châu Âu (EU)."], correct: 0},
+        {q: "Câu 42. Trong quá trình chuẩn bị về tổ chức để thành lập Đảng Cộng sản của Việt Nam (1919-1929), Nguyễn Ái Quốc có sự sáng tạo nào sau đây?", opts: ["A. Viết tác phẩm Bản án chế độ dân Pháp để tố cáo những tội ác của thực dân Pháp.", "B. Thành lập các tổ chức tiền cộng sản trước khi thành lập Đảng Cộng sản Việt Nam.", "C. Xuất bản cuốn Đường Kách mệnh, bí mật gửi về nước để tuyên truyền cách mạng.", "D. Chủ nhiệm, kiêm chủ bút cho tờ báo Người cùng khổ để tuyên truyền cách mạng."], correct: 1},
+        {q: "Câu 43. Tháng 7 năm 1925, Nguyễn Ái Quốc cùng với một số nhà yêu nước Triều Tiên, In- đô-nê-xia đã?", opts: ["A. Thành lập Hội Liên hiệp thuộc địa ở Pa-ri.", "B. Thành lập Hội Liên hiệp các dân tộc bị áp bức Á Đông.", "C. Lãnh đạo phong trào của giai cấp công nhân phát triển mạnh ở các nước.", "D. Xây dựng cơ sở cách mạng để tập hợp các dân tộc bị áp bức."], correct: 1},
+        {q: "Câu 44. Các hoạt động đối ngoại mà nước Việt Nam dân chủ cộng hòa tiến hành từ sau cách mạng tháng Tám phải tuân thủ nguyên tắc nào sau đây?", opts: ["A. Không vi phạm đến chủ quyền dân tộc.", "B. Nhân nhượng tất cả yêu cầu của Tưởng.", "C. Không nhân nhượng thỏa hiệp với Pháp.", "D. Giải quyết xung đột bằng thương lượng."], correct: 0},
+        {q: "Câu 45. Trong quá trình thực hiện công cuộc đổi mới, về đối ngoại, Việt Nam đã thành công trong việc", opts: ["A. trở thành nước công nghiệp.", "B. thống nhất đất nước.", "C. phá thế bao vây cấm vận.", "D. phát triển kinh tế nhiều thành phần."], correct: 2},
+        {q: "Câu 46. Một trong những nét khác biệt về hoạt động đối ngoại của Nguyễn Ái Quốc so với Phan Bội Châu và Phan Châu Trinh là", opts: ["A. chủ yếu diễn ra ở Phương Tây", "B. thể hiện tinh thần yêu nước.", "C. đi qua nhiều châu lục.", "D. tìm kiếm sự ủng hộ từ bên ngoài."], correct: 0},
+        {q: "Câu 47. Năm 1911, Nguyễn Tất Thành có hoạt động nào sau đây?", opts: ["A. Ra đi tìm đường cứu nước.", "B. Thành lập Hội Duy tân.", "C. Phát động phong trào Đông du.", "D. Tham gia phong trào chống thuế."], correct: 0},
+        {q: "Câu 48. Những hoạt động đối ngoại của Nguyễn Ái Quốc trong giai đoạn 1911 đến 1927 có ý nghĩa như thế nào đối với sự ra đời của Đảng Cộng sản Việt Nam?", opts: ["A. Thống nhất các tổ chức Cộng sản.", "B. Nhận được sự đồng ý của Quốc tế Cộng sản.", "C. Chuẩn bị đợi thời cơ khởi nghĩa.", "D. Chuẩn bị về tư tưởng và tổ chức."], correct: 3},
+        {q: "Câu 49. Biểu hiện của quan hệ hợp tác toàn diện giữa Việt Nam và Liên Xô trong giai đoạn 1975 - 1986 là", opts: ["A. phối hợp, giúp đỡ Campuchia chống Khơ-me Đỏ.", "B. nhiều hiệp ước trên nhiều lĩnh vực được kí kết.", "C. phát triển quan hệ đối tác chiến lược toàn diện.", "D. chấm dứt bao vây, cấm vận nền kinh tế Việt Nam."], correct: 1},
+        {q: "Câu 50. Việt Nam đã thực hiện chiến lược nào để nâng cao vị thế quốc tế từ năm 1986 đến năm 2024?", opts: ["A. Giảm sự tham gia vào các diễn đàn toàn cầu.", "B. Tham gia vào ngoại giao đa phương.", "C. Chỉ tập trung vào các liên minh quân sự.", "D. Hạn chế quan hệ đối tác nước ngoài."], correct: 1},
+        {q: "Câu 51. Mục đích thực hiện các hoạt động đối ngoại của Phan Chu Trinh là", opts: ["A. vận động cải cách và duy tân.", "B. tiến hành khởi nghĩa vũ trang.", "C. xin viện trợ các nước châu Âu.", "D. tập hợp lực lượng cách mạng."], correct: 0},
+        {q: "Câu 52. Từ năm 1986 đến nay, Việt Nam không có hoạt động đối ngoại nào sau đây?", opts: ["A. Việt Nam gia nhập Tổ chức Thương mại Thế giới (WTO).", "B. Việt Nam và Liên Xô cùng kí Hiệp ước hữu nghị và hợp tác.", "C. Việt Nam và Trung Quốc bình thường hóa quan hệ ngoại giao.", "D. Phát triển quan hệ đối tác chiến lược toàn diện với Hoa Kì."], correct: 1},
+        {q: "Câu 53. Nguyễn Tất Thành tham gia hoạt động trong tổ chức nào sau đây ở Pháp năm 1918?", opts: ["A. Đảng Cộng hòa.", "B. Đảng Xã hội Pháp.", "C. Đảng Dân chủ.", "D. Đảng Cộng sản Pháp."], correct: 1},
+        {q: "Câu 54. Trong quá trình hoạt động tại Pháp (1919-1923), Nguyễn Ái Quốc đã", opts: ["A. tham dự Hội nghị Quốc tế Nông dân lần thứ III.", "B. thành lập Hội Việt Nam Cách mạng Thanh niên.", "C. làm chủ nhiệm kiêm chủ bút báo Thanh niên.", "D. làm chủ nhiệm kiêm chủ bút báo Người cùng khổ."], correct: 3},
+        {q: "Câu 55. Từ thực tiễn về vai trò của Hồ Chí Minh đối với thắng lợi của Cách mạng tháng Tám năm 1945 có thể rút ra bài học nào sau đây cho công cuộc xây dựng đất nước hiện nay?", opts: ["A. Xây dựng lực lượng vũ trang và tham gia các liên minh quân sự của các cường quốc.", "B. Đánh giá và tận dụng thời cơ trong điều kiện các cường quốc tham gia chiến tranh thế giới.", "C. Phát huy vai trò của tổ chức tập hợp quần chúng để thực hiện thắng lợi mục tiêu chung.", "D. Phát huy vai trò của hậu phương trong việc đảm bảo vật chất tinh thần cho kháng chiến."], correct: 2},
+        {q: "Câu 56. Đến năm 2020, Việt Nam đã thể hiện là một quốc gia năng động, tích cực trong hoạt động đối ngoại qua biểu hiện nào sau đây?", opts: ["A. Cùng với Liên Xô trở thành thành trì của chủ nghĩa xã hội trên thế giới.", "B. Hợp tác tích cực, có hiệu quả trong tất cả các tổ chức, diễn đàn quốc tế.", "C. Tham gia tất cả các diễn đàn quốc tế về giải quyết các vấn đề toàn cầu.", "D. Thành viên của 63 tổ chức quốc tế và hơn 500 tổ chức phi chính phủ."], correct: 3},
+        {q: "Câu 57. Những vấn đề cơ bản về chiến lược và sách lược của cách mạng Việt Nam được Nguyễn Ái Quốc hoạch định hoàn chỉnh trong tài liệu nào sau đây?", opts: ["A. Cương lĩnh chính trị đầu tiên của Đảng (1930).", "B. Cuốn Bản án chế độ thực dân Pháp (1925).", "C. Luận cương chính trị của Đảng (10-1930).", "D. Tác phẩm Đường Kách mệnh (1927)."], correct: 0},
+        {q: "Câu 58. Hội Liên hiệp các dân tộc bị áp bức ở Á Đông đã tập hợp những bài giảng tại các lớp huấn luyện cho hội viên Hội Việt Nam Cách mạng Thanh niên xuất bản thành tác phẩm?", opts: ["A. Người cùng khổ.", "B. Đường Kách mệnh.", "C. Bản án chế độ thực dân Pháp", "D. Báo Thanh niên."], correct: 1},
+        {q: "Câu 59. Sự kiện Việt Nam trở thành thành viên thứ 149 của tổ chức Liên hợp quốc có ý nghĩa gì?", opts: ["A. Là dấu mốc quan trọng trong quá trình hội nhập quốc tế của Việt Nam.", "B. Có tiếng nói ngày càng quan trọng trong tổ chức Liên hợp quốc.", "C. Là sự kiện lớn khẳng định vị thế Việt Nam trên trường quốc tế.", "D. Đó là một thắng lợi lớn trên mặt trận ngoại giao của Đảng và Nhà nước ta năm 1976."], correct: 0},
+        {q: "Câu 60. Ngôi trường Nguyễn Tất Thành từng theo học trong những năm 1908-1909 là", opts: ["A. Bưởi.", "B. Quốc học Huế.", "C. Quốc Tử giám.", "D. Quân sự Hoàng Phố."], correct: 1},
+        {q: "Câu 61. Tháng 6 năm 1925 đánh dấu sự ra đời của tổ chức cách mạng nào ở Việt Nam?", opts: ["A. Tân Việt Cách mạng đảng", "B. Đông Dương Cộng sản đảng.", "C. Việt Nam Quốc dân đảng", "D. Hội Việt Nam Cách mạng Thanh niên."], correct: 3},
+        {q: "Câu 62. Trong giai đoạn (1975 - 1985), Việt Nam thực hiện hoạt động đối ngoại chủ yếu nào sau đây?", opts: ["A. Gia nhập Tổ chức Thương mại Thế giới (WTO).", "B. Đẩy mạnh hợp tác toàn diện với Liên Xô.", "C. Quan hệ đối tác chiến lược toàn diện với Mĩ.", "D. Gia nhập Hiệp hội các quốc gia Đông Nam Á."], correct: 1},
+        {q: "Câu 63. Năm 1977, Việt Nam trở thành thành viên của tổ chức nào sau đây?", opts: ["A. ASEAN.", "B. NATO.", "C. WTO.", "D. Liên Hợp Quốc."], correct: 3},
+        {q: "Câu 64. Năm 1910, Nguyễn Tất Thành đã tham gia dạy học tại trường", opts: ["A. Tiểu học Pháp – Việt Đông Ba.", "B. Quốc học Huế.", "C. Chu Văn An.", "D. Dục Thanh."], correct: 3},
+        {q: "Câu 65. Từ năm 1986 đến nay, hoạt động đối ngoại của Việt Nam diễn ra trong bối cảnh nào sau đây?", opts: ["A. Cuộc Chiến tranh lạnh đã chấm dứt hoàn toàn.", "B. Xu thế khu vực hóa, toàn cầu hóa đã phát triển.", "C. Thế bao vây, cấm vận Việt Nam đã được dỡ bỏ.", "D. Cuộc kháng chiến chống Mĩ diễn ra quyết liệt."], correct: 1},
+        {q: "Câu 66. Một trong những điểm giống nhau về kết quả trong các hoạt động đối ngoại của Phan Bội Châu và Phan Chu Trinh là", opts: ["A. chưa giành lại độc lập cho dân tộc.", "B. đã nhận ra được bản chất kẻ thù.", "C. đã thúc đẩy phong trào công nhân.", "D. Pháp cho thực hiện nhiều cải cách."], correct: 0},
+        {q: "Câu 67. Năm 1978, Việt Nam có hoạt động đối ngoại nổi bật nào sau đây?", opts: ["A. Việt Nam gia nhập Tổ chức Thương mại Thế giới (WTO).", "B. Việt Nam và Liên Xô cùng kí Hiệp ước hữu nghị và hợp tác.", "C. Việt Nam và Trung Quốc bình thường hóa quan hệ ngoại giao.", "D. Phát triển quan hệ đối tác chiến lược toàn diện với Hàn Quốc."], correct: 1},
+        {q: "Câu 68. Sự kiện nào sau đây đánh dấu Nguyễn Ái Quốc tìm ra con đường cứu nước, giải phóng cho dân tộc Việt Nam?", opts: ["A. Tham gia hợp nhất các tổ chức Cộng sản (1930).", "B. Gửi bản yêu sách của Nhân dân An Nam (1919).", "C. Bỏ phiếu tán thành gia nhập Quốc tế ba (1920).", "D. Đọc được bản Luận cương của Lênin (1920)."], correct: 3},
+        {q: "Câu 69. Người Cộng sản đầu tiên của dân tộc Việt Nam là", opts: ["A. Nguyễn Đức Cảnh.", "B. Nguyễn Ái Quốc.", "C. Ngô Bội Phu.", "D. Phan Bội Châu."], correct: 1},
+        {q: "Câu 70. Một trong những địa điểm mà Nguyễn Ái Quốc thực hiện các hoạt động đối ngoại từ năm 1911 đến 1920 là", opts: ["A. Trung Quốc.", "B. Pháp.", "C. Thái Lan.", "D. Liên Xô."], correct: 1},
+        {q: "Câu 71. Trong giai đoạn 1921 – 1930, Nguyễn Ái Quốc đã tham gia sáng lập tổ chức nào dưới đây?", opts: ["A. Hội Liên hiệp các quốc gia bị áp bức ở Đông Á.", "B. Hội Liên hiệp thuộc địa", "C. Hội Liên hiệp các nước thuộc địa và phụ thuộc châu Á.", "D. Hội Liên hiệp các dân tộc bị áp bức ở Đông Nam Á."], correct: 1},
+        {q: "Câu 72. Một trong những quốc gia Nguyễn Ái Quốc có hoạt động đối ngoại trong giai đoạn từ năm 1923 đến năm 1924 là", opts: ["A. Tây Âu.", "B. Ấn Độ.", "C. Thái Lan.", "D. Liên Xô."], correct: 3},
+        {q: "Câu 73. Trong quá trình vận động thành lập Đảng, Nguyễn Ái Quốc đã sáng lập tổ chức cách mạng nào?", opts: ["A. Việt Nam Quốc dân đảng.", "B. Hội Việt Nam Cách mạng Thanh niên.", "C. Tân Việt Cách mạng đảng.", "D. Cộng sản đoàn."], correct: 1},
+        {q: "Câu 74. Từ năm 1986 đến nay, Việt Nam đã tổ chức thành công nhiều hội nghị quốc tế quan trọng thuộc ASEAN chứng tỏ", opts: ["A. Việt Nam là nước có nền kinh tế phát triển mạnh ở khu vực.", "B. Việt Nam có đủ khả năng hợp tác toàn diện với tất cả các nước trên thế giới.", "C. Vị thế của đất nước trên trường quốc tế ngày càng được nâng cao.", "D. Việt Nam có quan hệ tốt với nhiều nước trên thế giới."], correct: 2}
+    ];
+
+    let currentIdx = 0;
+    let correctCount = 0; 
+    let hasFailedCurrent = false;
+
+    function renderQuiz() {
+        if (currentIdx >= quizData.length) {
+            showFinalResult();
+            return;
+        }
+
+        hasFailedCurrent = false;
+        const q = quizData[currentIdx];
+        document.getElementById('progress').innerText = `Câu hỏi ${currentIdx + 1} / ${quizData.length}`;
+        document.getElementById('questionText').innerText = q.q;
+        document.getElementById('message').innerText = "";
+        
+        const group = document.getElementById('optionsGroup');
+        group.innerHTML = "";
+
+        q.opts.forEach((text, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option';
+            btn.innerText = text;
+            btn.onclick = () => checkAnswer(i, btn);
+            group.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(index, btn) {
+        const correctIdx = quizData[currentIdx].correct;
+        const msg = document.getElementById('message');
+
+        if (index === correctIdx) {
+            btn.classList.add('correct');
+            if (!hasFailedCurrent) correctCount++;
+            msg.innerText = "Chính xác!";
+            msg.style.color = "#28a745";
+            
+            const buttons = document.querySelectorAll('.option');
+            buttons.forEach(b => b.onclick = null);
+
+            setTimeout(() => {
+                currentIdx++;
+                renderQuiz();
+            }, 600);
+        } else {
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            hasFailedCurrent = true;
+            msg.innerText = "Sai rồi, chọn lại đi!";
+            msg.style.color = "#dc3545";
+        }
+    }
+
+    function showFinalResult() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
+
+        const rawScore = (correctCount / quizData.length) * 10;
+        document.getElementById('finalScore').innerText = rawScore.toFixed(2) + "đ";
+        document.getElementById('correctCount').innerText = `Bạn đúng ngay lần đầu ${correctCount}/${quizData.length} câu.`;
+
+        let comment = "Cần cố gắng nhiều hơn nè!";
+        if (correctCount === quizData.length) comment = "vô thi đúng full trắc nghiệm haa";
+        else if (correctCount >= 65) comment = "cũng chất đấy chứ";
+        else if (correctCount >= 50) comment = "cũng ra gì phết";
+
+        document.getElementById('commentText').innerText = comment;
+    }
+
+    window.onload = renderQuiz;
+</script>
+
+</body>
+</html>
