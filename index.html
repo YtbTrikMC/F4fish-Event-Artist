@@ -53,17 +53,25 @@
         }
 
         h1 {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-weight: 300;
             letter-spacing: 2px;
             text-transform: uppercase;
             font-size: 1.5rem;
         }
 
-        .user-info {
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+        /* Dòng tổng số lượt làm */
+        .total-counter {
             color: var(--accent-green);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .user-id-info {
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
         }
 
         .button-group {
@@ -93,7 +101,6 @@
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
 
-        /* Bảng xếp hạng */
         .leaderboard {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
@@ -117,20 +124,13 @@
             font-size: 0.85rem;
         }
 
-        .lb-item:last-child { border-bottom: none; }
         .lb-rank { font-weight: bold; color: var(--history-gold); width: 30px; }
         .lb-name { flex-grow: 1; }
         .lb-score { color: var(--accent-green); }
 
-        .footer {
-            margin-top: 20px;
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
+        .footer { margin-top: 20px; font-size: 0.7rem; opacity: 0.6; }
 
-        @media (max-width: 500px) {
-            .button-group { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 500px) { .button-group { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -141,7 +141,11 @@
         </div>
 
         <h1>Hệ Thống Ôn Tập</h1>
-        <div id="userDisplay" class="user-info">Đang định danh...</div>
+        
+        <div class="total-counter">
+            Tổng số lượt làm: <span id="totalCount">...</span>
+        </div>
+        <div id="userDisplay" class="user-id-info">Đang xác định...</div>
         
         <div class="button-group">
             <a onclick="updateCounter('tn.html')" class="nav-button">Trắc Nghiệm Sinh</a>
@@ -161,7 +165,6 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwQXOMeU4M9tt3xqaL2rBjsh426TFxy6BOj-KWJezZrF-oNlMIvnvRNiIjL0QsxpJrm/exec";
 
-        // 1. Quản lý User ID (Lưu chết trong máy)
         function getUserId() {
             let id = localStorage.getItem('ntt_user_id');
             if (!id) {
@@ -171,47 +174,52 @@
             return id;
         }
 
-        // 2. Lấy dữ liệu và hiển thị bảng xếp hạng
         async function loadData() {
             const myId = getUserId();
-            document.getElementById('userDisplay').innerText = "Xin chào: " + myId;
+            document.getElementById('userDisplay').innerText = "Mã của bạn: " + myId;
 
             try {
                 const response = await fetch(API_URL);
-                const data = await response.json(); // Data dạng mảng [[User, Times], [u1, 10], ...]
+                const data = await response.json(); 
                 
-                // Loại bỏ dòng tiêu đề và lọc Top 10
                 let students = data.slice(1)
                     .map(item => ({ name: item[0], score: parseInt(item[1]) || 0 }))
-                    .sort((a, b) => b.score - a.score)
-                    .slice(0, 10);
+                    .sort((a, b) => b.score - a.score);
 
+                // TÍNH TỔNG SỐ LƯỢT: Cộng dồn tất cả score của mọi người
+                let total = students.reduce((sum, s) => sum + s.score, 0);
+                document.getElementById('totalCount').innerText = total;
+
+                // Hiển thị Top 10
+                let top10 = students.slice(0, 10);
                 let lbHtml = "";
-                students.forEach((s, index) => {
+                top10.forEach((s, index) => {
                     lbHtml += `
                         <div class="lb-item">
                             <span class="lb-rank">#${index + 1}</span>
                             <span class="lb-name">${s.name} ${s.name === myId ? '(Bạn)' : ''}</span>
-                            <span class="lb-score">${s.score} lượt</span>
+                            <span class="lb-score">${s.score}</span>
                         </div>`;
                 });
                 document.getElementById('lb-content').innerHTML = lbHtml || "Chưa có dữ liệu";
             } catch (e) {
-                document.getElementById('lb-content').innerText = "Không thể tải bảng xếp hạng";
+                document.getElementById('totalCount').innerText = "Lỗi";
+                document.getElementById('lb-content').innerText = "Lỗi kết nối";
             }
         }
 
-        // 3. Cập nhật lượt nhấn
         function updateCounter(targetUrl) {
             const myId = getUserId();
             
-            // Gửi dữ liệu POST (User ID) lên Google Sheet
+            // Tăng số lượt tổng và số cá nhân trên màn hình ngay để nhìn cho "đã"
+            const totalEl = document.getElementById('totalCount');
+            totalEl.innerText = (parseInt(totalEl.innerText) || 0) + 1;
+
             fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify({ userId: myId })
             });
 
-            // Chuyển trang nhanh
             setTimeout(() => { window.location.href = targetUrl; }, 200);
         }
 
