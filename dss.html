@@ -18,7 +18,6 @@
         .btn-false:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); }
         .active-true { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
         .active-false { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
-        .correct-hint { border: 2px dashed var(--success) !important; color: var(--success); }
         .nav-box { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; min-height: 50px; }
         #feedback { font-weight: bold; font-size: 1.1rem; color: var(--secondary); }
         button.main-btn { padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; transition: 0.3s; }
@@ -142,7 +141,6 @@
 
     let currentQ = 0;
     let totalScore = 0;
-    let answeredCount = 0;
     let correctInCurrentStep = 0;
 
     function loadQuestion() {
@@ -151,11 +149,11 @@
             return;
         }
         
-        answeredCount = 0;
         correctInCurrentStep = 0;
         document.getElementById('progress').innerText = `Câu hỏi tư liệu ${currentQ + 1} / ${quizData.length}`;
         document.getElementById('docContent').innerHTML = quizData[currentQ].doc;
-        document.getElementById('feedback').innerText = "";
+        document.getElementById('feedback').innerText = "Chọn đúng để hoàn thành câu.";
+        document.getElementById('feedback').style.color = "var(--secondary)";
         document.getElementById('nextBtn').style.display = "none";
         
         const area = document.getElementById('statementArea');
@@ -177,35 +175,40 @@
 
     function checkStep(idx, val, btn) {
         const correctVal = quizData[currentQ].statements[idx].ans;
-        const row = btn.parentElement;
-        const buttons = row.querySelectorAll('.btn-check');
-
-        buttons.forEach(b => b.onclick = null); // Khóa nút ngay
-        answeredCount++;
+        const trueBtn = document.getElementById(`t-${idx}`);
+        const falseBtn = document.getElementById(`f-${idx}`);
 
         if (val === correctVal) {
-            btn.classList.add('active-true');
+            // ĐÚNG: Xanh và khóa dòng
+            btn.classList.add(val ? 'active-true' : 'active-false');
+            trueBtn.disabled = true;
+            falseBtn.disabled = true;
             correctInCurrentStep++;
+
+            if (correctInCurrentStep === 4) {
+                totalScore += 1;
+                document.getElementById('feedback').innerText = "Tuyệt vời! Hãy tiếp tục.";
+                document.getElementById('feedback').style.color = "var(--success)";
+                document.getElementById('nextBtn').style.display = "block";
+                document.getElementById('nextBtn').innerText = (currentQ === quizData.length -1) ? "Xem tổng điểm" : "Tiếp tục";
+            }
         } else {
-            btn.classList.add('active-false');
-            // Gợi ý đáp án đúng
-            const correctBtnId = correctVal ? `t-${idx}` : `f-${idx}`;
-            document.getElementById(correctBtnId).classList.add('correct-hint');
-        }
+            // SAI: Đỏ rồi tắt để chọn lại
+            btn.classList.add(val ? 'active-false' : 'active-true');
+            document.getElementById('feedback').innerText = "Chưa chính xác!";
+            document.getElementById('feedback').style.color = "var(--danger)";
+            
+            trueBtn.disabled = true;
+            falseBtn.disabled = true;
 
-        if (answeredCount === 4) {
-            updateScore(correctInCurrentStep);
-            document.getElementById('feedback').innerText = `Kết quả câu này: Đúng ${correctInCurrentStep}/4 ý.`;
-            document.getElementById('nextBtn').style.display = "block";
-            document.getElementById('nextBtn').innerText = (currentQ === quizData.length -1) ? "Xem tổng điểm" : "Tiếp tục";
+            setTimeout(() => {
+                btn.classList.remove('active-false', 'active-true');
+                trueBtn.disabled = false;
+                falseBtn.disabled = false;
+                document.getElementById('feedback').innerText = "Chọn lại nào.";
+                document.getElementById('feedback').style.color = "var(--secondary)";
+            }, 600);
         }
-    }
-
-    function updateScore(count) {
-        if (count === 4) totalScore += 1.0;
-        else if (count === 3) totalScore += 0.5;
-        else if (count === 2) totalScore += 0.25;
-        else if (count === 1) totalScore += 0.1;
     }
 
     function processNext() {
@@ -216,8 +219,8 @@
     function showResult() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
-        document.getElementById('finalScore').innerText = totalScore.toFixed(2);
-        document.getElementById('detailCount').innerText = `Bạn đã hoàn thành xong phần trắc nghiệm.`;
+        document.getElementById('finalScore').innerText = totalScore;
+        document.getElementById('detailCount').innerText = `Bạn đã vượt qua ${quizData.length} câu hỏi tư liệu.`;
     }
 
     window.onload = loadQuestion;
