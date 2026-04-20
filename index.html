@@ -8,8 +8,8 @@
         :root {
             --nasa-blue: #0b3d91;
             --nasa-red: #fc3d21;
-            --history-orange: #d35400; /* Màu cam cho Lịch sử */
-            --history-gold: #f1c40f;   /* Màu vàng cho Lịch sử Đúng Sai */
+            --history-orange: #d35400; 
+            --history-gold: #f1c40f;   
             --hover-blue: #154ba3;
             --bg-color: #0b192e; 
         }
@@ -40,14 +40,22 @@
         }
 
         h1 {
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-weight: 300;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
 
+        /* Phần hiển thị số lượt làm */
+        .counter-box {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
         .button-group {
-            display: grid; /* Sử dụng grid để chia 2 cột cho đẹp */
+            display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
@@ -65,7 +73,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 200px;
+            min-width: 150px;
+            cursor: pointer;
         }
 
         .nav-button:hover {
@@ -74,16 +83,9 @@
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Sinh học */
         .btn-bio-ds { background-color: var(--nasa-red); }
-        .btn-bio-ds:hover { background-color: #ff523b; }
-
-        /* Lịch sử */
         .btn-hist { background-color: var(--history-orange); }
-        .btn-hist:hover { background-color: #e67e22; }
-
-        .btn-hist-ds { background-color: var(--history-gold); color: #000; } /* Chữ đen cho dễ đọc trên nền vàng */
-        .btn-hist-ds:hover { background-color: #f39c12; }
+        .btn-hist-ds { background-color: var(--history-gold); color: #000; }
 
         .footer {
             margin-top: 30px;
@@ -101,28 +103,59 @@
     <div class="container">
         <h1>Hệ Thống Ôn Tập</h1>
         
+        <div class="counter-box">
+            Số lượt làm: <span id="viewCount">Đang tải...</span>
+        </div>
+        
         <div class="button-group">
-            <a href="tn.html" class="nav-button">
-                Trắc Nghiệm Sinh
-            </a>
-            
-            <a href="ds.html" class="nav-button btn-bio-ds">
-                Đúng Sai Sinh
-            </a>
-
-            <a href="tns.html" class="nav-button btn-hist">
-                Trắc Nghiệm Sử
-            </a>
-            
-            <a href="dss.html" class="nav-button btn-hist-ds">
-                Đúng Sai Sử
-            </a>
+            <a onclick="updateCounter('tn.html')" class="nav-button">Trắc Nghiệm Sinh</a>
+            <a onclick="updateCounter('ds.html')" class="nav-button btn-bio-ds">Đúng Sai Sinh</a>
+            <a onclick="updateCounter('tns.html')" class="nav-button btn-hist">Trắc Nghiệm Sử</a>
+            <a onclick="updateCounter('dss.html')" class="nav-button btn-hist-ds">Đúng Sai Sử</a>
         </div>
 
         <div class="footer">
             Thiết kế bởi NTT@THPTLTV-2026
         </div>
     </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxfqOBTETFZIKtxhYgDhA-9ALJeJQKQ1Wpx3WvIvpO7I3A_D2co_AtpOh8boWpw4nnnNg/exec";
+
+        // 1. Hàm lấy số lượt hiện tại từ Google Sheet khi vừa mở trang
+        async function getCount() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                document.getElementById('viewCount').innerText = data.luot_dung_moi || data.new_value || "0";
+            } catch (error) {
+                console.error("Lỗi lấy dữ liệu:", error);
+                document.getElementById('viewCount').innerText = "Chưa kết nối";
+            }
+        }
+
+        // 2. Hàm cập nhật số lượt khi nhấn nút và chuyển trang
+        function updateCounter(targetUrl) {
+            // Hiển thị trạng thái đang xử lý (tùy chọn)
+            document.getElementById('viewCount').innerText = "...";
+
+            // Gửi lệnh POST để cộng số
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors" // Để tránh lỗi bảo mật khi gọi chéo tên miền
+            }).then(() => {
+                // Sau khi gửi xong, đợi 0.5s rồi chuyển trang để đảm bảo lệnh đã đi
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 500);
+            }).catch(err => {
+                window.location.href = targetUrl; // Lỗi thì vẫn chuyển trang
+            });
+        }
+
+        // Gọi hàm lấy số lượt khi load trang
+        window.onload = getCount;
+    </script>
 
 </body>
 </html>
