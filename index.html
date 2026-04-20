@@ -46,12 +46,15 @@
             text-transform: uppercase;
         }
 
-        /* Phần hiển thị số lượt làm */
         .counter-box {
             margin-bottom: 30px;
             font-size: 1.1rem;
             color: #00ffcc;
             font-weight: bold;
+            background: rgba(0, 255, 204, 0.1);
+            padding: 10px;
+            border-radius: 50px;
+            display: inline-block;
         }
 
         .button-group {
@@ -104,7 +107,7 @@
         <h1>Hệ Thống Ôn Tập</h1>
         
         <div class="counter-box">
-            Số lượt làm: <span id="viewCount">Đang tải...</span>
+            Số lượt làm: <span id="viewCount">0</span>
         </div>
         
         <div class="button-group">
@@ -122,39 +125,48 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwx-X-7G5qfngSfDyAuZwD_qdgHzUdEciqkKfS6OSOle7K5Y-TH_LifqkpVTlqrUdeghg/exec";
 
-        // 1. Hàm lấy số lượt hiện tại từ Google Sheet khi vừa mở trang
-        async function getCount() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                document.getElementById('viewCount').innerText = data.luot_dung_moi || data.new_value || "0";
-            } catch (error) {
-                console.error("Lỗi lấy dữ liệu:", error);
-                document.getElementById('viewCount').innerText = "Chưa kết nối";
-            }
+        // 1. Hàm hiện số ngay lập tức khi mở trang
+        function initCount() {
+            const viewCountElement = document.getElementById('viewCount');
+            // Lấy số từ bộ nhớ máy hiện ra trước (0.001 giây)
+            const localCount = localStorage.getItem('lastCount') || "0";
+            viewCountElement.innerText = localCount;
+
+            // Sau đó mới âm thầm gọi API để cập nhật số mới nhất từ Google
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const serverCount = data.luot_dung_moi || data.new_value || "0";
+                    viewCountElement.innerText = serverCount;
+                    localStorage.setItem('lastCount', serverCount); // Lưu lại cho lần sau
+                })
+                .catch(err => console.log("Chưa có kết nối mạng để cập nhật số mới"));
         }
 
-        // 2. Hàm cập nhật số lượt khi nhấn nút và chuyển trang
+        // 2. Hàm cộng số cực nhanh khi nhấn nút
         function updateCounter(targetUrl) {
-            // Hiển thị trạng thái đang xử lý (tùy chọn)
-            document.getElementById('viewCount').innerText = "...";
+            const viewCountElement = document.getElementById('viewCount');
+            
+            // CỘNG GIẢ TRÊN MÀN HÌNH LUÔN (Hiện số mới ngay lập tức)
+            let currentNum = parseInt(viewCountElement.innerText) || 0;
+            let fakeNum = currentNum + 1;
+            viewCountElement.innerText = fakeNum;
+            localStorage.setItem('lastCount', fakeNum);
 
-            // Gửi lệnh POST để cộng số
+            // Gửi lệnh thật về Google (chạy ngầm)
             fetch(API_URL, {
                 method: "POST",
-                mode: "no-cors" // Để tránh lỗi bảo mật khi gọi chéo tên miền
-            }).then(() => {
-                // Sau khi gửi xong, đợi 0.5s rồi chuyển trang để đảm bảo lệnh đã đi
-                setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 500);
-            }).catch(err => {
-                window.location.href = targetUrl; // Lỗi thì vẫn chuyển trang
+                mode: "no-cors"
             });
+
+            // Chuyển trang ngay sau 200ms để người dùng thấy số nhảy rồi đi luôn
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 200);
         }
 
-        // Gọi hàm lấy số lượt khi load trang
-        window.onload = getCount;
+        // Chạy hàm khởi tạo ngay khi web tải
+        initCount();
     </script>
 
 </body>
