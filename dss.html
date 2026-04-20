@@ -3,66 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc Nghiệm Đúng Sai</title>
+    <title>Trắc Nghiệm Đúng Sai - Lịch Sử</title>
     <style>
         :root { --primary: #2c3e50; --secondary: #34495e; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 900px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .container { width: 100%; max-width: 900px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         .header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 15px; padding-bottom: 10px; }
-        .doc-box { background: #f8f9fa; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 20px; font-style: italic; line-height: 1.6; font-size: 0.95rem; color: #333; }
+        .doc-box { background: #f8f9fa; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 20px; font-style: italic; line-height: 1.6; font-size: 1rem; color: #333; word-wrap: break-word; }
         
-        /* Bố cục dòng câu hỏi */
-        .statement-row { 
-            display: flex; 
-            flex-direction: column; /* Ưu tiên hàng dọc cho mobile */
-            gap: 12px; 
-            padding: 15px 0; 
-            border-bottom: 1px solid #eee; 
-        }
-        
-        .statement-text { 
-            font-size: 1rem; 
-            color: #333; 
-            line-height: 1.5; 
-            text-align: justify;
-        }
+        /* Table styling for Question 8 */
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.9rem; font-style: normal; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #eee; }
 
-        .btn-group { 
-            display: flex; 
-            gap: 10px; 
-            width: 100%; /* Chiếm hết chiều ngang trên mobile */
-        }
+        .statement-row { display: flex; flex-direction: column; gap: 10px; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .statement-text { flex: 1; font-size: 1.05rem; color: #333; line-height: 1.6; text-align: left; }
+        .btn-group { display: flex; gap: 10px; width: 100%; }
+        .btn-check { flex: 1; max-width: 120px; padding: 12px 5px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; font-weight: bold; background: white; transition: 0.2s; font-size: 0.9rem; }
 
-        .btn-check { 
-            flex: 1; 
-            padding: 12px; 
-            border: 2px solid #ddd; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            background: white; 
-            transition: 0.2s;
-            font-size: 0.9rem;
-        }
-
-        /* Desktop tinh chỉnh lại để không quá dài */
-        @media (min-width: 600px) {
-            .statement-row { flex-direction: row; justify-content: space-between; align-items: center; gap: 20px; }
-            .btn-group { width: 180px; }
+        @media (min-width: 768px) {
+            .statement-row { flex-direction: row; align-items: flex-start; gap: 20px; }
+            .btn-group { width: auto; min-width: 200px; }
             .container { padding: 30px; }
         }
 
-        .btn-true:hover:not(:disabled) { border-color: var(--success); color: var(--success); }
-        .btn-false:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); }
         .active-true { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
         .active-false { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         
         .nav-box { margin-top: 25px; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 60px; }
-        #feedback { font-weight: bold; font-size: 1rem; text-align: center; }
-        
-        button.main-btn { width: 100%; max-width: 250px; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; transition: 0.3s; font-size: 1rem; }
-        button.main-btn:hover { background: #1a252f; transform: translateY(-2px); }
-        
+        #feedback { font-weight: bold; font-size: 1.1rem; text-align: center; }
+        button.main-btn { width: 100%; max-width: 280px; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: var(--primary); color: white; font-size: 1.1rem; }
         .result-screen { text-align: center; padding: 40px 0; display: none; }
         .score-big { font-size: 4rem; color: var(--primary); font-weight: 800; }
     </style>
@@ -72,25 +42,22 @@
 <div class="container">
     <div id="quiz-ui">
         <div class="header">
-            <h2 style="margin:0; color: var(--primary); font-size: 1.4rem;">LUYỆN TẬP LỊCH SỬ</h2>
-            <p id="progress" style="color: #666; font-weight: bold; margin-top: 5px; font-size: 0.9rem;">Đang tải...</p>
+            <h2 style="margin:0; color: var(--primary);">LUYỆN TẬP LỊCH SỬ</h2>
+            <p id="progress" style="color: #666; font-weight: bold; margin-top: 8px;">Đang tải...</p>
         </div>
-
         <div id="content-area">
             <div id="docContent" class="doc-box"></div>
             <div id="statementArea"></div>
         </div>
-
         <div class="nav-box">
             <div id="feedback"></div>
             <button class="main-btn" id="nextBtn" style="display: none;" onclick="processNext()">Tiếp tục</button>
         </div>
     </div>
-
     <div id="result-ui" class="result-screen">
         <h2>HOÀN THÀNH!</h2>
         <div class="score-big" id="finalScore">0</div>
-        <p id="detailCount" style="margin-bottom: 20px;"></p>
+        <p id="detailCount" style="margin-bottom: 20px; font-size: 1.2rem;"></p>
         <button class="main-btn" onclick="location.reload()">LÀM LẠI BÀI TẬP</button>
     </div>
 </div>
@@ -98,7 +65,7 @@
 <script>
     const quizData = [
         {
-            doc: `“Trước hết phải có đảng cách mệnh, để trong thì vận động và tổ chức dân chúng, ngoài thì liên lạc với dân tộc bị áp bức và vô sản giai cấp mọi nơi. Đảng có vững cách mệnh mới thành công, cũng như người cầm lái có vững thuyền mới chạy”.<br>(Hồ Chí Minh: Toàn tập, Nxb. Chính trị quốc gia Sự thật, Hà Nội, 2006, t. 2, tr. 289)`,
+            doc: `Câu 1. Cho đoạn tư liệu sau đây:<br>“Trước hết phải có đảng cách mệnh, để trong thì vận động và tổ chức dân chúng, ngoài thì liên lạc với dân tộc bị áp bức và vô sản giai cấp mọi nơi. Đảng có vững cách mệnh mới thành công, cũng như người cầm lái có vững thuyền mới chạy”.<br>(Hồ Chí Minh: Toàn tập, Nxb. Chính trị quốc gia Sự thật, Hà Nội, 2006, t. 2, tr. 289)`,
             statements: [
                 { text: "a) Muốn có Đảng vững mạnh, cần xây dựng sự đa dạng về tư tưởng và có tổ chức thống nhất.", ans: false },
                 { text: "b) Đảng làm nhiệm vụ vận động nhân dân Việt Nam và thế giới cùng chống ngoại xâm.", ans: false },
@@ -107,7 +74,7 @@
             ]
         },
         {
-            doc: `“Theo Người, bất cứ lịch sử xâm chiếm thực dân nào thì từ đầu đến cuối đều được viết bằng máu của những người bản xứ. Vì thế, để giải phóng mình, các dân tộc bị áp bức không có con đường nào khác là con đường cách mạng bạo lực. Hồ Chí Minh cho rằng, bạo lực cách mạng để đập tan bạo lực phản cách mạng của thực dân Pháp, giành chính quyền về tay nhân dân...”`,
+            doc: `Câu 2. Cho đoạn tư liệu sau đây:<br>“Theo Người, bất cứ lịch sử xâm chiếm thực dân nào thì từ đầu đến cuối đều được viết bằng máu của những người bản xứ. Vì thế, để giải phóng mình, các dân tộc bị áp bức không có con đường nào khác là con đường cách mạng bạo lực. Hồ Chí Minh cho rằng, bạo lực cách mạng để đập tan bạo lực phản cách mạng của thực dân Pháp, giành chính quyền về tay nhân dân. Thắng Pháp là chúng ta đã thắng Mỹ một phần vì khi đó Mỹ là kẻ thù nguy hiểm nhưng còn đang giấu mặt. Người đã nhiều lần chỉ rõ bản chất của đế quốc Mỹ là “chết thì chết, nết không chừa””.<br>(Hồ Chí Minh (2011), Toàn tập, Tập 6, Nxb. Chính trị quốc gia, Tr.201)`,
             statements: [
                 { text: "a) Vì cách mạng là sự nghiệp của quần chúng, nên Hồ Chí Minh đã xác định bạo lực cách mạng chỉ là bạo lực của Đảng Cộng sản, Nhà nước nhằm thực hiện mục tiêu giành và giữ chính quyền.", ans: false },
                 { text: "b) Thực tiễn kháng chiến chống Mĩ (1954 – 1975) cho thấy tư tưởng Hồ Chí Minh thể hiện chủ nghĩa nhân văn, nhân đạo cao cả trong sử dụng bạo lực cách mạng chống lại bạo lực phản cách mạng.", ans: true },
@@ -116,7 +83,7 @@
             ]
         },
         {
-            doc: `“Chủ động hội nhập kinh tế quốc tế và khu vực theo tinh thần phát huy tối đa nội lực, nâng cao hiệu quả hợp tác quốc tế, bảo đảm độc lập tự chủ và định hướng xã hội chủ nghĩa, bảo vệ lợi ích dân tộc, an ninh quốc gia, giữ gìn bản sắc văn hóa dân tộc, bảo vệ môi trường”.`,
+            doc: `Câu 3. Cho đoạn tư liệu sau đây:<br>“Chủ động hội nhập kinh tế quốc tế và khu vực theo tinh thần phát huy tối đa nội lực, nâng cao hiệu quả hợp tác quốc tế, bảo đảm độc lập tự chủ và định hướng xã hội chủ nghĩa, bảo vệ lợi ích dân tộc, an ninh quốc gia, giữ gìn bản sắc văn hóa dân tộc, bảo vệ môi trường”. <br>(Văn kiện Đại hội Đảng thời kỳ đổi mới (Đại hội VI, VII, VIII, IX), Nxb. Chính trị quốc gia, Hà Nội, 2005, tr. 664)`,
             statements: [
                 { text: "a) Để phát triển bền vững, Việt Nam cần kết hợp hài hòa các yếu tố truyền thống và hiện đại.", ans: true },
                 { text: "b) Việt Nam thực hiện hội nhập để xây dựng, phát triển đất nước.", ans: true },
@@ -125,16 +92,16 @@
             ]
         },
         {
-            doc: `“Việt Nam là thành viên tích cực, có trách nhiệm của hơn 70 tổ chức, diễn đàn quốc tế quan trọng của khu vực và thế giới, như: Liên hợp quốc (UN), ASEAN, AIPA, IPU, ASEM, APEC, WTO...”.`,
+            doc: `Câu 4. Cho đoạn tư liệu sau đây:<br>“Việt Nam là thành viên tích cực, có trách nhiệm của hơn 70 tổ chức, diễn đàn quốc tế quan trọng của khu vực và thế giới, như: Liên hợp quốc (UN), Hiệp hội các quốc gia Đông Nam Á (ASEAN), Đại hội đồng Liên nghị viện Hiệp hội các quốc gia Đông Nam Á (AIPA), Đại hội đồng Liên minh nghị viện thế giới (IPU), Diễn đàn hợp tác Á – Âu (ASEM), Diễn đàn Hợp tác kinh tế châu Á – Thái Bình Dương (APEC), Tổ chức thương mại thế giới (WTO)…”. <br>(Nguyễn Phú Trọng, Xây dựng và phát triển nền đối ngoại, ngoại giao Việt Nam toàn diện, hiện đại, mang đậm bản sắc “cây tre Việt Nam”, NXB Chính trị Quốc gia Sự Thật, 2024, tr.33)`,
             statements: [
-                { text: "a) Hoạt động đối ngoại và quá trình hội nhập kinh tế quốc tế của Việt Nam là nhân tố quyết định đưa đến thắng lợi của công cuộc Đổi mới đất nước.", ans: false },
-                { text: "b) Với việc Việt Nam là thành viên của hơn 70 tổ chức quốc tế góp phần huy động các nguồn lực bên ngoài đẩy mạnh công nghiệp hoá, hiện đại hoá.", ans: true },
+                { text: "a) Hoạt động đối ngoại và quá trình hội nhập kinh tế quốc tế của Việt Nam là nhân tố quyết định đưa đến thắng lợi của công cuộc Đổi mới đất nước (từ năm 1986 đến nay).", ans: false },
+                { text: "b) Với việc Việt Nam là thành viên của hơn 70 tổ chức, diễn đàn quốc tế của khu vực và thế giới góp phần huy động các nguồn lực bên ngoài đẩy mạnh công nghiệp hoá, hiện đại hoá.", ans: true },
                 { text: "c) Việt Nam gia nhập Liên hợp quốc là bước đầu của quá trình hội nhập khu vực và quốc tế.", ans: false },
                 { text: "d) Đoạn tư liệu trên đề cập đến những thành tựu Việt Nam đạt được trong lĩnh vực đối ngoại.", ans: true }
             ]
         },
         {
-            doc: `“Nhân dân Việt Nam chúng tôi yêu chuộng hòa bình, một nền hòa bình chân chính trọng độc lập và tự do thật sự... Mỹ phải chấm dứt chiến tranh xâm lược và rút quân ra khỏi miền Nam Việt Nam... Đó là cách đứng đắn để giải quyết vấn đề Việt Nam”.`,
+            doc: `Câu 5. Cho đoạn tư liệu sau đây:<br>“Nhân dân Việt Nam chúng tôi yêu chuộng hòa bình, một nền hòa bình chân chính trọng độc lập và tự do thật sự. Nhân dân Việt Nam quyết chiến đấu đến cùng, không sợ hi sinh gian khổ, để bảo vệ Tổ quốc và các quyền dân tộc thiêng liêng của mình... Ngài [Nich-xơn] bày tỏ lòng mong muốn hành động cho một nền hòa bình công bằng. Muốn vậy, Mỹ phải chấm dứt chiến tranh xâm lược và rút quân ra khỏi miền Nam Việt Nam, tôn trọng quyền tự quyết của nhân dân miền Nam và dân tộc Việt Nam, không có sự can thiệp của nước ngoài. Đó là cách đứng đắn để giải quyết vấn đề Việt Nam”.<br>(Hồ Chí Minh, “Thư trả lời Tổng thống Mỹ Ri-sớt Ních-xơn ngày 25-8-1969”, trích trong: Hồ Chí Minh toàn tập, Tập 15,NXB Chính trị quốc gia Sự thật, Hà Nội, 2011, tr.602-603)`,
             statements: [
                 { text: "a) Trong đấu tranh ngoại giao với Mỹ, Việt Nam luôn kết hợp giương cao ngọn cờ độc lập tự chủ và ngọn cờ dân tộc chính nghĩa.", ans: true },
                 { text: "b) Một trong những mục tiêu của đối ngoại Việt Nam thời kì chống Mỹ, cứu nước là buộc các nước tôn trọng các quyền dân tộc cơ bản của Việt Nam.", ans: true },
@@ -143,7 +110,7 @@
             ]
         },
         {
-            doc: `“Hiệp định về chấm dứt chiến tranh, lập lại hòa bình ở Việt Nam chính thức được ký kết ngày 27-1-1973 tại Paris (Pháp) mở ra bước ngoặt mới trong lịch sử cuộc kháng chiến chống Mỹ... tạo thời cơ mới cho cách mạng Việt Nam tiếp tục tiến lên giành những thắng lợi mới...”`,
+            doc: `Câu 6. Cho đoạn tư liệu sau đây:<br>“Hiệp định về chấm dứt chiến tranh, lập lại hòa bình ở Việt Nam chính thức được ký kết ngày 27-1-1973 tại Paris (Pháp) mở ra bước ngoặt mới trong lịch sử cuộc kháng chiến chống Mỹ, cứu nước của nhân dân Việt Nam; tạo thời cơ mới cho cách mạng Việt Nam tiếp tục tiến lên giành những thắng lợi mới, mà đỉnh cao là Đại thắng mùa Xuân năm 1975, giải phóng hoàn toàn miền Nam, thống nhất đất nước. Tính chất mở đường của Hiệp định Paris được thể hiện rõ nét, sinh động kể từ thời điểm có hiệu lực thi hành cho đến ngày toàn thắng 30-4-1975”.<br>(TS Nguyễn Thị Mai - Tô Thị Hạnh Nhân, Hiệp định Pari mở đường thống nhất đất nước và bài học cho hoạt động ngoại giao của Việt Nam hiện nay, Tạp chí Cộng sản, 06:28, ngày 06-01-2024)`,
             statements: [
                 { text: "a) Đoạn tư liệu đề cập đến hoạt động đối ngoại của Việt Nam trong thời kì kháng chiến chống Mỹ, cứu nước (1954 – 1975).", ans: true },
                 { text: "b) Hiệp định Pari là thành tựu tiêu biểu trong hoạt động đối ngoại của Việt Nam, đánh bại âm mưu “phân tuyến” của đối phương.", ans: false },
@@ -152,7 +119,7 @@
             ]
         },
         {
-            doc: `“Sức mạnh ngoại giao là một dạng “sức mạnh mềm” và ngoại giao đóng vai trò quan trọng tạo dựng thêm thế và lực của đất nước... các nước vừa và nhỏ vẫn có thể tham gia hiệu quả và có vai trò quan trọng trong các tổ chức quốc tế như Liên hợp quốc, WTO.”`,
+            doc: `Câu 7. Cho đoạn tư liệu sau đây:<br>“Sức mạnh ngoại giao là một dạng “sức mạnh mềm” và ngoại giao đóng vai trò quan trọng tạo dựng thêm thế và lực của đất nước. Trong bối cảnh hiện nay, ngoại giao đa phương ngày càng có tầm quan trọng đặc biệt. Bên cạnh chủ thể chính của quan hệ quốc tế còn có các chủ thể khác là các tổ chức liên chính phủ và phi chính phủ, các công ty xuyên quốc gia. Thực tiễn quốc tế cho thấy, các nước vừa và nhỏ vẫn có thể tham gia hiệu quả và có vai trò quan trọng trong các tổ chức quốc tế như Liên hợp quốc, WTO. Đó là kinh nghiệm bổ ích về hoạt động chính trị quốc tế mà Việt Nam có thể tham khảo”.<br>(Nguyễn Duy Niên, Tư tưởng ngoại giao Hồ Chí Minh, NXB Chính trị quốc gia Sự thật, Hà Nội, 2009, tr.336)`,
             statements: [
                 { text: "a) Hiện nay, ngoại giao của các quốc gia chỉ tập trung vào lĩnh vực chính trị, quốc phòng - an ninh. Ngoại giao thậm chí có thể đi trước mở đường cho đấu tranh chính trị và quân sự.", ans: false },
                 { text: "b) Nội dung đoạn tư liệu trên phản ánh tầm quan trọng của ngoại giao trong gia tăng thế và lực của đất nước.", ans: true },
@@ -161,16 +128,16 @@
             ]
         },
         {
-            doc: `<b>BẢNG THÔNG TIN HOẠT ĐỘNG NGUYỄN ÁI QUỐC:</b><br>- 1917-1920: Đảng Xã hội Pháp.<br>- 1920: Sáng lập Đảng Cộng sản Pháp.<br>- 1921: Hội Liên hiệp thuộc địa.<br>- 1923: Sang Liên Xô.<br>- 1925: Hội Liên hiệp các dân tộc bị áp bức ở Á Đông.`,
+            doc: `Câu 8. Cho bảng thông tin sau đây:<table><tr><th>Thời gian</th><th>Sự kiện</th></tr><tr><td>1917-1920</td><td>Nguyễn Ái Quốc tham gia hoạt động trong Đảng Xã hội Pháp.</td></tr><tr><td>Năm 1920</td><td>Nguyễn Ái Quốc tham gia sáng lập Đảng Cộng sản Pháp và bỏ phiếu tán thành việc gia nhập Quốc tế Cộng sản.</td></tr><tr><td>Năm 1921</td><td>Nguyễn Ái Quốc tham gia thành lập Hội Liên hiệp thuộc địa.</td></tr><tr><td>Tháng 6/1923</td><td>Nguyễn Ái Quốc từ Pháp đến Liên Xô, tích cực tham gia các hội nghị, đại hội của Quốc tế Cộng sản.</td></tr><tr><td>Tháng 7/1925</td><td>Nguyễn Ái Quốc tham gia thành lập Hội Liên hiệp các dân tộc bị áp bức ở Á Đông.</td></tr></table>`,
             statements: [
                 { text: "a) Bảng thông tin trên đề cập đến hoạt động đối ngoại của Nguyễn Ái Quốc trong những năm 20 của thế kỉ XX.", ans: true },
-                { text: "b) Hoạt động đối đối ngoại của Nguyễn Ái Quốc 20 năm đầu thế kỉ XX thể hiện tinh thần yêu nước, góp phần xác lập khuynh hướng cách mạng mới ở Việt Nam.", ans: true },
+                { text: "b) Hoạt động đối ngoại của Nguyễn Ái Quốc 20 năm đầu thế kỉ XX thể hiện tinh thần yêu nước, góp phần xác lập khuynh hướng cách mạng mới ở Việt Nam.", ans: true },
                 { text: "c) Nguyễn Ái Quốc đã đứng trên lập trường của chiến sĩ cộng sản khi tham gia hoạt động trong Đảng Xã hội Pháp.", ans: false },
                 { text: "d) Những hoạt động đối ngoại Phan Bội Châu, Phan Châu Trinh và Nguyễn Ái Quốc đều hướng đến mục tiêu cuối cùng là giành độc lập cho dân tộc Việt Nam.", ans: true }
             ]
         },
         {
-            doc: `“Hỡi đồng bào yêu quý! Giờ quyết định cho vận mệnh dân tộc ta đã đến. Toàn quốc đồng bào hãy đứng dậy đem sức ta mà tự giải phóng cho ta. Nhiều dân tộc bị áp bức trên thế giới đang ganh nhau tiến bước giành quyền độc lập...”`,
+            doc: `Câu 9. Cho đoạn tư liệu sau đây:<br>“Hỡi đồng bào yêu quý!<br>Giờ quyết định cho vận mệnh dân tộc ta đã đến. Toàn quốc đồng bào hãy đứng dậy đem sức ta mà tự giải phóng cho ta. Nhiều dân tộc bị áp bức trên thế giới đang ganh nhau tiến bước giành quyền độc lập. Chúng ta không thể chậm trễ.<br>Tiến lên! Tiến lên! Dưới lá cờ Việt Minh, đồng bào hãy dũng cảm tiến lên!”.<br>(Hồ Chí Minh, Toàn tập, Sđd, t.3, NXB Chính trị Quốc gia, 2011, tr.596)`,
             statements: [
                 { text: "a) Sự chỉ đạo và hiệu triệu của Nguyễn Ái Quốc trong tháng Tám năm 1945 góp phần giúp nhân dân các nước Đông Dương giành độc lập.", ans: false },
                 { text: "b) Đoạn tư liệu cho thấy vai trò của Nguyễn Ái Quốc trong lãnh đạo hai cuộc kháng chiến chống ngoại xâm thế kỉ XX ở Việt Nam.", ans: false },
@@ -180,90 +147,57 @@
         }
     ];
 
-    let currentQ = 0;
-    let totalScore = 0;
-    let correctInCurrentStep = 0;
-
+    let currentQ = 0, totalScore = 0, correctInCurrentStep = 0;
     function loadQuestion() {
-        if (currentQ >= quizData.length) {
-            showResult();
-            return;
-        }
-        
+        if (currentQ >= quizData.length) { showResult(); return; }
         correctInCurrentStep = 0;
-        document.getElementById('progress').innerText = `Câu hỏi tư liệu ${currentQ + 1} / ${quizData.length}`;
+        document.getElementById('progress').innerText = `Câu ${currentQ + 1} / ${quizData.length}`;
         document.getElementById('docContent').innerHTML = quizData[currentQ].doc;
-        document.getElementById('feedback').innerText = "Vui lòng chọn đúng 4 ý để tiếp tục.";
+        document.getElementById('feedback').innerText = "Chọn Đúng/Sai cho cả 4 ý bên dưới.";
         document.getElementById('feedback').style.color = "var(--secondary)";
         document.getElementById('nextBtn').style.display = "none";
-        
         const area = document.getElementById('statementArea');
         area.innerHTML = "";
-        
         quizData[currentQ].statements.forEach((s, i) => {
             const row = document.createElement('div');
             row.className = 'statement-row';
-            row.innerHTML = `
-                <div class="statement-text">${s.text}</div>
-                <div class="btn-group">
-                    <button class="btn-check btn-true" id="t-${i}" onclick="checkStep(${i}, true, this)">Đúng</button>
-                    <button class="btn-check btn-false" id="f-${i}" onclick="checkStep(${i}, false, this)">Sai</button>
-                </div>
-            `;
+            row.innerHTML = `<div class="statement-text">${s.text}</div><div class="btn-group"><button class="btn-check btn-true" id="t-${i}" onclick="checkStep(${i}, true, this)">Đúng</button><button class="btn-check btn-false" id="f-${i}" onclick="checkStep(${i}, false, this)">Sai</button></div>`;
             area.appendChild(row);
         });
     }
-
     function checkStep(idx, val, btn) {
         const correctVal = quizData[currentQ].statements[idx].ans;
-        const trueBtn = document.getElementById(`t-${idx}`);
-        const falseBtn = document.getElementById(`f-${idx}`);
-
+        const trueBtn = document.getElementById(`t-${idx}`), falseBtn = document.getElementById(`f-${idx}`);
         if (val === correctVal) {
             btn.classList.add(val ? 'active-true' : 'active-false');
-            trueBtn.disabled = true;
-            falseBtn.disabled = true;
+            trueBtn.disabled = falseBtn.disabled = true;
             correctInCurrentStep++;
-
             if (correctInCurrentStep === 4) {
-                totalScore += 1;
-                document.getElementById('feedback').innerText = "Chính xác toàn bộ!";
+                totalScore++;
+                document.getElementById('feedback').innerText = "Chính xác! Nhấn 'Tiếp tục'.";
                 document.getElementById('feedback').style.color = "var(--success)";
                 document.getElementById('nextBtn').style.display = "block";
-                document.getElementById('nextBtn').innerText = (currentQ === quizData.length -1) ? "Kết thúc" : "Tiếp tục";
+                document.getElementById('nextBtn').innerText = (currentQ === quizData.length -1) ? "Xem kết quả" : "Tiếp tục";
             }
         } else {
             btn.classList.add(val ? 'active-false' : 'active-true');
-            document.getElementById('feedback').innerText = "Chưa đúng, hãy thử lại!";
+            document.getElementById('feedback').innerText = "Sai rồi, hãy thử lại ý này!";
             document.getElementById('feedback').style.color = "var(--danger)";
-            
-            trueBtn.disabled = true;
-            falseBtn.disabled = true;
-
+            trueBtn.disabled = falseBtn.disabled = true;
             setTimeout(() => {
                 btn.classList.remove('active-false', 'active-true');
-                trueBtn.disabled = false;
-                falseBtn.disabled = false;
-                document.getElementById('feedback').innerText = "Cố gắng lên!";
-                document.getElementById('feedback').style.color = "var(--secondary)";
+                trueBtn.disabled = falseBtn.disabled = false;
             }, 600);
         }
     }
-
-    function processNext() {
-        currentQ++;
-        loadQuestion();
-    }
-
+    function processNext() { currentQ++; loadQuestion(); }
     function showResult() {
         document.getElementById('quiz-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
         document.getElementById('finalScore').innerText = totalScore;
-        document.getElementById('detailCount').innerText = `Bạn đã hoàn thành ${quizData.length} câu hỏi ôn tập.`;
+        document.getElementById('detailCount').innerText = `Hoàn thành trọn vẹn ${quizData.length} câu hỏi tư liệu.`;
     }
-
     window.onload = loadQuestion;
 </script>
-
 </body>
 </html>
