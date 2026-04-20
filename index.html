@@ -10,7 +10,6 @@
             --nasa-red: #fc3d21;
             --history-orange: #d35400; 
             --history-gold: #f1c40f;   
-            --hover-blue: #154ba3;
             --bg-color: #0b192e; 
         }
 
@@ -39,12 +38,7 @@
             max-width: 600px;
         }
 
-        h1 {
-            margin-bottom: 20px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        h1 { margin-bottom: 20px; font-weight: 300; text-transform: uppercase; }
 
         .counter-box {
             margin-bottom: 30px;
@@ -52,9 +46,10 @@
             color: #00ffcc;
             font-weight: bold;
             background: rgba(0, 255, 204, 0.1);
-            padding: 10px;
+            padding: 8px 20px;
             border-radius: 50px;
             display: inline-block;
+            min-width: 150px;
         }
 
         .button-group {
@@ -69,36 +64,20 @@
             background-color: var(--nasa-blue);
             padding: 20px;
             border-radius: 10px;
-            font-size: 1.1rem;
             font-weight: bold;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: 0.3s;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 150px;
-            cursor: pointer;
         }
 
-        .nav-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
+        .nav-button:hover { transform: translateY(-3px); border-color: white; }
         .btn-bio-ds { background-color: var(--nasa-red); }
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            opacity: 0.6;
-        }
-
-        @media (max-width: 500px) {
-            .button-group { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 500px) { .button-group { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -116,58 +95,41 @@
             <a onclick="updateCounter('tns.html')" class="nav-button btn-hist">Trắc Nghiệm Sử</a>
             <a onclick="updateCounter('dss.html')" class="nav-button btn-hist-ds">Đúng Sai Sử</a>
         </div>
-
-        <div class="footer">
-            Thiết kế bởi NTT@THPTLTV-2026
-        </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwx-X-7G5qfngSfDyAuZwD_qdgHzUdEciqkKfS6OSOle7K5Y-TH_LifqkpVTlqrUdeghg/exec";
 
-        // 1. Hàm hiện số ngay lập tức khi mở trang
-        function initCount() {
-            const viewCountElement = document.getElementById('viewCount');
-            // Lấy số từ bộ nhớ máy hiện ra trước (0.001 giây)
-            const localCount = localStorage.getItem('lastCount') || "0";
-            viewCountElement.innerText = localCount;
+        // 1. HIỆN SỐ NGAY LẬP TỨC
+        (function init() {
+            const countEl = document.getElementById('viewCount');
+            // Lấy số từ bộ nhớ máy hiện ra ngay (mất 0.001s)
+            const cached = localStorage.getItem('ntt_count');
+            if (cached) countEl.innerText = cached;
 
-            // Sau đó mới âm thầm gọi API để cập nhật số mới nhất từ Google
-            fetch(API_URL)
-                .then(res => res.json())
-                .then(data => {
-                    const serverCount = data.luot_dung_moi || data.new_value || "0";
-                    viewCountElement.innerText = serverCount;
-                    localStorage.setItem('lastCount', serverCount); // Lưu lại cho lần sau
-                })
-                .catch(err => console.log("Chưa có kết nối mạng để cập nhật số mới"));
-        }
+            // Chạy ngầm cập nhật số mới từ server
+            fetch(API_URL).then(r => r.json()).then(d => {
+                const num = d.luot_dung_moi || d.new_value || cached || "0";
+                countEl.innerText = num;
+                localStorage.setItem('ntt_count', num);
+            }).catch(() => {});
+        })();
 
-        // 2. Hàm cộng số cực nhanh khi nhấn nút
-        function updateCounter(targetUrl) {
-            const viewCountElement = document.getElementById('viewCount');
+        // 2. CẬP NHẬT KHI NHẤN (KHÔNG CHỜ ĐỢI)
+        function updateCounter(url) {
+            const countEl = document.getElementById('viewCount');
+            let current = parseInt(countEl.innerText) || 0;
             
-            // CỘNG GIẢ TRÊN MÀN HÌNH LUÔN (Hiện số mới ngay lập tức)
-            let currentNum = parseInt(viewCountElement.innerText) || 0;
-            let fakeNum = currentNum + 1;
-            viewCountElement.innerText = fakeNum;
-            localStorage.setItem('lastCount', fakeNum);
+            // Tăng số trên màn hình ngay lập tức (đánh lừa thị giác)
+            countEl.innerText = current + 1;
+            localStorage.setItem('ntt_count', current + 1);
 
-            // Gửi lệnh thật về Google (chạy ngầm)
-            fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors"
-            });
+            // Gửi lệnh lên Google âm thầm
+            fetch(API_URL, { method: "POST", mode: "no-cors" });
 
-            // Chuyển trang ngay sau 200ms để người dùng thấy số nhảy rồi đi luôn
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 200);
+            // Chuyển trang luôn sau 100ms (cực nhanh)
+            setTimeout(() => { window.location.href = url; }, 100);
         }
-
-        // Chạy hàm khởi tạo ngay khi web tải
-        initCount();
     </script>
-
 </body>
 </html>
