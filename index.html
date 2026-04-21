@@ -13,6 +13,7 @@
             --hover-blue: #154ba3;
             --bg-color: #0b192e; 
             --accent-green: #00ffcc;
+            --chemistry-purple: #8e44ad; /* Màu mới cho môn Hóa */
         }
 
         body {
@@ -60,7 +61,6 @@
             font-size: 1.5rem;
         }
 
-        /* Dòng tổng số lượt làm */
         .total-counter {
             color: var(--accent-green);
             font-weight: bold;
@@ -72,6 +72,10 @@
             font-size: 0.8rem;
             margin-bottom: 20px;
             opacity: 0.8;
+            background: rgba(0, 255, 204, 0.1);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
         }
 
         .button-group {
@@ -79,6 +83,11 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-bottom: 30px;
+        }
+
+        /* Căn chỉnh lại nút Hóa cho đẹp nếu số lượng nút lẻ */
+        .full-width {
+            grid-column: span 2;
         }
 
         .nav-button {
@@ -94,12 +103,14 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            border: none;
         }
 
         .nav-button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
         .btn-bio-ds { background-color: var(--nasa-red); }
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
+        .btn-chem { background-color: var(--chemistry-purple); }
 
         .leaderboard {
             background: rgba(255, 255, 255, 0.1);
@@ -130,14 +141,17 @@
 
         .footer { margin-top: 20px; font-size: 0.7rem; opacity: 0.6; }
 
-        @media (max-width: 500px) { .button-group { grid-template-columns: 1fr; } }
+        @media (max-width: 500px) { 
+            .button-group { grid-template-columns: 1fr; } 
+            .full-width { grid-column: span 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="announcement">
-            📢 <b>THÔNG BÁO:</b> Update v1 - 21/4/2026 sẽ cập nhật Môn Hóa
+            📢 <b>THÔNG BÁO:</b> 22/04/2026 sẽ cập nhật đề môn Tin học.
         </div>
 
         <h1>Hệ Thống Ôn Tập</h1>
@@ -152,6 +166,7 @@
             <a onclick="updateCounter('ds.html')" class="nav-button btn-bio-ds">Đúng Sai Sinh</a>
             <a onclick="updateCounter('tns.html')" class="nav-button btn-hist">Trắc Nghiệm Sử</a>
             <a onclick="updateCounter('dss.html')" class="nav-button btn-hist-ds">Đúng Sai Sử</a>
+            <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem full-width">!!HOT!Trắc Nghiệm Hóa</a>
         </div>
 
         <div class="leaderboard">
@@ -165,10 +180,20 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwQXOMeU4M9tt3xqaL2rBjsh426TFxy6BOj-KWJezZrF-oNlMIvnvRNiIjL0QsxpJrm/exec";
 
+        // Hàm xử lý tên người dùng
         function getUserId() {
             let id = localStorage.getItem('ntt_user_id');
-            if (!id) {
-                id = "user#" + Math.floor(1000 + Math.random() * 9000);
+            
+            // Nếu chưa có tên hoặc tên vẫn là mã ngẫu nhiên cũ
+            if (!id || id.startsWith("user#")) {
+                let name = prompt("Chào mừng! Hãy nhập họ tên của bạn để lưu danh bảng vàng:", "");
+                
+                if (name && name.trim() !== "") {
+                    id = name.trim();
+                } else {
+                    // Nếu không nhập thì gán tên tạm thời để lần sau bắt hỏi tiếp
+                    id = "user#" + Math.floor(1000 + Math.random() * 9000);
+                }
                 localStorage.setItem('ntt_user_id', id);
             }
             return id;
@@ -176,7 +201,7 @@
 
         async function loadData() {
             const myId = getUserId();
-            document.getElementById('userDisplay').innerText = "Mã của bạn: " + myId;
+            document.getElementById('userDisplay').innerText = "Thí sinh: " + myId;
 
             try {
                 const response = await fetch(API_URL);
@@ -186,11 +211,9 @@
                     .map(item => ({ name: item[0], score: parseInt(item[1]) || 0 }))
                     .sort((a, b) => b.score - a.score);
 
-                // TÍNH TỔNG SỐ LƯỢT: Cộng dồn tất cả score của mọi người
                 let total = students.reduce((sum, s) => sum + s.score, 0);
                 document.getElementById('totalCount').innerText = total;
 
-                // Hiển thị Top 10
                 let top10 = students.slice(0, 10);
                 let lbHtml = "";
                 top10.forEach((s, index) => {
@@ -211,12 +234,12 @@
         function updateCounter(targetUrl) {
             const myId = getUserId();
             
-            // Tăng số lượt tổng và số cá nhân trên màn hình ngay để nhìn cho "đã"
             const totalEl = document.getElementById('totalCount');
             totalEl.innerText = (parseInt(totalEl.innerText) || 0) + 1;
 
             fetch(API_URL, {
                 method: "POST",
+                mode: "no-cors", // Thêm chế độ này để tránh lỗi CORS khi post lên Google Apps Script
                 body: JSON.stringify({ userId: myId })
             });
 
@@ -227,3 +250,4 @@
     </script>
 </body>
 </html>
+
