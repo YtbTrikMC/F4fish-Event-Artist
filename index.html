@@ -16,6 +16,24 @@
             --chemistry-purple: #8e44ad;
         }
 
+        /* Hiệu ứng nhấp nháy cho cảnh báo */
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; transform: scale(1.02); }
+            100% { opacity: 1; }
+        }
+
+        .warning-text {
+            color: #ff0000;
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            animation: blink 0.8s infinite;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -103,8 +121,6 @@
             margin-bottom: 30px;
         }
 
-        .full-width { grid-column: span 2; }
-
         .nav-button {
             text-decoration: none;
             color: white;
@@ -139,7 +155,6 @@
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
         .btn-chem { background-color: var(--chemistry-purple); }
-        /* Màu riêng cho môn Tin */
         .btn-it { background-color: #2980b9; } 
 
         .leaderboard {
@@ -173,13 +188,16 @@
 
         @media (max-width: 500px) { 
             .button-group { grid-template-columns: 1fr; } 
-            .full-width { grid-column: span 1; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="warning-text">
+            ⚠️ TRẮC NGHIỆM HÓA CÓ THỂ CÓ SAI SÓT NHIỀU, VUI LÒNG ĐỌC THẬT KỸ VÀ KHIẾU NẠI SỚM NẾU THẤY SAI!!!
+        </div>
+
         <div class="announcement">
             📢 <b>THÔNG BÁO:</b> Đã cập nhật đầy đủ đề môn Tin học (21/04/2026). 22/04/2026 sẽ cập nhật Tiếng Anh.
         </div>
@@ -292,4 +310,3 @@
     </script>
 </body>
 </html>
-
