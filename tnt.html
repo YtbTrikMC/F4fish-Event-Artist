@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Tin Học - tnt.html</title>
+    <style>
+        :root {
+            --primary-color: #2980b9;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #ecf0f1;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .question-num {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .option:hover {
+            background-color: #f7f9f9;
+            border-color: var(--primary-color);
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: var(--success-color);
+            color: #155724;
+        }
+
+        .option.wrong {
+            background-color: #f8d7da;
+            border-color: var(--error-color);
+            color: #721c24;
+        }
+
+        .status-msg {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            height: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .disabled {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div class="question-num" id="q-num">Câu 1</div>
+        <div id="score-display">Đúng: 0 | Sai: 0</div>
+    </div>
+
+    <div id="quiz-content">
+        <div class="question-text" id="q-text">Đang tải câu hỏi...</div>
+        <div class="options" id="q-options"></div>
+    </div>
+
+    <div class="status-msg" id="status-msg"></div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "Câu 1: Phát biểu nào sau đây sai?", a: "Các lớp giả không cần định nghĩa và mặc định được coi như các lớp có sẵn của CSS.", b: "Nếu không tìm thấy mẫu định dạng tương ứng thì sẽ lấy thông số định dạng CSS kế thừa từ phần tử cha.", c: "Bộ chọn ::selection mô tả phần được chọn (bằng cách kéo thả chuột trên màn hình) của đối tượng.", d: "Nếu có nhiều mẫu định dạng với cùng trọng số thì định dạng ở vị trí đầu tiên sẽ được áp dụng.", ans: "D" },
+        { q: "Câu 2: Em hãy sắp xếp theo thứ tự từ cao xuống thấp các mức độ ưu tiên khi áp dụng CSS sau:\n1. Trọng số CSS.\n2. Mặc định theo trình duyệt.\n3. CSS liên quan đến kích thước thiết bị.\n4. Kế thừa từ CSS cha.", a: "3, 1, 4, 2.", b: "2, 3, 4, 1.", c: "1, 4, 2, 3.", d: "3, 2, 1, 4.", ans: "A" },
+        { q: "Câu 3: Giá trị trọng số của bộ chọn ::selection là bao nhiêu?", a: "0.", b: "1.", c: "10.", d: "100.", ans: "B" },
+        { q: "Câu 4: Mẫu CSS thiết lập định dạng dòng đầu tiên của các đoạn thuộc lớp description có kích thước gấp 3 lần cỡ chữ hiện thời của trình duyệt là", a: "p#description::first-line {font-size: 3rem;}.", b: "p.description::first-line {font-size: 3pt;}.", c: "p.description::first-line {font-size: 3em;}.", d: "#p.description::first-line {font-size: 3em;}.", ans: "C" },
+        { q: "Câu 5: Bộ chọn a:link ~ p#info có trọng số bằng bao nhiêu?", a: "22.", b: "130.", c: "112.", d: "220.", ans: "C" },
+        { q: "Câu 6: Người làm nghề sửa chữa, bảo trì máy tính cần có kiến thức nào sau đây?", a: "Kiến thức về cơ sở dữ liệu.", b: "Kiến thức về lập trình.", c: "Kiến thức về hệ điều hành.", d: "Kiến thức marketing.", ans: "C" },
+        { q: "Câu 7: Vì sao người làm nghề sửa chữa, bảo trì máy tính cần có kĩ năng giao tiếp?", a: "Để biết cách tìm kiếm, tra cứu tài liệu hướng dẫn, thông tin hữu ích được chia sẻ trên Internet và phương pháp khắc phục lỗi.", b: "Để hoàn thành dự án sửa chữa, bảo trì trong thời gian quy định và đáp ứng yêu cầu của khách hàng.", c: "Để hiểu các yêu cầu của người dùng từ đó có thể giải thích và tư vấn cho họ các giải pháp kĩ thuật một cách dễ hiểu.", d: "Để có hiểu biết về công nghệ mới.", ans: "C" },
+        { q: "Câu 8: Cơ sở đào tạo nào sau đây có đào tạo các ngành học liên quan đến nghề sửa chữa và bảo trì máy tính?", a: "Trường Cao đẳng Y Dược Hà Nội.", b: "Trường Cao đẳng Nghệ thuật Hà Nội.", c: "Trường Cao đẳng Du lịch Hà Nội.", d: "Trường Cao đẳng nghề Bách Khoa Hà Nội.", ans: "D" },
+        { q: "Câu 9: Vì sao người làm nghề sửa chữa, bảo trì máy tính cần có kĩ năng quản lí thời gian?", a: "Để hoàn thành dự án sửa chữa, bảo trì trong thời gian quy định và đáp ứng yêu cầu của khách hàng.", b: "Để có hiểu biết về công nghệ mới.", c: "Để biết cách tìm kiếm, tra cứu tài liệu hướng dẫn, thông tin hữu ích được chia sẻ trên Internet và phương pháp khắc phục lỗi.", d: "Để hiểu các yêu cầu của người dùng từ đó có thể giải thích và tư vấn cho họ các giải pháp kĩ thuật một cách dễ hiểu.", ans: "A" },
+        { q: "Câu 10: Loại kết nối mạng nào cho phép một thiết bị kết nối trực tiếp và truyền tải thông điệp tới nhiều thiết bị song song?", a: "Multicast.", b: "Point-to-point.", c: "Broadcast.", d: "Multipion.", ans: "C" },
+        { q: "Câu 11: Mỗi trang web đầy đủ nhất bao gồm mấy phần chính?", a: "2.", b: "3.", c: "4.", d: "5.", ans: "B" },
+        { q: "Câu 12: Phần chân trang của một website có thể chứa nội dung nào sau đây?", a: "Nội dung website.", b: "Thanh điều hướng.", c: "Thông tin về bản quyền của website.", d: "Thông tin mới cập nhật của website.", ans: "C" },
+        { q: "Câu 13: Biểu tượng đại diện cho tất cả các trang web trong một website và hiển thị trước địa chỉ trang web trên tab của trình duyệt được gọi là gì?", a: "Favicon.", b: "Weblogo.", c: "Favlogo.", d: "Webicon.", ans: "A" },
+        { q: "Câu 14: Phát biểu nào sau đây sai?", a: "Mỗi trang web phải bắt nguồn từ một nhu cầu cụ thể.", b: "Thân trang là phần chứa nội dung của trang web, thường được bố cục thành các khối hình chữ nhật, mỗi khối trình bày một nội dung với tiêu đề riêng.", c: "Phần đầu trang có thể bao gồm những liên kết tới các trang mạng xã hội liên quan.", d: "Việc xây dựng trang web cần bắt đầu với việc phân tích, xác lập định hướng về mục đích của trang web và đối tượng người dùng.", ans: "C" },
+        { q: "Câu 15: Khi xây dựng trang web, em cần làm gì để định hình ý tưởng?", a: "Xây dựng kiến trúc nội dung, thiết kế mĩ thuật, chọn bảng màu, phông chữ,…", b: "Làm logo, favicon, ảnh nền và đặt tên trang web.", c: "Lựa chọn phần mềm để xây dựng trang web.", d: "Xác định mục đích và đối tượng phục vụ của trang web.", ans: "D" },
+        { q: "Câu 16: Phát biểu nào sau đây sai?", a: "Logo có thể có dạng hình chữ nhật, favicon dạng hình vuông với kích thước 16x16, 32x32, 48x48 px.", b: "Có thể chọn ảnh nền trang web từ ảnh trong Google Drive, Google Photos hay ảnh trên Internet.", c: "Các kích thước tuỳ chọn của phần đầu trang chỉ khác nhau về chiều rộng.", d: "Khi thiết lập ảnh nền cho trang web, độ sáng của ảnh được tự động điều chỉnh để vẫn đọc được phần chữ trên nền.", ans: "D" },
+        { q: "Câu 17: Biểu tượng (Chỉnh sửa ảnh nền) dùng để làm gì?", a: "Điều chỉnh chất lượng của ảnh nền.", b: "Chỉnh màu cho ảnh nền.", c: "Điều chỉnh phần ấn tượng nhất của ảnh hiển thị trọn vẹn trong đầu trang.", d: "Huỷ bỏ chế độ tự động điều chỉnh độ sáng của ảnh được chọn làm ảnh nền.", ans: "C" },
+        { q: "Câu 18: Google Sites sẽ tự động lưu trang web đang tạo vào đâu?", a: "Google Drive.", b: "Files.", c: "Máy tính.", d: "Gmail.", ans: "A" },
+        { q: "Câu 19: Tại giao diện thiết lập phần đầu trang, dòng nào là nơi nhập nội dung tóm tắt trang?", a: "Dòng Tiêu đề trang.", b: "Dòng Trang web không có tiêu đề.", c: "Dòng Nhập tên trang web.", d: "Dòng Loại tiêu đề.", ans: "B" },
+        { q: "Câu 20: Để thiết lập kích thước phần đầu trang, em thực hiện như thế nào?", a: "Nháy chuột Loại kích thước và chọn một kích thước.", b: "Nháy chuột Tuỳ chọn tiêu đề và chọn một kích thước.", c: "Nháy chuột Thay đổi hình ảnh và chọn một kích thước.", d: "Nháy chuột Loại tiêu đề và chọn một kích thước.", ans: "D" },
+        { q: "Câu 21: Phần chân trang của một website có thể chứa nội dung nào sau đây?", a: "Bảng chọn các chức năng.", b: "Thông tin tóm tắt của trang.", c: "Những liên kết tới các trang mạng xã hội liên quan.", d: "Nội dung website.", ans: "C" },
+        { q: "Câu 22: Bảng chọn Chèn của giao diện tạo phần thân trang web có mấy nhóm lệnh?", a: "2.", b: "3.", c: "4.", d: "5.", ans: "B" },
+        { q: "Câu 23: Google Sites cung cấp sẵn bao nhiêu mẫu cấu trúc nội dung để tạo phần thân trang web?", a: "6.", b: "7.", c: "8.", d: "9.", ans: "A" },
+        { q: "Câu 24: Phát biểu nào sau đây sai?", a: "Google Sites cho phép thực hiện tạo phần thân trang theo kiến trúc khối với các mẫu được hỗ trợ sẵn.", b: "Sau khi thiết lập cấu trúc nội dung cho phần thân trang web, nháy chuột vào biểu tượng để thêm ảnh vào trang web.", c: "Có thể thay đổi kích thước của bản đồ bằng cách chọn bản đồ rồi kéo thả chuột tại các nút trên khung để được kích thước mong muốn.", d: "Sử dụng biểu tượng để thêm bản đồ vào trang web.", ans: "B" },
+        { q: "Câu 25: Nếu muốn nhúng Google Maps vào trang web, em có thể thực hiện như thế nào?", a: "Chọn Bản đồ ở nhóm thứ nhất của bảng chọn Chèn.", b: "Chọn Biểu đồ ở nhóm thứ ba của bảng chọn Chèn.", c: "Chọn Tài liệu ở nhóm thứ ba của bảng chọn Chèn.", d: "Chọn Bản đồ ở nhóm thứ ba của bảng chọn Chèn.", ans: "D" },
+        { q: "Câu 26: Pseudo-class được sử dụng để:", a: "Định nghĩa kiểu chữ đặc biệt", b: "Tạo các lớp giả định của phần tử HTML", c: "Thay đổi màu nền của trang web", d: "Tạo hiệu ứng động cho các hình ảnh", ans: "B" },
+        { q: "Câu 27: Trọng số CSS không bao gồm yếu tố nào sau đây?", a: "Số lượng ID", b: "Số lượng class", c: "Số lượng thẻ HTML", d: "Số lượng thuộc tính", ans: "D" },
+        { q: "Câu 28: Dịch vụ sửa chữa và bảo trì máy tính có nhiệm vụ gì?", a: "Chỉ bảo trì phần cứng", b: "Hỗ trợ kỹ thuật cho người dùng", c: "Chỉ sửa chữa phần mềm", d: "Chỉ cung cấp phần mềm mới", ans: "B" },
+        { q: "Câu 29: Phần nào của trang web chứa thông tin về thương hiệu, bản quyền và liên kết mạng xã hội?", a: "Phần đầu trang", b: "Phần thân trang", c: "Phần chân trang", d: "Phần thông báo", ans: "C" },
+        { q: "Câu 30: Lệnh \"Nhúng\" trong bảng chọn Chèn có chức năng gì?", a: "Chèn văn bản từ Google Drive", b: "Chèn hình ảnh từ máy tính", c: "Chèn dữ liệu từ các ứng dụng Internet khác", d: "Chèn liên kết đến các trang web khác", ans: "C" }
+    ];
+
+    let currentQuestion = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+
+    function renderQuestion() {
+        const data = quizData[currentQuestion];
+        document.getElementById('q-num').innerText = `Câu ${currentQuestion + 1}`;
+        document.getElementById('q-text').innerText = data.q;
+        
+        const optionsContainer = document.getElementById('q-options');
+        optionsContainer.innerHTML = '';
+        
+        const labels = ['A', 'B', 'C', 'D'];
+        labels.forEach(label => {
+            const btn = document.createElement('div');
+            btn.className = 'option';
+            btn.innerText = `${label}. ${data[label.toLowerCase()]}`;
+            btn.onclick = () => checkAnswer(label, btn);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('status-msg').innerText = '';
+        updateProgress();
+    }
+
+    function checkAnswer(choice, element) {
+        const data = quizData[currentQuestion];
+        const options = document.querySelectorAll('.option');
+
+        if (choice === data.ans) {
+            element.classList.add('correct');
+            document.getElementById('status-msg').innerText = 'Chính xác!';
+            document.getElementById('status-msg').style.color = 'var(--success-color)';
+            correctCount++;
+            document.getElementById('q-options').classList.add('disabled');
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < quizData.length) {
+                    document.getElementById('q-options').classList.remove('disabled');
+                    renderQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 1500);
+        } else {
+            element.classList.add('wrong');
+            document.getElementById('status-msg').innerText = 'Sai rồi, chọn lại nhé!';
+            document.getElementById('status-msg').style.color = 'var(--error-color)';
+            wrongCount++;
+        }
+        updateScore();
+    }
+
+    function updateScore() {
+        document.getElementById('score-display').innerText = `Đúng: ${correctCount} | Sai: ${wrongCount}`;
+    }
+
+    function updateProgress() {
+        const percent = ((currentQuestion) / quizData.length) * 100;
+        document.getElementById('progress-fill').style.width = percent + '%';
+    }
+
+    function finishQuiz() {
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('quiz-content').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <h2 style="color: var(--success-color)">Hoàn thành!</h2>
+                <p>Bạn đã trả lời xong tất cả 30 câu hỏi.</p>
+                <p style="font-size: 1.2rem;">Kết quả: <b>${correctCount}</b> câu đúng.</p>
+                <button onclick="location.reload()" style="padding: 10px 20px; background: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">Làm lại</button>
+            </div>
+        `;
+    }
+
+    window.onload = renderQuestion;
+</script>
+
+</body>
+</html>
+
