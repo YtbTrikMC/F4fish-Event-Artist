@@ -123,7 +123,6 @@
 
         .nav-button:hover:not(.disabled) { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
         
-        /* Trạng thái nút bị khóa */
         .nav-button.disabled {
             background-color: #444 !important;
             color: #888 !important;
@@ -140,6 +139,8 @@
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
         .btn-chem { background-color: var(--chemistry-purple); }
+        /* Màu riêng cho môn Tin */
+        .btn-it { background-color: #2980b9; } 
 
         .leaderboard {
             background: rgba(255, 255, 255, 0.1);
@@ -180,7 +181,7 @@
 
     <div class="container">
         <div class="announcement">
-            📢 <b>THÔNG BÁO:</b> 22/04/2026 sẽ cập nhật đề môn Tin học.
+            📢 <b>THÔNG BÁO:</b> Đã cập nhật đầy đủ đề môn Tin học (21/04/2026). 22/04/2026 sẽ cập nhật Tiếng Anh.
         </div>
 
         <h1>Hệ Thống Ôn Tập</h1>
@@ -199,8 +200,12 @@
             <a class="nav-button btn-bio-ds disabled">Đúng Sai Sinh</a>
             <a class="nav-button btn-hist disabled">Trắc Nghiệm Sử</a>
             <a class="nav-button btn-hist-ds disabled">Đúng Sai Sử</a>
-            <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem full-width">🔥 HOT! Trắc Nghiệm Hóa</a>
-            <a onclick="updateCounter('dsh.html')" class="nav-button btn-chem full-width" style="margin-top: 10px;">Đúng Sai Hóa</a>
+            
+            <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem">🔥 Trắc Nghiệm Hóa</a>
+            <a onclick="updateCounter('dsh.html')" class="nav-button btn-chem">Đúng Sai Hóa</a>
+            
+            <a onclick="updateCounter('tnt.html')" class="nav-button btn-it">💻 Trắc Nghiệm Tin</a>
+            <a onclick="updateCounter('dst.html')" class="nav-button btn-it">Đúng Sai Tin</a>
         </div>
 
         <div class="leaderboard">
@@ -287,3 +292,4 @@
     </script>
 </body>
 </html>
+
