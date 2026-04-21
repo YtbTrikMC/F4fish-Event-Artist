@@ -3,26 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc nghiệm Hóa học</title>
+    <title>Trắc nghiệm Hóa học - NTT</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; }
-        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; }
         .timer { font-size: 22px; font-weight: bold; color: #d9534f; }
-        .question-text { font-size: 19px; font-weight: 600; margin-bottom: 20px; min-height: 50px; }
+        .question-text { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; white-space: pre-wrap; }
         .options { display: flex; flex-direction: column; gap: 12px; }
-        .option { padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 16px; position: relative; }
+        .option { padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 16px; }
         .option:hover { background-color: #f8f9fa; border-color: #007bff; }
         .option.correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
-        .option.wrong { background-color: #f8d7da; border-color: #dc3545; color: #721c24; opacity: 0.8; }
+        .option.wrong { background-color: #f8d7da; border-color: #dc3545; color: #721c24; }
         .msg { height: 30px; margin-top: 15px; font-weight: bold; font-size: 16px; text-align: center; }
-        .msg.success { color: #28a745; }
-        .msg.error { color: #dc3545; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
         .result-box { display: none; text-align: center; }
         .btn-retry { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 20px; }
-        .btn-retry:hover { background-color: #0056b3; }
         .progress { margin-top: 20px; font-size: 14px; color: #666; text-align: right; }
         .disabled { pointer-events: none; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -30,7 +31,7 @@
 <div class="container">
     <div id="quiz-section">
         <div class="header">
-            <h2 style="margin:0; font-size: 20px;">Trắc nghiệm Hóa học</h2>
+            <h2 style="margin:0; font-size: 20px;">Hệ Thống Ôn Tập - Trắc Nghiệm Hóa</h2>
             <div class="timer" id="timer">50:00</div>
         </div>
 
@@ -45,104 +46,105 @@
 
     <div id="result-section" class="result-box">
         <h2 style="color: #28a745;">Hoàn thành bài thi!</h2>
-        <p style="font-size: 18px;">Số câu trả lời đúng: <strong id="res-correct"></strong> / 85</p>
+        <p style="font-size: 18px;">Số câu đúng (lần đầu): <strong id="res-correct"></strong> / 85</p>
         <p style="font-size: 24px;">Tổng điểm: <strong id="res-score"></strong> / 10</p>
-        <button class="btn-retry" onclick="window.location.href='index.html'">Làm lại</button>
+        <button class="btn-retry" onclick="window.location.href='index.html'">Quay lại trang chủ</button>
     </div>
 </div>
 
 <script>
-    // Dữ liệu 85 câu hỏi giữ nguyên nội dung của bạn
     const quizData = [
         { q: "Dãy kim loại nào sau đây thuộc loại kim loại chuyển tiếp thứ nhất?", a: ["Co, V, K.", "Fe, Sc, Al.", "Cr, Mn, Ni.", "Cu, Zn, Ag."], c: 2 },
-        { q: "Trong quá trình Solvay, ở giai đoạn tạo thành NaHCO3 tồn tại cân bằng... Khi làm lạnh dung dịch, muối bị tách ra là", a: ["NaHCO3.", "NH4Cl.", "NaCl.", "NH4HCO3."], c: 0 },
-        { q: "Tính dẻo, tính dẫn điện, tính dẫn nhiệt và ánh kim của kim loại đều do thành phần nào gây ra?", a: ["Cation kim loại.", "Hạt proton tự do.", "Hạt neutron tự do.", "Hạt electron tự do."], c: 3 },
-        { q: "Cấu hình electron lớp ngoài cùng của nguyên tử Na (chu kì 3, nhóm IA) là", a: ["3s23p5.", "3s2.", "3s1.", "3s23p1."], c: 2 },
-        { q: "Hai kim loại thường được dùng làm dây dẫn điện là", a: ["đồng và nhôm.", "đồng và tungsten.", "nhôm và sắt.", "kẽm và nhôm."], c: 0 },
-        { q: "Điện phân dung dịch NaCl (điện cực trơ, không màng ngăn) thu được dung dịch tẩy màu là do tạo ra", a: ["CuSO4.", "NaCl.", "K2SO4.", "AgNO3."], c: 1 },
-        { q: "Đặc điểm nào dưới đây không phải của nước cứng?", a: ["Làm tăng tính acid, gây ngộ độc.", "Giảm tác dụng xà phòng.", "Tắc ống dẫn nước nóng.", "Giảm mùi vị thực phẩm."], c: 0 },
-        { q: "Xỉ trong quá trình luyện kim thường có đặc điểm là", a: ["Khối lượng riêng nhỏ hơn kim loại.", "Dễ nóng chảy.", "Dễ bay hơi.", "Có nhiều độc tính."], c: 0 },
-        { q: "Phương pháp điều chế vàng (Au) từ quặng theo sơ đồ hòa tan phức cyanide là", a: ["Thủy luyện.", "Nhiệt luyện.", "Điện phân nóng chảy.", "Điện phân dung dịch."], c: 0 },
-        { q: "Ống nghiệm chứa Zn + H2SO4, thêm CuSO4 khí thoát nhanh hơn do", a: ["Tốc độ như nhau.", "CuSO4 là xúc tác.", "Ăn mòn điện hóa học.", "Ăn mòn hóa học."], c: 2 },
-        { q: "Nồng độ mol ion Ca2+ trong dd bão hoà Ca(OH)2 ở 20°C (S=0,173) gần nhất là", a: ["1,730.", "0,940.", "0,023.", "0,047."], c: 2 },
-        { q: "Điện phân nóng chảy muối chloride kim loại kiềm thổ, quá trình tại cathode là", a: ["M → M+ + 1e.", "M+ + 1e → M.", "M → M2+ + 2e.", "M2+ + 2e → M."], c: 3 },
-        { q: "Sắt sản xuất nam châm dựa trên tính chất", a: ["Dẫn điện.", "Dẫn nhiệt.", "Tính dẻo.", "Tính nhiễm từ."], c: 3 },
-        { q: "So với BaSO4, CaSO4 có đặc điểm", a: ["Khó nhiệt phân.", "Khó thuỷ phân.", "Dễ kết tủa.", "Dễ tan hơn."], c: 3 },
-        { q: "Phát biểu SAI về tinh thể kim loại", a: ["Có cation và electron tự do.", "Cation chuyển động tự do.", "Cation và electron phân bố trật tự nhất định.", "Trung hòa về điện."], c: 2 },
-        { q: "Hợp kim làm thân vỏ máy bay là", a: ["Duralumin.", "Đồng thau.", "Đồng thiếc.", "Manganin."], c: 0 },
-        { q: "Điều kiện cần thiết để gỉ sắt là môi trường có", a: ["Oxygen và nước.", "Oxygen và nhiệt độ cao.", "Nước và nhiệt độ cao.", "Oxygen, nước và nhiệt độ cao."], c: 0 },
-        { q: "Nhiệt độ nóng chảy nhóm IA từ Li đến Cs", a: ["Tăng dần.", "Không đổi.", "Không quy luật.", "Giảm dần."], c: 3 },
-        { q: "Số phát biểu ĐÚNG về Solvay: (a) tháp carbonate; (b) kết tủa NaHCO3; (c) tỏa nhiệt; (d) quay vòng CO2/NH3.", a: ["1.", "3.", "2.", "4."], c: 2 },
-        { q: "Nước cứng chứa nhiều ion", a: ["Ca2+ và Mg2+.", "Cl– và SO42-.", "HCO3- và Cl–.", "Na+ và K+."], c: 0 },
-        { q: "Thứ tự hoạt động hóa học giảm dần (X: điện phân, Y: nhiệt phân, Z: khử C)", a: ["X, Z, Y.", "Y, Z, X.", "X, Y, Z.", "Z, Y, X."], c: 0 },
-        { q: "Điện phân NaCl nóng chảy, cathode thu được", a: ["HCl.", "Cl2.", "Na.", "NaOH"], c: 2 },
-        { q: "Cực dương gọi là (1), cực âm gọi là (2)", a: ["(1): anode, (2): cathode.", "(1): cathode, (2): anode.", "Cả hai là anode.", "Cả hai là cathode."], c: 0 },
-        { q: "Thành phần không có trong mạng tinh thể kim loại", a: ["Ion kim loại.", "Electron.", "Nguyên tử.", "Anion gốc acid."], c: 3 },
-        { q: "Ở pH=7, kim loại tan trong nước có thế điện cực chuẩn", a: ["> -0,413 V.", "< -0,413 V.", "> -0,826 V.", "< -0,826 V."], c: 1 },
-        { q: "Phản xạ ánh sáng tạo nên tính", a: ["Dẫn điện.", "Ánh kim.", "Tính dẻo.", "Dẫn nhiệt."], c: 1 },
-        { q: "Thép không gỉ chứa thêm", a: ["Mn, Mg.", "Mg, Al.", "Cr, Ni.", "Li, Ti."], c: 2 },
-        { q: "Tôn gỉ nhanh ở vị trí đinh thép do", a: ["Tiếp xúc nước mưa.", "Đinh là anode.", "Carbon trong đinh là cathode.", "Thép không đồng nhất."], c: 0 },
-        { q: "Nhôm KHÔNG dùng làm", a: ["Dây cao thế.", "Giấy gói thực phẩm.", "Vật liệu xây dựng.", "Mỏ neo tàu biển."], c: 3 },
-        { q: "Kim loại kiềm là", a: ["Sr.", "Mg.", "Cr.", "Cs."], c: 3 },
-        { q: "Hóa chất tan dầu mỡ ống bếp", a: ["Nước vôi.", "Giấm.", "Baking soda.", "Soda."], c: 3 },
-        { q: "Đặc điểm chung kim loại kiềm", a: ["Cấu tạo khá rỗng.", "Liên kết mạnh.", "Nhiệt độ nóng chảy cao.", "Nặng hơn dầu hỏa."], c: 0 },
-        { q: "Khử 1,6g oxide bằng CO được 1,12g rắn. Oxide là", a: ["FeO.", "Fe2O3.", "CuO.", "MgO."], c: 1 },
-        { q: "Điện phân CuSO4 trơ, hiện tượng SAI là", a: ["Nhạt màu xanh.", "Khí 2 cực.", "Khí anode màu nâu đỏ.", "Đồng ở cathode."], c: 2 },
-        { q: "Xảy ra phản ứng khi", a: ["Cu + NaCl.", "Al + MgCl2.", "Ag + FeSO4.", "Cu + AgNO3."], c: 3 },
-        { q: "Phát biểu ĐÚNG về tách kim loại", a: ["Fe đẩy Cu khỏi CuSO4.", "Zn từ ZnO bằng nhiệt luyện.", "Mg từ MgCl2 bằng điện phân dd.", "CO khử được Al2O3."], c: 1 },
-        { q: "Nước muối sinh lí 0,9% chứa", a: ["NaCl.", "NaClO.", "Na2SO4.", "NaNO3."], c: 0 },
-        { q: "Phản ứng bột nở làm bánh xốp", a: ["+ Ca(OH)2.", "Nhiệt phân NaHCO3.", "+ HCl.", "Tạo NaHCO3."], c: 1 },
-        { q: "Điện phân nóng chảy KCl, tại cathode", a: ["Oxi hóa K+.", "Oxi hóa Cl-.", "Khử K+.", "Khử Cl-."], c: 2 },
-        { q: "Kim loại cứng nhất", a: ["Cr.", "Al.", "Mg.", "Na."], c: 0 },
-        { q: "Ăn mòn điện hóa sắt khi", a: ["Sắt + H2SO4 loãng.", "Gang + HCl.", "Sắt + Cl2 khô.", "Sắt + Lưu huỳnh nung."], c: 1 },
-        { q: "Kim loại tan trong acid loãng có thế điện cực", a: ["> 0V.", "< 0V.", "> -0,413V.", "< -0,413V."], c: 1 },
-        { q: "Tính chất vật lí chung kim loại", a: ["Dẻo, dẫn điện/nhiệt, ánh kim.", "Mềm, dẫn điện.", "Cứng, dẫn điện.", "Nhiệt độ nóng chảy cao."], c: 0 },
-        { q: "Kim loại trong dural và thép 304 là", a: ["Al & Mg.", "Al & Fe.", "Mg & Fe.", "Zn & Fe."], c: 1 },
-        { q: "Ăn mòn kim loại là", a: ["Phá hủy bởi chất điện li.", "Chỉ là ăn mòn điện hóa.", "Diễn ra trong dd.", "Oxi hóa do môi trường."], c: 3 },
-        { q: "Phát biểu ĐÚNG về tinh thể kim loại", a: ["Cation & electron cùng tự do.", "Tương tác tĩnh điện ion/nguyên tử.", "Cation trật tự, electron tự do.", "Liên kết ion."], c: 2 },
-        { q: "Cation M+ cấu hình 2s22p6. M là", a: ["Rb.", "Na.", "Li.", "K."], c: 1 },
-        { q: "Bảo quản Na, K trong", a: ["Dầu hỏa.", "Phenol.", "Ethanol.", "Bình hút ẩm."], c: 0 },
-        { q: "Tính chất SAI của kim loại kiềm", a: ["D thấp.", "Độ cứng thấp.", "Tnc thấp.", "Dẫn điện tốt hơn Cu."], c: 3 },
-        { q: "Thủy luyện dùng kim loại mạnh khử ion trong", a: ["Muối khan.", "Dung dịch muối.", "Oxide.", "Hydroxide."], c: 1 },
-        { q: "Điện phân H2SO4 0,01M, nhận xét SAI", a: ["Anode O2, cathode H2.", "m H2SO4 không đổi.", "C% H2SO4 không đổi.", "pH giảm."], c: 2 },
-        { q: "Tinh chế đồng, tại anode", a: ["Cu -> Cu2+ + 2e.", "Cu2+ + 2e -> Cu.", "Nước tạo O2.", "H+ tạo H2."], c: 0 },
-        { q: "Pha 500ml nước muối 0,9% (d=1,0046) cần NaCl", a: ["4,521g.", "5,421g.", "6,986g.", "15,068g."], c: 0 },
-        { q: "Nguyên liệu sản xuất soda Solvay", a: ["Đá vôi & NaCl.", "NaCl, NH3, CO2.", "NaOH & CO2.", "NaCl & H2CO3."], c: 0 },
-        { q: "Điện phân Cu(NO3)2, tại anode", a: ["Nước tạo O2.", "Nước tạo H2.", "Cu tạo Cu2+.", "Cu2+ tạo Cu."], c: 0 },
-        { q: "Cation điện phân trước ở cathode", a: ["Cu2+.", "Ag+.", "H+.", "Fe2+."], c: 1 },
-        { q: "Hợp kim là vật liệu", a: ["Nấu chảy hỗn hợp.", "Chứa kim loại cơ bản & thành phần khác.", "Hỗn hợp nóng chảy.", "Hỗn hợp nguội."], c: 1 },
-        { q: "Thành phần hematite", a: ["Fe3O4.", "Fe2O3.", "FeO.", "Phức sắt."], c: 1 },
-        { q: "Vàng bạc làm trang sức do", a: ["Quý hiếm.", "Ánh kim, dẻo, bền oxi hóa.", "Dễ dát mỏng.", "Nhẹ."], c: 1 },
-        { q: "Nam châm tách được", a: ["Al.", "Thép.", "Cu.", "Zn."], c: 1 },
-        { q: "Nguyên tử có 3 electron lớp ngoài cùng", a: ["Na.", "Al.", "Si.", "Mg."], c: 1 },
-        { q: "Phát biểu ĐÚNG về cấu tạo/liên kết kim loại", a: ["(1)(2)(3).", "(1)(2)(4).", "(1)(2)(3)(4).", "(2)(3)(4)."], c: 2 },
-        { q: "Dãy Li, Na, Al, Ca, K, Rb có bao nhiêu kim loại kiềm?", a: ["1.", "2.", "3.", "4."], c: 3 },
-        { q: "Mức độ phản ứng nước tăng dần", a: ["K, Na, Li.", "Na, K, Li.", "Li, Na, K.", "K, Li, Na."], c: 2 },
-        { q: "Nhận định SAI về kim loại IA", a: ["Khử mạnh nhất.", "Thế điện cực âm nhất.", "Bán kính lớn nhất.", "Liên kết mạnh nhất."], c: 3 },
-        { q: "Z không tan gồm (Y từ X + CO dư, NaOH dư)", a: ["MgO, Fe, Cu.", "Mg, Fe, Cu.", "MgO, Fe3O4, Cu.", "Mg, Al, Fe, Cu."], c: 0 },
-        { q: "Đặc điểm Solvay", a: ["Áp suất cao.", "Oxi hóa khử.", "NaHCO3 tan kém.", "Trao đổi khí."], c: 2 },
-        { q: "Kim loại không tan trong HCl", a: ["Zn.", "Ag.", "Mg.", "K."], c: 1 },
-        { q: "Phát biểu SAI về chống ăn mòn", a: ["Phủ bề mặt.", "Điện hóa.", "Quấn kẽm bảo vệ kẽm.", "Bạc đen là hóa học."], c: 2 },
-        { q: "Hợp chất A lửa vàng, +HCl tạo khí đục nước vôi", a: ["K2CO3.", "NaNO3.", "CaCO3.", "Muối Na carbonate."], c: 3 },
-        { q: "Ứng dụng KHÔNG của soda", a: ["Mềm nước.", "Bột giấy.", "Tẩy dầu mỡ.", "Sản xuất NaHCO3."], c: 3 },
-        { q: "Dãy điện phân dung dịch được", a: ["Mg, Cu, Zn.", "Fe, Al, Cr.", "Ag, Cu, Fe.", "Au, Ag, Ca."], c: 2 },
-        { q: "Thùng phuy thép đựng được", a: ["HCl đặc.", "H2SO4 loãng.", "H2SO4 đặc.", "HNO3 loãng."], c: 2 },
-        { q: "Cấu hình KHÔNG của kim loại", a: ["[Ne]3s23p3.", "[Ne]3s2.", "[Ar]3d34s2.", "[Ar]3d64s2."], c: 0 },
-        { q: "Zn tách được dãy ion", a: ["Sn2+, Pb2+, Cu2+.", "Mg2+, Pb2+, Cu2+.", "Pb2+, Ag+, Al3+.", "Ag+, Cu2+, Na+."], c: 0 },
-        { q: "Kim loại có tính vật lí chung do", a: ["Mạng tinh thể.", "Electron tự do.", "Ít electron hóa trị.", "Năng lượng ion hóa nhỏ."], c: 1 },
-        { q: "Tungsten làm dây tóc do", a: ["Dẫn nhiệt.", "Tỷ trọng.", "Dẻo.", "Tnc cao."], c: 3 },
-        { q: "Tôn bị ăn mòn điện hóa thì", a: ["Zn cathode.", "Fe cathode.", "Zn anode bị oxi hóa.", "Fe anode."], c: 2 },
-        { q: "Cation điện phân trước tại cathode", a: ["Ni2+.", "Cu2+.", "Mg2+.", "Ag+."], c: 3 },
-        { q: "Kim loại kiềm là", a: ["Ba.", "Li.", "Al.", "Cu."], c: 1 },
-        { q: "Mạng tinh thể kim loại kiềm", a: ["Lập phương tâm khối.", "Tâm diện.", "Lục phương.", "Tùy loại."], c: 0 },
-        { q: "Không còn ion Na+ khi", a: ["Nhiệt phân NaHCO3.", "Điện phân dd NaOH.", "ĐPNC NaCl.", "Điện phân dd NaCl."], c: 2 },
-        { q: "Số phát biểu ĐÚNG về hợp kim", a: ["2.", "3.", "5.", "4."], c: 3 },
-        { q: "Khối lượng Ag thu được (kg)", a: ["2,75.", "4,32.", "2,16.", "3,24."], c: 1 },
-        { q: "NaHCO3 trong thuốc dạ dày đóng vai trò", a: ["Acid.", "Base.", "Lưỡng tính.", "Trung tính."], c: 1 }
+        { q: "Trong quá trình Solvay, ở giai đoạn tạo thành NaHCO3 tồn tại cân bằng sau:\nNaCl + NH3 + CO2 + H2O -> NaHCO3 + NH4Cl\nKhi làm lạnh dung dịch trên, muối bị tách ra khỏi dung dịch là", a: ["NaHCO3.", "NH4Cl.", "NaCl.", "NH4HCO3."], c: 0 },
+        { q: "Tính dẻo, tính dẫn điện, tính dẫn nhiệt và ánh kim của kim loại đều do thành phần nào sau đây gây ra?", a: ["Cation kim loại.", "Hạt proton tự do.", "Hạt neutron tự do.", "Hạt electron tự do."], c: 3 },
+        { q: "Kim loại Na ở chu kì 3, nhóm IA trong bảng tuần hoàn. Cấu hình electron lớp ngoài cùng của nguyên tử Na ở trạng thái cơ bản là", a: ["3s23p5.", "3s2.", "3s1.", "3s23p1."], c: 2 },
+        { q: "Hai kim loại thường được dùng làm dây dẫn điện là", a: ["đồng và nhôm.", "đồng và tungsten.", "nhôm và sắ.", "kẽm và nhôm."], c: 0 },
+        { q: "Điện phân dung dịch chất nào sau đây (với điện cực trơ, không có màng ngăn điện cực), thu được dung dịch có khả năng tẩy màu?", a: ["CuSO4.", "NaCl.", "K2SO4.", "AgNO3."], c: 1 },
+        { q: "Đặc điểm nào dưới đây không phải của nước cứng?", a: ["Làm tăng tính acid của nước, gây ngộ độc nước uống.", "Làm giảm tác dụng của xà phòng.", "Làm tắc các đường ống dẫn nước nóng trong sản xuất và trong đời sống.", "Nấu đồ ăn bằng nước cứng sẽ giảm mùi vị thực phẩm."], c: 0 },
+        { q: "Xỉ xuất hiện trong quá trình tách kim loại, luyện kim và tinh luyện để tái chế kim loại. Xỉ là hỗn hợp nhiều chất, hỗn hợp này thường", a: ["có khối lượng riêng nhỏ hơn so với khối lượng riêng của kim loại cần tách hoặc cần tái chế.", "dễ nóng chảy.", "dễ bay hơi.", "có nhiều độc tính nên cần phải chôn lấp sau khi được tháo ra khỏi lò."], c: 0 },
+        { q: "Vàng (Au) tồn tại trong tự nhiên ở dạng đơn chất. Tuy nhiên, hàm lượng Au trong quặng hoặc trong đất thường rất thấp vì vậy rất khó tách Au bằng phương pháp cơ học. Trong công nghiệp, người ta tách vàng từ quặng theo sơ đồ sau:\nQuặng chứa vàng (Au) -> K[Au(CN)2] (aq) -> Au(s)\nPhương pháp điều chế kim loại nào đã được sử dụng trong quá trình sản xuất Au theo sơ đồ trên?", a: ["Thủy luyện.", "Nhiệt luyện.", "Điện phân nóng chảy.", "Điện phân dung dịch."], c: 0 },
+        { q: "Rót vào ống nghiệm 1 và 2, mỗi ống khoảng 3 mL dung dịch H2SO4 loãng cùng nồng độ, rồi đồng thời cho vào mỗi ống một mẩu kẽm như nhau. Nhỏ thêm 2 – 3 giọt dung dịch CuSO4 vào ống 2. Phát biểu nào sau đây đúng?", a: ["Tốc độ thoát khí của hai ống nghiệm như nhau.", "Ống nghiệm 2 khí thoát ra nhanh hơn do có CuSO4 là chất xúc tác.", "Ống nghiệm 2 khí thoát ra nhanh hơn do xảy ra ăn mòn điện hóa học.", "Ống nghiệm 1 khí thoát ra nhanh hơn do xảy ra ăn mòn hóa học."], c: 2 },
+        { q: "Độ tan của Ca(OH)2 ở 20°C là 0,173 g/100g nước. Biết khối lượng riêng của dung dịch Ca(OH)2 bão hoà ở 20 °C là 1g/mL. Nồng độ mol của ion Ca2+ trong dung dịch bão hoà Ca(OH)2 ở 20°C có giá trị gần đúng là", a: ["1,730.", "0,940.", "0,023.", "0,047."], c: 2 },
+        { q: "Trong công nghiệp, kim loại kiềm thổ thường được điều chế bằng phương pháp điện phân nóng chảy muối chloride. Quá trình khử xảy ra tại cathode là", a: ["M → M+ + 1e.", "M+ + 1e → M.", "M → M2+ + 2e.", "M2+ + 2e → M."], c: 3 },
+        { q: "Sắt được sử dụng để sản xuất nam châm trong các máy phát điện và nhiều thiết bị (loa, chuông, tivi, máy tính, điện thoại,…) dựa trên tính chất nào sau đây?", a: ["Tính dẫn điện.", "Tính dẫn nhiệt.", "Tính dẻo.", "Tính nhiễm từ."], c: 3 },
+        { q: "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Chuẩn bị hai ống nghiệm, ống (1) chứa 2 ml dung dịch CaCl2, ống (2) chứa 2 ml dung dịch BaCl2 1M.\nBước 2: Nhỏ đồng thời vào mỗi ống nghiệm 3 giọt dung dịch CuSO4 1 M, thấy ống (1) xuất hiện kết tủa chậm hơn và ít hơn so với ống (2).\nNhận định nào sau đây đúng khi so sánh CaSO4 với BaSO4?", a: ["Khó nhiệt phân hơn.", "Khó thuỷ phân hơn.", "Dễ kết tủa hơn.", "Dễ tan hơn."], c: 3 },
+        { q: "Phát biểu nào sau đây không đúng khi nói về tinh thể kim loại (M)?", a: ["Trong tinh thể kim loại M có các cation Mn+ và các elctron hóa trị tự do.", "Các cation Mn+ chuyển động tự do trong mạng tinh thể kim loại.", "Trong tinh thể kim loại M, các cation Mn+ và elctron hóa trị tự do được phân bố theo trật tự nhất định.", "Tinh thể kim loại M trung hòa về điện."], c: 2 },
+        { q: "Hợp kim nào sau đây được sử dụng để làm cấu trúc thân vỏ máy bay?", a: ["Duralumin.", "Đồng thau (Brass).", "Đồng thiếc (Bronze).", "Manganin."], c: 0 },
+        { q: "Điều kiện nào sau đây là điều kiện cần thiết để xảy ra hiện tượng gỉ sắt?", a: ["Môi trường có oxygen và nước.", "Môi trường có oxygen và nhiệt độ cao.", "Môi trường có nước và nhiệt độ cao.", "Môi trường có oxygen, nước và nhiệt độ cao."], c: 0 },
+        { q: "Nhiệt độ nóng chảy của các kim loại nhóm IA từ Li đến Cs biến đổi như thế nào?", a: ["Tăng dần.", "Không đổi.", "Không có quy luật.", "Giảm dần."], c: 3 },
+        { q: "Phương pháp Solvay để sản xuất Na2CO3 trong công nghiệp được minh họa bằng các phát biểu sau:\n(a) Ion hydrogencarbonate được tạo thành tại tháp carbonate hóa.\n(b) Ở giai đoạn làm lạnh, NaHCO3 được tách biệt bằng phương pháp kết tủa.\n(c) Phản ứng chuyển hóa NaHCO3 thành Na2CO3 là phản ứng tỏa nhiệt.\n(d) Ammonia và carbon dioxide được sử dụng quay vòng trong quá trình sản xuất.\nSố phát biểu đúng là:", a: ["1.", "3.", "2.", "4."], c: 2 },
+        { q: "Nước cứng gây nhiều tác hại trong đời sống và sản xuất. Nước cứng là nước có chứa nhiều các ion", a: ["Ca2+ và Mg2+.", "Cl– và SO42-.", "HCO3- và Cl–.", "Na+ và K+."], c: 0 },
+        { q: "Cho ba kim loại X, Y, Z tách từ quặng:\nX: Điện phân; Y: Nhiệt phân; Z: Khử bằng Carbon.\nKhả năng hoạt động hoá học giảm dần là:", a: ["X, Z, Y.", "Y, Z, X.", "X, Y, Z.", "Z, Y, X."], c: 0 },
+        { q: "Khi điện phân NaCl nóng chảy (điện cực trơ), ở cathode thu được chất nào sau đây?", a: ["HCl.", "Cl2.", "Na.", "NaOH"], c: 2 },
+        { q: "Điện cực nối cực dương là (1), cực âm là (2). Thông tin phù hợp là:", a: ["(1): anode và (2): cathode.", "(1): cathode và (2): anode.", "(1): anode và (2): anode.", "(1): cathode và (2): cathode."], c: 0 },
+        { q: "Thành phần nào sau đây không có trong mạng tinh thể kim loại?", a: ["Ion kim loại.", "Electron.", "Nguyên tử kim loại.", "Anion gốc acid."], c: 3 },
+        { q: "Trong môi trường có pH = 7, các kim loại tan trong nước thường có giá trị điện cực chuẩn", a: ["lớn hơn –0,413 V.", "nhỏ hơn –0,413 V.", "lớn hơn –0,826 V.", "nhỏ hơn –0,826 V."], c: 1 },
+        { q: "Các electron tự do phản xạ hầu hết các tia sáng nhìn thấy được tạo nên tính chất:", a: ["Tính dẫn điện.", "Ánh kim.", "Tính dẻo.", "Tính dẫn nhiệt."], c: 1 },
+        { q: "Ngoài Fe và C, thép không gỉ thường chứa thêm thành phần nào sau đây?", a: ["Mn, Mg.", "Mg, Al.", "Cr, Ni.", "Li, Ti."], c: 2 },
+        { q: "Các tấm tôn (thép mạ kẽm) thường bị gỉ sét nhanh hơn tại các vị trí đóng đinh thép do:", a: ["việc đóng đinh tạo điều kiện cho nước mưa tiếp xúc với các kim loại.", "đinh thép đóng vai trò như anode.", "do trong đinh thép có carbon, đóng vai trò như cathode.", "do chất lượng thép không đồng nhất."], c: 0 },
+        { q: "Kim loại nhôm KHÔNG được sử dụng trong trường hợp nào sau đây?", a: ["Làm dây dẫn điện cao thế.", "Sản xuất hộp đựng, giấy bao gói thực phẩm.", "Chế tạo vật liệu xây dựng, trang trí.", "Chế tạo mỏ neo cho tàu biển."], c: 3 },
+        { q: "Kim loại nào sau đây thuộc kim loại kiềm?", a: ["Sr.", "Mg.", "Cr.", "Cs."], c: 3 },
+        { q: "Hóa chất nào phù hợp để làm tan dầu mỡ tắc ở bồn rửa bát?", a: ["Nước vôi.", "Giấm.", "Baking soda.", "Soda."], c: 3 },
+        { q: "Đặc điểm chung của các kim loại kiềm là", a: ["có cấu tạo tinh thể khá rỗng.", "có lực liên kết kim loại mạnh.", "có nhiệt độ nóng chảy cao.", "nặng hơn dầu hoả."], c: 0 },
+        { q: "Khử hoàn toàn 1,6 gam oxide kim loại bằng khí CO dư thu được 1,12 gam chất rắn. Oxide đó là:", a: ["FeO.", "Fe2O3.", "CuO.", "MgO."], c: 1 },
+        { q: "Điện phân dung dịch CuSO4 với điện cực trơ (Pt). Hiện tượng nào KHÔNG đúng?", a: ["Màu xanh nhạt dần.", "Lúc đầu khí thoát ra ở anode, sau đó ở cả 2 cực.", "Khí ở cathode không màu, khí ở anode màu nâu đỏ.", "Thu được Cu ở cathode."], c: 2 },
+        { q: "Trường hợp nào sau đây xảy ra phản ứng hóa học?", a: ["Cu + NaCl.", "Al + MgCl2.", "Ag + FeSO4.", "Cu + AgNO3."], c: 3 },
+        { q: "Phát biểu ĐÚNG về phương pháp tách kim loại:", a: ["Cu tách khỏi CuSO4 nhờ Fe.", "Zn tách khỏi ZnO bằng nhiệt luyện.", "Mg tách khỏi dd MgCl2 bằng điện phân.", "Al tách khỏi Al2O3 bằng CO nhiệt luyện."], c: 1 },
+        { q: "Nước muối sinh lí chứa chất X nồng độ 0,9%. X là:", a: ["NaCl.", "NaClO.", "Na2SO4.", "NaNO3."], c: 0 },
+        { q: "Phản ứng hóa học nào của bột nở NaHCO3 làm bánh nở xốp?", a: ["2NaHCO3 + Ca(OH)2 ⟶ Na2CO3 + CaCO3 + H2O.", "2NaHCO3 ⟶ Na2CO3 + H2O + CO2.", "NaHCO3 + HCl ⟶ NaCl + CO2 + H2O.", "Na2CO3 + Ca(OH)2 ⟶ 2NaHCO3 + CaCO3."], c: 1 },
+        { q: "Điện phân nóng chảy KCl điện cực trơ, quá trình ở cathode là:", a: ["oxi hoá ion K+.", "oxi hoá ion Cl–.", "khử ion K+.", "khử ion Cl–."], c: 2 },
+        { q: "Kim loại có độ cứng lớn nhất là", a: ["Cr.", "Al.", "Mg.", "Na."], c: 0 },
+        { q: "Thí nghiệm nào có xảy ra sự ăn mòn điện hoá của sắt?", a: ["Lá sắt + H2SO4 loãng.", "Mẩu gang + dd HCl.", "Đốt dây sắt trong khí Cl2 khô.", "Nung bột sắt và lưu huỳnh."], c: 1 },
+        { q: "Kim loại tan trong HCl hoặc H2SO4 loãng thường có thế điện cực chuẩn:", a: ["lớn hơn 0 V.", "nhỏ hơn 0 V.", "lớn hơn -0,413 V.", "nhỏ hơn -0,413 V."], c: 1 },
+        { q: "Tính chất vật lí chung của kim loại là", a: ["tính dẻo, dẫn điện, dẫn nhiệt, ánh kim.", "tính mềm, dẫn điện, dẫn nhiệt, ánh kim.", "tính cứng, dẫn điện, dẫn nhiệt, ánh kim.", "nhiệt độ nóng chảy cao, dẫn điện, ánh kim."], c: 0 },
+        { q: "Kim loại cơ bản trong dural và thép 304 lần lượt là", a: ["nhôm và magnesium.", "nhôm và sắt.", "magnesium và sắt.", "zinc và sắt."], c: 1 },
+        { q: "Sự ăn mòn kim loại là:", a: ["phá hủy do chất điện li.", "chính là ăn mòn điện hóa.", "diễn ra trong dung dịch điện li.", "phá hủy do tác dụng môi trường, kim loại bị oxi hóa."], c: 3 },
+        { q: "Phát biểu ĐÚNG về tinh thể kim loại:", a: ["Cation và electron cùng chuyển động tự do.", "Cation và nguyên tử có tương tác tĩnh điện.", "Cation trật tự, electron chuyển động tự do.", "Giữa chúng là liên kết ion bền vững."], c: 2 },
+        { q: "Cation M+ có cấu hình electron 2s22p6. M là:", a: ["Rb.", "Na.", "Li.", "K."], c: 1 },
+        { q: "Kim loại Na, K thường được bảo quản trong", a: ["dầu hỏa khan.", "phenol.", "ethanol.", "bình hút ẩm."], c: 0 },
+        { q: "Tính chất vật lí KHÔNG đúng với kim loại kiềm:", a: ["Khối lượng riêng nhỏ.", "Độ cứng thấp.", "Tnc và T sôi thấp.", "Dẫn điện tốt hơn đồng."], c: 3 },
+        { q: "Phương pháp thuỷ luyện dùng kim loại mạnh khử ion kim loại trong:", a: ["muối dạng khan.", "dung dịch muối.", "oxide kim loại.", "hydroxide kim loại."], c: 1 },
+        { q: "Điện phân dd H2SO4 0,01 M (điện cực trơ). Nhận xét SAI:", a: ["Anode O2, Cathode H2.", "m H2SO4 không đổi.", "C% H2SO4 không đổi.", "pH giảm."], c: 2 },
+        { q: "Tại anode của quá trình tinh chế đồng xảy ra phản ứng:", a: ["Cu(s) → Cu2+(aq) + 2e.", "Cu2+(aq) + 2e → Cu(s).", "2H2O → O2 + 4H+ + 4e.", "2H+ + 2e → H2."], c: 0 },
+        { q: "Pha 500 mL nước muối sinh lí 0,9% (d=1,0046 g/mL) cần NaCl là:", a: ["4,521 gam.", "5,421 gam.", "6,986 gam.", "15,068 gam."], c: 0 },
+        { q: "Nguyên liệu đầu sản xuất soda Solvay (ngoài nước):", a: ["đá vôi và sodium chloride.", "NaCl, NH3 và CO2.", "NaOH và CO2.", "NaCl và carbonic acid."], c: 0 },
+        { q: "Điện phân dd Cu(NO3)2 điện cực trơ, tại anode xảy ra:", a: ["H2O → O2 + 2H+ + 2e.", "2H2O + 2e → H2 + 2OH-.", "Cu → Cu2+ + 2e.", "Cu2+ + 2e → Cu."], c: 0 },
+        { q: "Cho dãy 2H+/H2 (0.00), Cu2+/Cu (+0.34), Fe2+/Fe (-0.44), Ag+/Ag (+0.799). Cation bị điện phân ĐẦU TIÊN là:", a: ["Cu2+.", "Ag+.", "H+.", "Fe2+."], c: 1 },
+        { q: "Hợp kim là vật liệu kim loại:", a: ["nóng chảy hỗn hợp cơ bản.", "chứa kim loại cơ bản và thành phần khác.", "hỗn hợp nóng chảy để nguội.", "hỗn hợp kim loại/phi kim nóng chảy."], c: 1 },
+        { q: "Thành phần chính khoáng vật hematite:", a: ["Fe3O4.", "Fe2O3.", "FeO.", "Fe(OH)CO3."], c: 1 },
+        { q: "Bạc và vàng làm đồ trang sức vì:", a: ["là kim loại quý hiếm.", "ánh kim, dẻo, không bị oxi hóa môi trường.", "dễ dát mỏng kéo sợi.", "ánh kim, dẻo và nhẹ."], c: 1 },
+        { q: "Dùng nam châm tách riêng phế liệu nào?", a: ["aluminium.", "thép.", "copper.", "zinc."], c: 1 },
+        { q: "Nguyên tử có 3 electron lớp ngoài cùng:", a: ["Na (Z=11).", "Al (Z=13).", "Si (Z=14).", "Mg (Z=12)."], c: 1 },
+        { q: "Số phát biểu ĐÚNG về kim loại/tinh thể:\n(1) Nhóm B là kim loại.\n(2) Rắn có cấu tạo tinh thể.\n(3) Bán kính > phi kim cùng chu kì.\n(4) Lực hút e tự do và ion dương.", a: ["(1), (2), (3).", "(1), (2), (4).", "(1), (2), (3), (4).", "(2), (3), (4)."], c: 2 },
+        { q: "Dãy Li, Na, Al, Ca, K, Rb. Số kim loại kiềm là:", a: ["1.", "2.", "3.", "4."], c: 3 },
+        { q: "Mức độ phản ứng với nước tăng dần:", a: ["K, Na, Li.", "Na, K, Li.", "Li, Na, K.", "K, Li, Na."], c: 2 },
+        { q: "So sánh IA với chu kì, nhận định SAI:", a: ["Tính khử mạnh nhất.", "Thế điện cực âm nhất.", "Bán kính lớn nhất.", "Liên kết kim loại mạnh nhất."], c: 3 },
+        { q: "Z không tan gồm (Y từ X + CO dư, NaOH dư):", a: ["MgO, Fe, Cu.", "Mg, Fe, Cu.", "MgO, Fe3O4, Cu.", "Mg, Al, Fe, Cu."], c: 0 },
+        { q: "Đặc điểm phương pháp Solvay:", a: ["Áp suất cao đẩy Cl-.", "Phản ứng oxi hóa khử.", "NaHCO3 độ tan kém dễ kết tinh.", "Phản ứng trao đổi giảm mol khí."], c: 2 },
+        { q: "Kim loại không tan trong dd HCl:", a: ["Zn.", "Ag.", "Mg.", "K."], c: 1 },
+        { q: "Phát biểu SAI về chống ăn mòn:", a: ["Sơn, mạ là phủ bề mặt.", "Nối với kim loại mạnh hơn là điện hóa.", "Quấn kẽm quanh đinh sắt bảo vệ kẽm.", "Bạc đen là ăn mòn hóa học."], c: 2 },
+        { q: "A lửa vàng, +HCl tạo khí đục nước vôi. A là:", a: ["K2CO3.", "NaNO3.", "CaCO3.", "Na2CO3 hoặc NaHCO3."], c: 3 },
+        { q: "Ứng dụng KHÔNG của sodium carbonate:", a: ["Làm mềm nước.", "Nguyên liệu bột giấy.", "Tẩy dầu mỡ ống bếp.", "Sản xuất NaHCO3."], c: 3 },
+        { q: "Điện phân dd muối điều chế dãy:", a: ["Mg, Cu, Zn.", "Fe, Al, Cr.", "Ag, Cu, Fe.", "Au, Ag, Ca."], c: 2 },
+        { q: "Thùng phuy thép đựng được dd nào ở nhiệt độ thường?", a: ["HCl đặc.", "H2SO4 loãng.", "H2SO4 đặc.", "HNO3 loãng."], c: 2 },
+        { q: "Cấu hình electron KHÔNG phải của kim loại:", a: ["[Ne]3s23p3.", "[Ne]3s2.", "[Ar]3d34s2.", "[Ar]3d64s2."], c: 0 },
+        { q: "Dùng kẽm tách được dãy ion riêng biệt nào?", a: ["Sn2+, Pb2+, Cu2+.", "Mg2+, Pb2+, Cu2+.", "Pb2+, Ag+, Al3+.", "Ag+, Cu2+, Na+."], c: 0 },
+        { q: "Đơn chất kim loại có tính chất vật lí chung do:", a: ["cấu trúc mạng tinh thể.", "các electron tự do.", "ít electron hóa trị.", "năng lượng ion hóa nhỏ."], c: 1 },
+        { q: "Tungsten (W) làm dây tóc bóng đèn nhờ:", a: ["Tính dẫn nhiệt.", "Tỉ trọng nhỏ.", "Tính dẻo.", "Nhiệt độ nóng chảy cao."], c: 3 },
+        { q: "Tôn bị ăn mòn điện hóa trong không khí ẩm thì:", a: ["Zn là cathode bị oxi hóa.", "Fe là cathode bị oxi hóa.", "Zn là anode bị oxi hóa.", "Fe là anode bị oxi hóa."], c: 2 },
+        { q: "Điện phân phân đoạn Ag+, Cu2+, Ni2+, Mg2+. Cation điện phân TRƯỚC là:", a: ["Ni2+.", "Cu2+.", "Mg2+.", "Ag+."], c: 3 },
+        { q: "Kim loại nào sau đây là kim loại kiềm?", a: ["Ba.", "Li.", "Al.", "Cu."], c: 1 },
+        { q: "Mạng tinh thể kim loại kiềm là:", a: ["lập phương tâm khối.", "lập phương tâm diện.", "lục phương.", "tùy bản chất nguyên tố."], c: 0 },
+        { q: "Trường hợp nào không còn tồn tại ion Na+?", a: ["Nhiệt phân NaHCO3.", "Điện phân dd NaOH.", "Điện phân nóng chảy NaCl.", "Điện phân dd NaCl."], c: 2 },
+        { q: "Số phát biểu ĐÚNG về hợp kim:\n(a) Dùng phổ biến hơn kim loại.\n(b) Tnc luôn cao hơn B.\n(c) Tính hóa học tương tự thành phần.\n(d) Có thể cứng hơn kim loại tạo nó.\n(e) Khó bị oxi hóa hơn.", a: ["2.", "3.", "5.", "4."], c: 3 },
+        { q: "Sử dụng 1,50 kg Zn khử phức Ag thu được 4,52 kg rắn (Ag và Zn dư). Ag thu được là bao nhiêu kg?", a: ["2,75.", "4,32.", "2,16.", "3,24."], c: 1 },
+        { q: "Trong phản ứng NaHCO3 thuốc dạ dày, nó thể hiện tính chất:", a: ["acid.", "base.", "lưỡng tính.", "trung tính."], c: 1 }
     ];
 
     let currentIdx = 0;
     let timer = 50 * 60;
+    let score = 0;
+    let hasFailedThisQuestion = false; // Biến kiểm tra xem câu này đã từng chọn sai chưa
     const labels = ['A', 'B', 'C', 'D'];
 
     function startTimer() {
@@ -159,21 +161,21 @@
     }
 
     function renderQuestion() {
+        hasFailedThisQuestion = false; // Reset trạng thái cho câu mới
         const data = quizData[currentIdx];
-        document.getElementById('q-text').innerText = `Câu ${currentIdx + 1}: ${data.q}`;
+        document.getElementById('q-text').innerText = `Câu ${currentIdx + 1}. ${data.q}`;
         const optionsHtml = data.a.map((opt, i) => `
             <div class="option" onclick="check(${i}, this)">
                 <strong>${labels[i]}.</strong> ${opt}
             </div>
         `).join('');
         document.getElementById('q-options').innerHTML = optionsHtml;
-        document.getElementById('q-msg').innerHTML = ''; // Reset thông báo
+        document.getElementById('q-msg').innerHTML = '';
         document.getElementById('progress').innerText = `Câu: ${currentIdx + 1} / ${quizData.length}`;
         document.getElementById('q-options').classList.remove('disabled');
     }
 
     function check(i, el) {
-        // Ngăn chặn bấm nhiều lần khi đang chờ chuyển câu
         if (document.getElementById('q-options').classList.contains('disabled')) return;
         if (el.classList.contains('wrong') || el.classList.contains('correct')) return;
         
@@ -183,7 +185,11 @@
             document.getElementById('q-options').classList.add('disabled');
             document.getElementById('q-msg').innerHTML = '<span class="success">Chính xác! Đang chuyển câu...</span>';
             
-            // Chờ đúng 2 giây (2000ms) mới chuyển câu
+            // Chỉ cộng điểm nếu chưa từng chọn sai ở câu này
+            if (!hasFailedThisQuestion) {
+                score++;
+            }
+            
             setTimeout(() => {
                 currentIdx++;
                 if (currentIdx < quizData.length) renderQuestion();
@@ -191,19 +197,22 @@
             }, 1000);
         } else {
             el.classList.add('wrong');
-            document.getElementById('q-msg').innerHTML = '<span class="error">Sai rồi, hãy chọn lại!</span>';
+            hasFailedThisQuestion = true; // Đánh dấu đã chọn sai, không được tính điểm câu này nữa
+            document.getElementById('q-msg').innerHTML = '<span class="error">Sai rồi, hãy chọn lại để tiếp tục!</span>';
         }
     }
 
     function finish() {
         document.getElementById('quiz-section').style.display = 'none';
         document.getElementById('result-section').style.display = 'block';
-        document.getElementById('res-correct').innerText = currentIdx;
-        document.getElementById('res-score').innerText = ((currentIdx / 85) * 10).toFixed(2);
+        document.getElementById('res-correct').innerText = score;
+        document.getElementById('res-score').innerText = ((score / 85) * 10).toFixed(2);
     }
 
-    startTimer();
-    renderQuestion();
+    window.onload = () => {
+        startTimer();
+        renderQuestion();
+    };
 </script>
 
 </body>
