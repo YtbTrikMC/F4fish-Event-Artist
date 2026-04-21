@@ -121,7 +121,21 @@
             border: none;
         }
 
-        .nav-button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
+        .nav-button:hover:not(.disabled) { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
+        
+        /* Trạng thái nút bị khóa */
+        .nav-button.disabled {
+            background-color: #444 !important;
+            color: #888 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+            position: relative;
+        }
+        .nav-button.disabled::after {
+            content: " 🔒";
+            font-size: 0.8rem;
+        }
+
         .btn-bio-ds { background-color: var(--nasa-red); }
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
@@ -181,11 +195,12 @@
         </div>
         
         <div class="button-group">
-            <a onclick="updateCounter('tn.html')" class="nav-button">Trắc Nghiệm Sinh</a>
-            <a onclick="updateCounter('ds.html')" class="nav-button btn-bio-ds">Đúng Sai Sinh</a>
-            <a onclick="updateCounter('tns.html')" class="nav-button btn-hist">Trắc Nghiệm Sử</a>
-            <a onclick="updateCounter('dss.html')" class="nav-button btn-hist-ds">Đúng Sai Sử</a>
+            <a class="nav-button disabled">Trắc Nghiệm Sinh</a>
+            <a class="nav-button btn-bio-ds disabled">Đúng Sai Sinh</a>
+            <a class="nav-button btn-hist disabled">Trắc Nghiệm Sử</a>
+            <a class="nav-button btn-hist-ds disabled">Đúng Sai Sử</a>
             <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem full-width">🔥 HOT! Trắc Nghiệm Hóa</a>
+            <a onclick="updateCounter('dsh.html')" class="nav-button btn-chem full-width" style="margin-top: 10px;">Đúng Sai Hóa</a>
         </div>
 
         <div class="leaderboard">
@@ -218,7 +233,7 @@
             let name = prompt("Nhập tên mới để thay thế tên cũ (" + currentId + "):", "");
             if (name && name.trim() !== "") {
                 localStorage.setItem('ntt_user_id', name.trim());
-                location.reload(); // Tải lại để áp dụng tên mới
+                location.reload();
             }
         }
 
