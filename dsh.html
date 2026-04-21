@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Đúng Sai Hóa Học - dsh.html</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-bottom: 20px; }
+        .timer { font-size: 22px; font-weight: bold; color: #e74c3c; }
+        .question-block { margin-bottom: 25px; }
+        .question-text { font-size: 18px; font-weight: 600; line-height: 1.6; margin-bottom: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #fff; }
+        table, th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f8f9fa; }
+
+        .sub-questions { display: flex; flex-direction: column; gap: 10px; }
+        .sub-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        .sub-text { flex: 1; margin-right: 15px; font-size: 15px; }
+        .btn-group { display: flex; gap: 8px; }
+        
+        .btn-choice { padding: 8px 15px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; background: #fff; }
+        .btn-choice.correct-active { background-color: #2ecc71; color: white; border-color: #27ae60; }
+        .btn-choice.wrong-active { background-color: #e74c3c; color: white; border-color: #c0392b; }
+        
+        .msg { height: 30px; margin-top: 20px; font-weight: bold; text-align: center; font-size: 17px; }
+        .msg.error { color: #e74c3c; }
+        .msg.success { color: #27ae60; }
+
+        .progress { margin-top: 20px; text-align: right; color: #666; font-weight: bold; }
+        .result-box { display: none; text-align: center; padding: 40px; }
+        .btn-retry { background-color: #8e44ad; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .disabled { pointer-events: none; opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-section">
+        <div class="header">
+            <h2 style="margin:0; color: #8e44ad;">Ôn Tập Đúng/Sai Hóa Học</h2>
+            <div class="timer" id="timer">50:00</div>
+        </div>
+
+        <div id="question-container">
+            <div class="question-text" id="q-main"></div>
+            <div id="q-table-container"></div>
+            <div class="sub-questions" id="q-subs"></div>
+            <div class="msg" id="q-msg"></div>
+        </div>
+
+        <div class="progress" id="progress">Câu: 1 / 16</div>
+    </div>
+
+    <div id="result-section" class="result-box">
+        <h2 style="color: #27ae60;">Chúc mừng bạn đã hoàn thành!</h2>
+        <p style="font-size: 18px;">Bạn đã vượt qua tất cả 16 câu hỏi ôn tập.</p>
+        <button class="btn-retry" onclick="window.location.href='index.html'">Quay về trang chủ</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "Câu 1. Các muối carbonate của kim loại nhóm IIA đều bị phân huỷ bởi nhiệt. Xét phản ứng nhiệt phân: MCO3(s) → MO(s) + CO2(g)",
+            table: `<table>
+                <tr><th>Muối</th><th>MgCO3(s)</th><th>CaCO3(s)</th><th>SrCO3(s)</th><th>BaCO3(s)</th></tr>
+                <tr><th>∆rH°298 (kJ/mol)</th><td>100,7</td><td>179,2</td><td>234,6</td><td>271,5</td></tr>
+            </table>
+            <p>Nhiệt độ bắt đầu xảy ra phản ứng nhiệt phân (sắp xếp ngẫu nhiên) các muối carbonate là 882°C; 1360°C; 542°C; 1155°C.</p>`,
+            subs: [
+                { t: "a) Độ bền nhiệt của các muối giảm dần từ MgCO3 đến BaCO3.", ans: "S" },
+                { t: "b) Các phản ứng nhiệt phân ở trên đều là phản ứng toả nhiệt.", ans: "S" },
+                { t: "c) Ở nhiệt độ 1360°C, phản ứng nhiệt phân SrCO3 bắt đầu xảy ra.", ans: "S" },
+                { t: "d) Trong phản ứng nhiệt phân muối CaCO3 thì khối lượng chất rắn giảm 44% sau khi nung (giả sử hiệu suất nhiệt phân là 100%).", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 2. Làm mềm nước cứng bằng phương pháp theo mô hình trao đổi ion.",
+            table: `<p><i>(Mô hình trao đổi ion: Vật liệu chứa Na+/K+ giữ lại Ca2+/Mg2+)</i></p>`,
+            subs: [
+                { t: "a) Tính cứng của nước có tên gọi là tính cứng tạm thời, tính cứng vĩnh cửu và tính cứng toàn phần.", ans: "Đ" },
+                { t: "b) Khi cho nước cứng qua vật liệu trao đổi ion, các ion Mg2+, Ca2+ đã được giữ lại trên vật liệu trao đổi, ion Na+ hoặc K+ đã đi ra khỏi vật liệu.", ans: "Đ" },
+                { t: "c) Phương pháp làm mềm nước cứng theo mô hình trên được gọi là phương pháp sắc kí cột.", ans: "S" },
+                { t: "d) Phương pháp theo mô hình trên sử dụng hiệu quả cho cả 3 loại nước cứng.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 3. Trong vỏ Trái Đất, sắt và nhôm là hai nguyên tố kim loại có hàm lượng cao hơn so với các nguyên tố kim loại khác.",
+            subs: [
+                { t: "a. Sắt hoặc nhôm đều được sử dụng với vai trò là kim loại cơ bản trong sản xuất với các hợp kim nặng.", ans: "S" },
+                { t: "b. Từ quặng bauxite sẽ tách được sắt bằng phương pháp nhiệt luyện, từ quặng hematite sẽ được tách nhôm bằng phương pháp điện phân.", ans: "S" },
+                { t: "c. Khi tráng một lớp kẽm lên đinh thép sẽ hạn chế được sự ăn mòn sắt trong thép theo phương pháp điện hóa.", ans: "Đ" },
+                { t: "d. Nhiệt độ cần để tái chế thép cao hơn nhiệt độ cần tái chế nhôm.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 4. Mỗi phát biểu nào sau đây là đúng hay sai?",
+            subs: [
+                { t: "a. Dung dịch Na2CO3 0,1 M có pH = 7.", ans: "S" },
+                { t: "b. Điện phân dung dịch NaCl không màng ngăn thu được dung dịch NaOH.", ans: "S" },
+                { t: "c. Kim loại kiềm có tính khử giảm dần từ Li đến Cs.", ans: "S" },
+                { t: "d. Có thể phân biệt được ion Na+ và K+ dựa vào màu ngọn lửa khi đốt các hợp chất của chúng.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 5. Tiến hành thí nghiệm ống (1) chứa Fe + H2SO4; ống (2) chứa Fe + H2SO4 + vài giọt CuSO4.",
+            subs: [
+                { t: "a. Ở bước 2, tốc độ thoát khí ở ống (2) nhanh hơn ống (1).", ans: "Đ" },
+                { t: "b. Ở bước 2, cả hai ống nghiệm đều xảy ra ăn mòn điện hoá.", ans: "S" },
+                { t: "c. Ở bước 2, trong ống (2) có chất rắn màu đỏ cam bám lên bề mặt đinh sắt.", ans: "Đ" },
+                { t: "d. Ở bước 2, cả hai ống nghiệm đều xảy ra quá trình khử Fe thành ion Fe2+.", ans: "S" }
+            ]
+        },
+        {
+            q: "Câu 6. Sử dụng thiết bị điện phân một chiều để mạ bạc một chiếc thìa kim loại.",
+            subs: [
+                { t: "a. Bạc sẽ bám lên chiếc thìa bởi vì bạc là kim loại rất hoạt động.", ans: "S" },
+                { t: "b. Dung dịch điện phân là muối bạc tan tốt trong nước.", ans: "Đ" },
+                { t: "c. Điện cực kim loại được làm bằng bạc.", ans: "Đ" },
+                { t: "d. Chiếc thìa được nối với cực âm của nguồn điện.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 7. Sodium hydrogencarbonate (NaHCO3) là chất rắn màu trắng, bị phân huỷ khi đun nóng.",
+            subs: [
+                { t: "a. Sodium hydrogencarbonate còn gọi là baking soda.", ans: "Đ" },
+                { t: "b. Khi đun nóng NaHCO3, khối lượng chất rắn giảm so với ban đầu.", ans: "Đ" },
+                { t: "c. Muối NaHCO3 là hợp chất lưỡng tính.", ans: "Đ" },
+                { t: "d. Trong dược học, NaHCO3 được dùng để sản xuất thuốc nhuận tràng.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 8. Về hiện tượng đinh sắt bị gỉ trong môi trường ẩm.",
+            subs: [
+                { t: "a. Sắt bị gỉ do bị oxi hoá bởi khí oxygen và hơi nước trong môi trường không khí ẩm.", ans: "Đ" },
+                { t: "b. Nếu trong môi trường nước biển, sự ăn mòn của sắt có thể xảy ra nhanh hơn.", ans: "Đ" },
+                { t: "c. Để bảo vệ đồ dùng bằng sắt không bị gỉ, người ta phủ lên bề mặt các đồ vật một lớp sơn, mạ kẽm hoặc bôi lớp dầu mỡ.", ans: "Đ" },
+                { t: "d. Sử dụng thép không gỉ là phương pháp ngăn rỉ sét từ bên ngoài.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 9. Cho các phát biểu về tính chất của kim loại.",
+            subs: [
+                { t: "a. Tất cả các nguyên tử kim loại đều có 1, 2 hoặc 3 electron ở lớp ngoài cùng.", ans: "S" },
+                { t: "b. Các nhóm A bao gồm các nguyên tố s và nguyên tố p.", ans: "Đ" },
+                { t: "c. Trong một chu kì, bán kính nguyên tử kim loại nhỏ hơn bán kính nguyên tử phi kim.", ans: "S" },
+                { t: "d. Các kim loại thường có ánh kim do các electron tự do phản xạ ánh sáng nhìn thấy được.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 10. Mỗi phát biểu nào sau đây là đúng hay sai?",
+            subs: [
+                { t: "a. Đồng là kim loại dẫn điện tốt nhất nên thường được dùng làm dây dẫn điện.", ans: "S" },
+                { t: "b. Duralumin thường được dùng để chế tạo vỏ máy bay.", ans: "Đ" },
+                { t: "c. Nhôm thường được điều chế bằng phương pháp thủy luyện.", ans: "S" },
+                { t: "d. Có thể bảo vệ sắt thép khỏi bị ăn mòn bằng cách gắn thêm magnesium.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 11. Thí nghiệm: Cốc (1) Fe + Fe(NO3)3; Cốc (2) Cu + AgNO3.",
+            subs: [
+                { t: "a. Sau khi phản ứng xảy ra hoàn toàn, khối lượng lá sắt ở cốc (1) giảm xuống, khối lượng lá đồng ở cốc (2) tăng lên.", ans: "Đ" },
+                { t: "b. Dung dịch ở cốc (2) từ màu xanh chuyển thành không màu do phản ứng oxi hóa ion Ag+ thành Ag kim loại.", ans: "S" },
+                { t: "c. Nếu ở bước 2 cốc (1) cho lá đồng thì dung dịch từ vàng nâu chuyển sang xanh.", ans: "Đ" },
+                { t: "d. Ở cốc (2) có vảy bạc bám vào lá đồng.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 12. Điện phân dung dịch NaCl bão hòa (điện cực trơ, màng ngăn xốp).",
+            subs: [
+                { t: "a. Dung dịch sau điện phân làm phenolphthalein chuyển màu hồng.", ans: "Đ" },
+                { t: "b. Ở cathode chỉ xảy ra quá trình khử ion Na+.", ans: "S" },
+                { t: "c. Số mol khí Cl2 thoát ra ở anode bằng số mol H2 thoát ra ở cathode.", ans: "Đ" },
+                { t: "d. Thứ tự điện phân ở anode là H2O, Cl–.", ans: "S" }
+            ]
+        },
+        {
+            q: "Câu 13. Thí nghiệm ăn mòn sắt trong các cốc chứa dung dịch NaCl bão hòa.",
+            subs: [
+                { t: "a. Ở cốc 4 (dầu nhờn), đinh sắt không bị gỉ (không bị ăn mòn).", ans: "Đ" },
+                { t: "b. Ở cốc 2 (quấn Zn), đinh sắt không bị gỉ, dây sắt bị ăn mòn và có khí thoát ra.", ans: "S" },
+                { t: "c. Ở cốc 3 (quấn Cu), đinh sắt bị gỉ nhiều nhất và dây đồng không bị ăn mòn.", ans: "Đ" },
+                { t: "d. Ở cốc 1, đinh sắt bị gỉ và dung dịch có màu vàng của FeCl2.", ans: "S" }
+            ]
+        },
+        {
+            q: "Câu 14. Vỏ tàu biển làm bằng thép, khi sử dụng lâu ngày sẽ bị gỉ.",
+            subs: [
+                { t: "a. Vỏ tàu bị gỉ chủ yếu do xảy ra ăn mòn điện hoá học.", ans: "Đ" },
+                { t: "b. Để chống sự ăn mòn vỏ tàu người ta phải phủ kín vỏ tàu bằng một lớp sơn.", ans: "Đ" },
+                { t: "c. Vỏ tàu bị ăn mòn là do sắt tác dụng với NaCl trong nước biển.", ans: "S" },
+                { t: "d. Người ta gắn một số tấm kẽm (Zn) vào vỏ tàu để hạn chế sự ăn mòn.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 15. Mỗi phát biểu sau đây là đúng hay sai?",
+            subs: [
+                { t: "a. Ở điều kiện thường, tất cả các kim loại đều tồn tại ở thể rắn và có cấu tạo tinh thể.", ans: "S" },
+                { t: "b. Cho mẫu nhỏ Na vào dung dịch FeSO4, thu được chất rắn là kim loại Fe.", ans: "S" },
+                { t: "c. Tái chế kim loại là giải pháp giúp con người sử dụng hiệu quả hơn nguồn tài nguyên.", ans: "Đ" },
+                { t: "d. Dùng bột sulfur (S) để xử lý thuỷ ngân rơi vãi khi nhiệt kế bị vỡ.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 16. Sản xuất soda bằng phương pháp Solvay.",
+            subs: [
+                { t: "a. Phản ứng xảy ra được là do NaHCO3 có độ tan kém hơn nên bị kết tinh trước.", ans: "Đ" },
+                { t: "b. Trong thực tế sản xuất, người ta đun nóng hỗn hợp các chất tham gia ban đầu để thu được Na2CO3 ngay.", ans: "S" },
+                { t: "c. Nguyên liệu chính ban đầu của quá trình là NaCl và Ca(OH)2.", ans: "S" },
+                { t: "d. NaHCO3 được ứng dụng làm bột nở là do phản ứng nhiệt phân tạo khí CO2.", ans: "Đ" }
+            ]
+        }
+    ];
+
+    let currentIdx = 0;
+    let timer = 50 * 60;
+    let userAnswers = ["", "", "", ""]; 
+
+    function startTimer() {
+        const tInterval = setInterval(() => {
+            let m = Math.floor(timer / 60);
+            let s = timer % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+            if (timer <= 0) { clearInterval(tInterval); alert("Hết giờ!"); }
+            timer--;
+        }, 1000);
+    }
+
+    function renderQuestion() {
+        userAnswers = ["", "", "", ""];
+        const data = quizData[currentIdx];
+        document.getElementById('q-main').innerText = data.q;
+        document.getElementById('q-table-container').innerHTML = data.table || "";
+        
+        const subsHtml = data.subs.map((sub, i) => `
+            <div class="sub-item">
+                <div class="sub-text">${sub.t}</div>
+                <div class="btn-group">
+                    <button class="btn-choice" id="btn-${i}-Đ" onclick="choose(${i}, 'Đ')">Đúng</button>
+                    <button class="btn-choice" id="btn-${i}-S" onclick="choose(${i}, 'S')">Sai</button>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('q-subs').innerHTML = subsHtml;
+        document.getElementById('q-msg').innerHTML = '';
+        document.getElementById('progress').innerText = `Câu: ${currentIdx + 1} / ${quizData.length}`;
+        document.getElementById('q-subs').classList.remove('disabled');
+    }
+
+    function choose(subIdx, choice) {
+        const data = quizData[currentIdx];
+        const correct = data.subs[subIdx].ans;
+
+        // Reset màu nút trong hàng đó
+        document.getElementById(`btn-${subIdx}-Đ`).className = 'btn-choice';
+        document.getElementById(`btn-${subIdx}-S`).className = 'btn-choice';
+
+        if (choice === correct) {
+            document.getElementById(`btn-${subIdx}-${choice}`).classList.add('correct-active');
+            userAnswers[subIdx] = "OK";
+            checkAllDone();
+        } else {
+            document.getElementById(`btn-${subIdx}-${choice}`).classList.add('wrong-active');
+            userAnswers[subIdx] = "";
+            document.getElementById('q-msg').innerHTML = '<span class="error">Có ý chưa đúng, hãy chọn lại!</span>';
+        }
+    }
+
+    function checkAllDone() {
+        if (userAnswers.every(ans => ans === "OK")) {
+            document.getElementById('q-msg').innerHTML = '<span class="success">Chính xác hoàn toàn! Đang chuyển câu...</span>';
+            document.getElementById('q-subs').classList.add('disabled');
+            
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < quizData.length) renderQuestion();
+                else finish();
+            }, 2000);
+        }
+    }
+
+    function finish() {
+        document.getElementById('quiz-section').style.display = 'none';
+        document.getElementById('result-section').style.display = 'block';
+    }
+
+    startTimer();
+    renderQuestion();
+</script>
+
+</body>
+</html>
+
