@@ -13,7 +13,7 @@
             --hover-blue: #154ba3;
             --bg-color: #0b192e; 
             --accent-green: #00ffcc;
-            --chemistry-purple: #8e44ad; /* Màu mới cho môn Hóa */
+            --chemistry-purple: #8e44ad;
         }
 
         body {
@@ -71,11 +71,29 @@
         .user-id-info {
             font-size: 0.8rem;
             margin-bottom: 20px;
-            opacity: 0.8;
+            opacity: 0.9;
             background: rgba(0, 255, 204, 0.1);
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             padding: 5px 15px;
             border-radius: 20px;
+        }
+
+        .btn-rename {
+            background: none;
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-rename:hover {
+            background: var(--accent-green);
+            color: var(--bg-color);
         }
 
         .button-group {
@@ -85,10 +103,7 @@
             margin-bottom: 30px;
         }
 
-        /* Căn chỉnh lại nút Hóa cho đẹp nếu số lượng nút lẻ */
-        .full-width {
-            grid-column: span 2;
-        }
+        .full-width { grid-column: span 2; }
 
         .nav-button {
             text-decoration: none;
@@ -159,14 +174,18 @@
         <div class="total-counter">
             Tổng số lượt làm: <span id="totalCount">...</span>
         </div>
-        <div id="userDisplay" class="user-id-info">Đang xác định...</div>
+        
+        <div class="user-id-info">
+            <span id="userDisplay">Đang xác định...</span>
+            <button class="btn-rename" onclick="forceRename()">Đổi tên</button>
+        </div>
         
         <div class="button-group">
             <a onclick="updateCounter('tn.html')" class="nav-button">Trắc Nghiệm Sinh</a>
             <a onclick="updateCounter('ds.html')" class="nav-button btn-bio-ds">Đúng Sai Sinh</a>
             <a onclick="updateCounter('tns.html')" class="nav-button btn-hist">Trắc Nghiệm Sử</a>
             <a onclick="updateCounter('dss.html')" class="nav-button btn-hist-ds">Đúng Sai Sử</a>
-            <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem full-width">!!HOT!Trắc Nghiệm Hóa</a>
+            <a onclick="updateCounter('tnh.html')" class="nav-button btn-chem full-width">🔥 HOT! Trắc Nghiệm Hóa</a>
         </div>
 
         <div class="leaderboard">
@@ -180,23 +199,27 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwQXOMeU4M9tt3xqaL2rBjsh426TFxy6BOj-KWJezZrF-oNlMIvnvRNiIjL0QsxpJrm/exec";
 
-        // Hàm xử lý tên người dùng
         function getUserId() {
             let id = localStorage.getItem('ntt_user_id');
-            
-            // Nếu chưa có tên hoặc tên vẫn là mã ngẫu nhiên cũ
             if (!id || id.startsWith("user#")) {
                 let name = prompt("Chào mừng! Hãy nhập họ tên của bạn để lưu danh bảng vàng:", "");
-                
                 if (name && name.trim() !== "") {
                     id = name.trim();
-                } else {
-                    // Nếu không nhập thì gán tên tạm thời để lần sau bắt hỏi tiếp
+                } else if (!id) {
                     id = "user#" + Math.floor(1000 + Math.random() * 9000);
                 }
                 localStorage.setItem('ntt_user_id', id);
             }
             return id;
+        }
+
+        function forceRename() {
+            let currentId = localStorage.getItem('ntt_user_id');
+            let name = prompt("Nhập tên mới để thay thế tên cũ (" + currentId + "):", "");
+            if (name && name.trim() !== "") {
+                localStorage.setItem('ntt_user_id', name.trim());
+                location.reload(); // Tải lại để áp dụng tên mới
+            }
         }
 
         async function loadData() {
@@ -233,13 +256,12 @@
 
         function updateCounter(targetUrl) {
             const myId = getUserId();
-            
             const totalEl = document.getElementById('totalCount');
             totalEl.innerText = (parseInt(totalEl.innerText) || 0) + 1;
 
             fetch(API_URL, {
                 method: "POST",
-                mode: "no-cors", // Thêm chế độ này để tránh lỗi CORS khi post lên Google Apps Script
+                mode: "no-cors",
                 body: JSON.stringify({ userId: myId })
             });
 
@@ -250,4 +272,3 @@
     </script>
 </body>
 </html>
-
