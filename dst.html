@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Đúng Sai Tin Học</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; color: #1c1e21; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .header { border-bottom: 3px solid #2980b9; padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .question-block { margin-bottom: 30px; }
+        .question-text { font-size: 1.1rem; font-weight: bold; line-height: 1.6; margin-bottom: 20px; color: #2c3e50; }
+        
+        .sub-questions { display: flex; flex-direction: column; gap: 12px; }
+        .sub-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: #f8f9fa; border-radius: 10px; border: 1px solid #e9ecef; transition: 0.3s; }
+        .sub-text { flex: 1; margin-right: 20px; font-size: 15px; line-height: 1.4; }
+        
+        .btn-group { display: flex; gap: 10px; }
+        .btn-choice { padding: 10px 20px; border: 2px solid #ced4da; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; background: white; min-width: 80px; }
+        
+        .btn-choice.correct-active { background-color: #2ecc71; color: white; border-color: #27ae60; }
+        .btn-choice.wrong-active { background-color: #e74c3c; color: white; border-color: #c0392b; }
+        
+        .msg-area { height: 40px; margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.1rem; }
+        .error { color: #e74c3c; }
+        .success { color: #27ae60; }
+
+        .progress { text-align: right; color: #7f8c8d; font-weight: bold; margin-top: 10px; }
+        .disabled { pointer-events: none; opacity: 0.7; }
+        
+        .result-screen { display: none; text-align: center; padding: 50px 20px; }
+        .btn-home { background: #2980b9; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-box">
+        <div class="header">
+            <h2 style="margin:0; color: #2980b9;">Ôn Tập Đúng/Sai Tin Học</h2>
+            <div id="timer" style="font-size: 1.2rem; font-weight: bold;">45:00</div>
+        </div>
+
+        <div id="content">
+            <div class="question-text" id="main-q"></div>
+            <div class="sub-questions" id="sub-list"></div>
+            <div class="msg-area" id="msg"></div>
+        </div>
+
+        <div class="progress" id="progress-text">Câu: 1 / 4</div>
+    </div>
+
+    <div id="result" class="result-screen">
+        <h2 style="color: #27ae60;">HOÀN THÀNH XUẤT SẮC!</h2>
+        <p>Bạn đã trả lời đúng tất cả các câu hỏi Đúng/Sai môn Tin học.</p>
+        <button class="btn-home" onclick="location.reload()">Làm lại từ đầu</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        {
+            q: "Câu 1. CSS hỗ trợ thiết lập định dạng cho các lớp giả (pseudo-class) và phần tử giả (pseudo-element).",
+            subs: [
+                { t: "a. Trong CSS, các lớp giả quy định viết sau dấu “::”.", ans: "S" },
+                { t: "b. Phần tử giả mô tả các thành phần (nhỏ hơn) của phần tử.", ans: "Đ" },
+                { t: "c. Bộ chọn ::selection mô tả phần được chọn (bằng cách kéo thả chuột trên màn hình) của đối tượng.", ans: "Đ" },
+                { t: "d. Để đổi màu chữ của một đoạn văn bản có mã định danh là note khi di chuyển chuột qua đoạn văn bản đó cần dùng định dạng CSS #note:visited {color: blue}.", ans: "S" }
+            ]
+        },
+        {
+            q: "Câu 2. Khi có nhiều mẫu định dạng có thể áp dụng cho một phần tử HTML nào đó trên trang web, CSS sẽ áp dụng định dạng theo thứ tự ưu tiên.",
+            subs: [
+                { t: "a. Các thuộc tính trong CSS với kí hiệu * sẽ có mức ưu tiên cao nhất.", ans: "S" },
+                { t: "b. Quy tắc kế thừa từ CSS cha có thứ tự ưu tiên cao hơn quy tắc CSS trực tiếp (inline CSS).", ans: "S" },
+                { t: "c. Nếu có nhiều mẫu định dạng CSS cùng mức ưu tiên áp dụng cho một phần tử HTML thì mẫu CSS nào có trọng số cao nhất sẽ được áp dụng.", ans: "Đ" },
+                { t: "d. Bộ chọn .test >#p có trọng số là 102.", ans: "S" }
+            ]
+        },
+        {
+            q: "Câu 3. Nhóm nghề quản trị trong ngành Công nghệ thông tin thực hiện những công việc nhằm đảm bảo hệ thống công nghệ thông tin của các tổ chức và doanh nghiệp hoạt động một cách hiệu quả và an toàn.",
+            subs: [
+                { t: "a. Những công việc chính trong lĩnh vực quản trị của ngành Công nghệ thông tin là quản trị mạng, bảo mật hệ thống thông tin, quản trị và bảo trì hệ thống.", ans: "Đ" },
+                { t: "b. Công việc của chuyên gia bảo mật hệ thống bao gồm cài đặt, cập nhật và xử lí sự cố để đảm bảo sự ổn định và hiệu suất làm việc của hệ thống.", ans: "Đ" },
+                { t: "c. Chuyên gia quản trị mạng chỉ cần có kiến thức về Mạng máy tính.", ans: "S" },
+                { t: "d. Kĩ năng tự nghiên cứu, học hỏi, cập nhật kiến thức là rất cần thiết để giúp người làm nghề quản trị trong ngành Công nghệ thông tin bắt kịp các xu hướng mới, công nghệ mới.", ans: "Đ" }
+            ]
+        },
+        {
+            q: "Câu 4: Hãy xác định đúng hoặc sai cho các phát biểu sau:",
+            subs: [
+                { t: "a. Nhóm lệnh đầu tiên trong bảng chọn Chèn bao gồm Hộp văn bản, Hình ảnh, Drive, và Nhúng.", ans: "Đ" },
+                { t: "b. Để thiết lập phần thân trang với cấu trúc hai khối, cần chọn biểu tượng trong nhóm Thành phần nội dung của bảng chọn Chèn.", ans: "Đ" },
+                { t: "c. Nhóm lệnh thứ ba trong bảng chọn Chèn không chứa lệnh để chèn video từ YouTube.", ans: "S" },
+                { t: "d. Có thể chỉnh sửa kích thước và di chuyển các đối tượng trên trang web bằng cách chọn khối và kéo thả chuột.", ans: "Đ" }
+            ]
+        }
+    ];
+
+    let currentIdx = 0;
+    let userState = ["", "", "", ""];
+    let timeLeft = 45 * 60;
+
+    function startTimer() {
+        setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+            timeLeft--;
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        userState = ["", "", "", ""];
+        const qData = data[currentIdx];
+        document.getElementById('main-q').innerText = qData.q;
+        document.getElementById('progress-text').innerText = `Câu: ${currentIdx + 1} / ${data.length}`;
+        document.getElementById('msg').innerHTML = '';
+        
+        let html = "";
+        qData.subs.forEach((item, i) => {
+            html += `
+                <div class="sub-item">
+                    <div class="sub-text">${item.t}</div>
+                    <div class="btn-group">
+                        <button class="btn-choice" id="btn-${i}-Đ" onclick="checkSub(${i}, 'Đ')">Đúng</button>
+                        <button class="btn-choice" id="btn-${i}-S" onclick="checkSub(${i}, 'S')">Sai</button>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('sub-list').innerHTML = html;
+        document.getElementById('sub-list').classList.remove('disabled');
+    }
+
+    function checkSub(subIdx, choice) {
+        const correct = data[currentIdx].subs[subIdx].ans;
+        
+        // Reset màu 2 nút của hàng đó
+        document.getElementById(`btn-${subIdx}-Đ`).className = 'btn-choice';
+        document.getElementById(`btn-${subIdx}-S`).className = 'btn-choice';
+
+        if (choice === correct) {
+            document.getElementById(`btn-${subIdx}-${choice}`).classList.add('correct-active');
+            userState[subIdx] = "OK";
+            document.getElementById('msg').innerHTML = "";
+        } else {
+            document.getElementById(`btn-${subIdx}-${choice}`).classList.add('wrong-active');
+            userState[subIdx] = "FAIL";
+            document.getElementById('msg').innerHTML = "<span class='error'>Có ý chưa chính xác!</span>";
+        }
+
+        if (userState.every(s => s === "OK")) {
+            document.getElementById('msg').innerHTML = "<span class='success'>Tuyệt vời! Đang chuyển câu tiếp theo...</span>";
+            document.getElementById('sub-list').classList.add('disabled');
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < data.length) loadQuestion();
+                else showFinal();
+            }, 2000);
+        }
+    }
+
+    function showFinal() {
+        document.getElementById('quiz-box').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+    }
+
+    startTimer();
+    loadQuestion();
+</script>
+
+</body>
+</html>
+
