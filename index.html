@@ -15,6 +15,7 @@
             --accent-green: #00ffcc;
             --chemistry-purple: #8e44ad;
             --english-blue: #27ae60;
+            --writing-purple: #9b59b6;
         }
 
         @keyframes blink {
@@ -118,7 +119,6 @@
         .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .nav-button { text-decoration: none; color: white; background-color: var(--nasa-blue); padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; text-align: center; }
         
-        /* CSS CHO NÚT BỊ KHÓA NHỎ LẠI */
         .nav-button.disabled { 
             background-color: #2c3e50 !important; 
             color: #7f8c8d !important; 
@@ -131,6 +131,7 @@
         .nav-button.disabled::after { content: " 🔒"; font-size: 0.7rem; }
 
         .btn-eng { background-color: var(--english-blue); }
+        .btn-writing { background-color: var(--writing-purple); }
         .btn-bio-ds { background-color: var(--nasa-red); }
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
@@ -153,7 +154,7 @@
     <div class="container">
         <div class="warning-text">CẨN THẬN VỚI TIẾNG ANH NHÉ!!!</div>
         <div class="announcement">
-            📢 <b>THÔNG BÁO:</b> Hệ thống sẽ cập nhật tự luận ôn tập Tiếng Anh sau! Chúc bạn thi môn cuối cùng thật là tốt!
+            📢 <b>THÔNG BÁO:</b> Đã cập nhật Tự luận Tiếng Anh! Chúc bạn thi môn cuối cùng thật là tốt!
         </div>
         <h1>Hệ Thống Ôn Tập</h1>
         <div class="total-counter">Tổng số lượt làm: <span id="totalCount">...</span></div>
@@ -166,6 +167,7 @@
             <a onclick="updateCounter('tnta.html')" class="nav-button btn-eng">Trắc Nghiệm Anh</a>
             <a onclick="updateCounter('ngulieu.html')" class="nav-button btn-eng">Đọc Hiểu Anh</a>
             <a onclick="updateCounter('xepcau.html')" class="nav-button btn-eng">Xếp Câu Anh</a>
+            <a onclick="updateCounter('tuluan.html')" class="nav-button btn-writing">Tự Luận Anh</a>
             
             <a class="nav-button disabled">Trắc Nghiệm Sinh</a>
             <a class="nav-button btn-bio-ds disabled">Đúng Sai Sinh</a>
