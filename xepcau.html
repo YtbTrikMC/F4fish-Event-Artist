@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sắp xếp câu</title>
+    <style>
+        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        .question-block { margin-bottom: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+        .sentence-list { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; border-left: 4px solid var(--primary); }
+        .sentence-item { margin-bottom: 5px; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; text-align: center; font-weight: bold; }
+        
+        .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
+        .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); pointer-events: none; }
+        .opt.disabled { pointer-events: none; opacity: 0.5; }
+
+        /* Khu vực kết quả mới */
+        #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
+        .comparison-box { margin: 15px 0; padding: 10px; background: #fff; border-radius: 8px; border: 1px dashed var(--success); color: #166534; font-style: italic; }
+        
+        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; transition: 0.3s; }
+        .btn-home:hover { background: #475569; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="text-align:center; color: var(--primary)">SẮP XẾP CÂU THÀNH ĐOẠN VĂN HỢP LÝ</h1>
+    <p style="text-align:center; color: #64748b;"><i>Chọn đáp án đúng (A, B, C, D) để vượt qua từng câu</i></p>
+
+    <div id="quiz-container"></div>
+
+    <button id="final-btn" class="btn" style="display:none;" onclick="showFinalResult()">NỘP BÀI & XEM KẾT QUẢ</button>
+
+    <div id="result-area">
+        <h2 id="score-text"></h2>
+        <div id="comparison-text" class="comparison-box"></div>
+        <a href="index.html" class="btn-home">Làm bài tập khác (Quay về trang chủ)</a>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu câu hỏi giữ nguyên như của bạn
+    const questions = [
+        { id: 1, sentences: ["a. Nam: Hi, Jessica. I've never met a talking robot before.", "b. Teacher: Hello, class. Please meet Jessica. She's a human-like robot...", "c. Jessica: Good morning, everybody. Welcome to the New Tech Centre."], opts: ["a – b – c", "b – a – c", "c – a – b", "b – c – a"], ans: 3 },
+        { id: 2, sentences: ["a. He can speak English fluently...", "b. Mr. John is applying for the position of project manager.", "c. He graduated from London University in 2018...", "d. He is a hard-working person..."], opts: ["c – a – b – d", "b – c – a – d", "b – a – c – d", "d – b – c – a"], ans: 1 },
+        { id: 3, sentences: ["a. I wanted to tell you that I’ve recently accepted a new job...", "b. Dear Emily,", "c. I’m planning to visit my family...", "d. Hope this message finds you well!", "e. Take care..."], opts: ["b – d – a – c – e", "d – a – b – c – e", "b – a – d – c – e", "a – b – d – e – c"], ans: 0 },
+        { id: 4, sentences: ["a. First of all, lifelong learning...", "b. Another benefit is personal development...", "c. Over all, lifelong learning is...", "d. Lifelong learning also helps your social life.", "e. Lifelong learning means...", "f. It is an enjoyable process..."], opts: ["e – a – b – d – c – f", "d – f – e – b – c – a", "a – d – c – f – b – e", "f – c – b – e – d – a"], ans: 0 },
+        { id: 5, sentences: ["a. Thank you very much for your kind invitation.", "b. Dear Mr. Brown,", "c. I regret to inform you that I cannot attend...", "d. I hope we can meet another time."], opts: ["b – a – c – d", "a – b – c – d", "b – c – a – d", "c – b – d – a"], ans: 0 },
+        { id: 6, sentences: ["a. Alex: That makes sense...", "b. Nick: Definitely. A doctor's job...", "c. Nick: You're right. Basic jobs...", "d. Alex: Do you think AI will affect...? "], opts: ["d – c – a – b", "d – b – a – c", "d – b – c – a", "a – d – c – b"], ans: 1 },
+        { id: 7, sentences: ["a. Then discover how AI can personalize...", "b. First, explore innovative AI technologies...", "c. Together with the use for your students...", "d. Here's what you'll learn...", "e. Finally, engage in hands-on activities..."], opts: ["d – a – b – e – c", "d – b – a – c – e", "b – e – a – c – d", "b – c – a – e – d"], ans: 1 },
+        { id: 8, sentences: ["a. Furthermore, vocational training...", "b. Firstly, it can sometimes be considered...", "c. Secondly, vocational programs...", "d. Vocational education, while valuable...", "e. Lastly, the practical nature..."], opts: ["d – c – e – a – b", "d – b – c – a – e", "c – d – a – e – b", "b – d – c – e – a"], ans: 1 },
+        { id: 9, sentences: ["a. Nam: Yes! I'm also trying to build...", "b. Mark: Hi Nam! Thanks. I've been learning...", "c. Nam: Hi, Mark! Long time no see."], opts: ["c-a-b", "b-c-a", "c-b-a", "a-c-b"], ans: 2 },
+        { id: 10, sentences: ["a. Jack: That sounds like a great idea.", "b. Emma: I'm going to apply...", "c. Jack: How do you plan to advance?", "d. Emma: I want to develop leadership skills...", "e. Jack: Why a management position?"], opts: ["b-d-e-c-a", "c-b-e-d-a", "d-b-a-e-c", "d-a-c-b-e"], ans: 1 },
+        { id: 11, sentences: ["a. Please let me know if you can make it...", "b. I’m going to have a birthday party...", "c. I’ve also invited some classmates...", "d. There will be about 20 people...", "e. There will be games, music..."], opts: ["b - e - c - d - a", "b - a - c - d – e", "b - d - c – e – a", "b - c - a - d - e"], ans: 2 },
+        { id: 12, sentences: ["a. It has transformed beliefs...", "b. Globalisation has made the world...", "c. lifestyles worldwide are becoming more similar...", "d. As a result, globalisation has reshaped...", "e. people can now experience food, fashion..."], opts: ["b - d - a - e – c", "b - e - c- d - a", "b - c - a - d – e", "b - a - e - c - d"], ans: 3 }
+    ];
+
+    let finishedCount = 0;
+    let firstTimeCorrect = 0;
+    let attempted = new Set();
+
+    const container = document.getElementById('quiz-container');
+
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = `
+            <div style="font-weight:bold; margin-bottom:10px;">Question ${idx+1}:</div>
+            <div class="sentence-list">
+                ${q.sentences.map(s => `<div class="sentence-item">${s}</div>`).join('')}
+            </div>
+            <div class="options-grid" id="grid-${idx}">
+                ${q.opts.map((opt, i) => `
+                    <div class="opt" onclick="checkAnswer(${idx}, ${i}, this)">
+                        ${String.fromCharCode(65+i)}. ${opt}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    function checkAnswer(qIdx, oIdx, el) {
+        const correctIdx = questions[qIdx].ans;
+        const grid = document.getElementById(`grid-${qIdx}`);
+
+        if (!attempted.has(qIdx)) {
+            if (oIdx === correctIdx) firstTimeCorrect++;
+            attempted.add(qIdx);
+        }
+
+        if (oIdx === correctIdx) {
+            el.classList.add('correct');
+            Array.from(grid.children).forEach(child => {
+                if (!child.classList.contains('correct')) child.classList.add('disabled');
+                child.onclick = null;
+            });
+            finishedCount++;
+            if (finishedCount === questions.length) {
+                document.getElementById('final-btn').style.display = 'block';
+            }
+        } else {
+            el.classList.add('wrong');
+        }
+    }
+
+    function showFinalResult() {
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('final-btn').style.display = 'none';
+        
+        // Tính điểm
+        const finalScore = (firstTimeCorrect / questions.length * 10).toFixed(2);
+        document.getElementById('score-text').innerText = `Hoàn thành! Điểm thực tế: ${finalScore}/10`;
+        
+        // Xử lý so sánh với localStorage
+        let lastResult = JSON.parse(localStorage.getItem('npc_arrange_last_score')) || { score: 0, count: 0 };
+        const diffScore = (finalScore - lastResult.score).toFixed(2);
+        const diffCount = firstTimeCorrect - lastResult.count;
+
+        let compMsg = "";
+        if (lastResult.count === 0 && lastResult.score === 0) {
+            compMsg = "Đây là lượt làm bài đầu tiên của bạn hoặc dữ liệu đã được làm mới.";
+        } else {
+            compMsg = `Bạn đã ${diffCount >= 0 ? 'vượt qua' : 'thấp hơn'} người làm gần nhất ${Math.abs(diffCount)} câu và ${diffScore >= 0 ? 'hơn' : 'kém'} ${Math.abs(diffScore)} điểm!`;
+        }
+        document.getElementById('comparison-text').innerText = compMsg;
+
+        // Lưu kết quả hiện tại cho lần sau
+        localStorage.setItem('npc_arrange_last_score', JSON.stringify({ score: finalScore, count: firstTimeCorrect }));
+
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
+
