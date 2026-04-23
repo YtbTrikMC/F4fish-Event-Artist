@@ -16,6 +16,7 @@
             --chemistry-purple: #8e44ad;
             --english-blue: #27ae60;
             --writing-purple: #9b59b6;
+            --tech-blue: #2980b9;
         }
 
         @keyframes blink {
@@ -102,13 +103,14 @@
         }
 
         .announcement {
-            background: rgba(252, 61, 33, 0.2);
-            border: 1px dashed var(--nasa-red);
-            padding: 10px;
+            background: rgba(0, 255, 204, 0.15);
+            border: 1px dashed var(--accent-green);
+            padding: 12px;
             border-radius: 10px;
             margin-bottom: 15px;
-            font-size: 0.85rem;
-            color: #ff9f91;
+            font-size: 0.9rem;
+            color: #00ffcc;
+            line-height: 1.5;
         }
 
         h1 { margin-bottom: 5px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; font-size: 1.4rem; }
@@ -132,11 +134,12 @@
 
         .btn-eng { background-color: var(--english-blue); }
         .btn-writing { background-color: var(--writing-purple); }
+        .btn-tech { background-color: var(--tech-blue); }
+        .btn-tech-ds { background-color: #e67e22; }
         .btn-bio-ds { background-color: var(--nasa-red); }
         .btn-hist { background-color: var(--history-orange); }
         .btn-hist-ds { background-color: var(--history-gold); color: #000; }
         .btn-chem { background-color: var(--chemistry-purple); }
-        .btn-it { background-color: #2980b9; } 
 
         .leaderboard { background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 15px; text-align: left; }
         .leaderboard h3 { text-align: center; margin-top: 0; font-size: 0.9rem; color: var(--accent-green); text-transform: uppercase; }
@@ -154,7 +157,7 @@
     <div class="container">
         <div class="warning-text">CẨN THẬN VỚI TIẾNG ANH NHÉ!!!</div>
         <div class="announcement">
-            📢 <b>THÔNG BÁO:</b> Đã cập nhật Tự luận Tiếng Anh! Chúc bạn thi môn cuối cùng thật là tốt!
+            📢 <b>THÔNG BÁO:</b> Hệ thống đã hoàn thành hai môn Tiếng Anh và Công Nghệ,nếu có sai sót 1 trong 2 môn vui lòng báo cáo. 24/04/2026 sẽ là ngày cuối cùng thi, chúc các bạn thi tốt.Thanks.
         </div>
         <h1>Hệ Thống Ôn Tập</h1>
         <div class="total-counter">Tổng số lượt làm: <span id="totalCount">...</span></div>
@@ -168,16 +171,18 @@
             <a onclick="updateCounter('ngulieu.html')" class="nav-button btn-eng">Đọc Hiểu Anh</a>
             <a onclick="updateCounter('xepcau.html')" class="nav-button btn-eng">Xếp Câu Anh</a>
             <a onclick="updateCounter('tuluan.html')" class="nav-button btn-writing">Tự Luận Anh</a>
+            <a onclick="updateCounter('listen.html')" class="nav-button btn-eng">Listening English</a>
             
+            <a onclick="updateCounter('tncn.html')" class="nav-button btn-tech">Trắc Nghiệm Công Nghệ</a>
+            <a onclick="updateCounter('dscn.html')" class="nav-button btn-tech-ds">Đúng Sai Công Nghệ</a>
+
             <a class="nav-button disabled">Trắc Nghiệm Sinh</a>
-            <a class="nav-button btn-bio-ds disabled">Đúng Sai Sinh</a>
-            <a class="nav-button btn-hist disabled">Trắc Nghiệm Sử</a>
-            <a class="nav-button btn-hist-ds disabled">Đúng Sai Sử</a>
-            <a class="nav-button btn-chem disabled">Trắc Nghiệm Hóa</a>
-            <a class="nav-button btn-chem disabled">Đúng Sai Hóa</a>
-            
-            <a class="nav-button btn-it disabled">Trắc Nghiệm Tin</a>
-            <a class="nav-button btn-it disabled">Đúng Sai Tin</a>
+            <a class="nav-button disabled">Đúng Sai Sinh</a>
+            <a class="nav-button disabled">Trắc Nghiệm Sử</a>
+            <a class="nav-button disabled">Đúng Sai Sử</a>
+            <a class="nav-button disabled">Trắc Nghiệm Hóa</a>
+            <a class="nav-button disabled">Đúng Sai Hóa</a>
+            <a class="nav-button disabled">Trắc Nghiệm Tin</a>
         </div>
 
         <div class="leaderboard">
@@ -270,7 +275,7 @@
 
         function startCommentStream(username) {
             const messages = [
-                `Xin chào ${username}!`, "Học Tiếng Anh thật vui!", "Cố lên, sắp thi rồi!", "Dành ra 5 phút mỗi ngày nhé!", "Bạn là số 1!"
+                `Xin chào ${username}!`, "Học Tiếng Anh thật vui!", "Cố lên, sắp thi rồi!", "Dành ra 5 phút mỗi ngày nhé!", "Bạn là số 1!", "Công nghệ không hề khó!"
             ];
             const container = document.getElementById('streamContainer');
             const laneCount = 10;
