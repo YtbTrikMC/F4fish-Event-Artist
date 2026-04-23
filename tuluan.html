@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Tự Luận Anh</title>
+    <style>
+        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); text-transform: uppercase; font-size: 1.5rem; }
+        
+        .q-card { 
+            display: none; 
+            padding: 20px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            background: #fff;
+            animation: fadeIn 0.5s;
+        }
+        .q-card.active { display: block; border-color: var(--primary); }
+        .q-card.completed { display: block; border-color: var(--success); background: #f0fdf4; opacity: 0.8; }
+
+        .question-text { font-weight: bold; margin-bottom: 10px; display: block; line-height: 1.6; }
+        .input-group { display: flex; gap: 10px; margin-top: 10px; }
+        input[type="text"] { 
+            flex-grow: 1; 
+            padding: 12px; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 1rem;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+        input.error { border-color: var(--danger); background: #fff1f2; }
+        input.correct { border-color: var(--success); background: #f0fdf4; pointer-events: none; }
+
+        .btn-check { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-check:hover { background: #1d4ed8; }
+        
+        /* Khu vực hiện đáp án khi sai */
+        #msg { text-align: center; min-height: 30px; margin-bottom: 15px; padding: 10px; border-radius: 8px; font-size: 0.95rem; display: none; }
+        .msg-wrong { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; display: block !important; }
+        
+        #result-area { display: none; text-align: center; padding: 30px; background: #fff; border-radius: 15px; border: 3px solid var(--success); }
+        .comp-box { margin: 15px 0; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px dashed var(--primary); }
+        .btn-home { display: inline-block; padding: 12px 25px; background: #64748b; color: white; text-decoration: none; border-radius: 8px; margin-top: 15px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Luyện Viết Câu Tiếng Anh</h1>
+    <div id="msg"></div>
+
+    <div id="quiz-flow"></div>
+
+    <div id="result-area">
+        <h2 style="color: var(--success)">HOÀN THÀNH XUẤT SẮC!</h2>
+        <h3 id="score-display"></h3>
+        <div id="comparison-display" class="comp-box"></div>
+        <a href="index.html" class="btn-home">Quay lại Trang Chủ</a>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { q: "Question 1: The teacher will make the students clean the classroom. (have)<br>→ The teacher will ________________________ by the students.", ans: "have the classroom cleaned" },
+        { q: "Question 2: The room was so crowded that we couldn’t find a seat. (such)<br>→ It was ___________ that we couldn’t find a seat.", ans: "such a crowded room" },
+        { q: "Question 3: If the documents are not signed, we cannot proceed with the contract. (unless)<br>→ We cannot proceed with the contract _________ signed.", ans: "unless the documents are" },
+        { q: "Question 4: She couldn’t tolerate his bad behavior any longer. (put)<br>→ She couldn’t _______ his bad behavior any longer.", ans: "put up with" },
+        { q: "Question 5: “I'll pay for your new smartphone” my father said to me. (would)<br>→ My father told _________ for my new smartphone.", ans: "me he would pay" },
+        { q: "Question 6: This exercise is easier than the previous one. (as)<br>→ The previous exercise is not ____ this one.", ans: "as easy as" },
+        { q: "Question 7. Lan is going to have Tom clean the rooms. (cleaned)<br>→ Lan is going to_________________________.", ans: "have the rooms cleaned by Tom" },
+        { q: "Question 8. “Would you like to come to my birthday party tonight?” She said to me (invited)<br>→ She _________to her birthday party that night.", ans: "invited me to come" },
+        { q: "Question 9. When the alarm rang, everyone proceeded calmly to the emergency exits. (off)<br>→ When ___________, everyone proceeded calmly to the emergency exits.", ans: "the alarm went off" },
+        { q: "Question 10. If the local government doesn’t take immediate action, pollution in the river will get worse. (Unless)<br>→_____ action immediately, pollution in the river will get worse.", ans: "Unless the local government takes" },
+        { q: "Question 11. He couldn’t retake the exam because he missed too many lessons. (hadn’t)<br>→ He could have retaken the exam _____ too many lessons.", ans: "if he hadn't missed" },
+        { q: "Question 12: The test was too difficult for the students to finish. (that)<br>→ The test was so ____ finish it.", ans: "difficult that the students couldn't" },
+        { q: "Question 13: I am eager to work as an architect in your company. (forward)<br>→ I am _____ as an architect in your company.", ans: "looking forward to working" },
+        { q: "Question 14: She missed the train because she woke up late. (hadn’t)<br>→ If she __________ late, she wouldn’t have missed the train.", ans: "hadn't woken up" },
+        { q: "Question 15: The teacher will make the students clean the classroom. (to)<br>→ The teacher will get the students ______.", ans: "to clean the classroom" },
+        { q: "Question 16: “Don’t forget to lock the door,” Dad said to me. (reminded)<br>→ Dad ____ the door.", ans: "reminded me to lock" },
+        { q: "Question 17: My city is more crowded than his city. (not)<br>→ His city is __________ mine.", ans: "not as crowded as" },
+        { q: "Question 18. The shop attracts more customers because it offers discounts. (didn’t)<br>→ If the shop_____________discounts, it wouldn’t attract so many customers.", ans: "didn't offer" },
+        { q: "Question 19. “You have to practise your English every day,” My teacher said to me. (had)<br>→ My teacher told me______English every day.", ans: "i had to practice my" },
+        { q: "Question 20. The film was very boring, so we left early. (that)<br>→ The film was so________early.", ans: "boring that we left" }
+    ];
+
+    let currentStep = 0;
+    let wrongAttempts = 0;
+    const flowContainer = document.getElementById('quiz-flow');
+    const msgEl = document.getElementById('msg');
+
+    data.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `q-card ${index === 0 ? 'active' : ''}`;
+        div.id = `card-${index}`;
+        div.innerHTML = `
+            <span class="question-text">${item.q}</span>
+            <div class="input-group">
+                <input type="text" id="input-${index}" placeholder="Nhập đáp án tại đây..." autocomplete="off">
+                <button class="btn-check" onclick="validateAnswer(${index})">KIỂM TRA</button>
+            </div>
+        `;
+        flowContainer.appendChild(div);
+        
+        document.getElementById(`input-${index}`).addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') validateAnswer(index);
+        });
+    });
+
+    function validateAnswer(idx) {
+        const input = document.getElementById(`input-${idx}`);
+        const userAns = input.value.trim().toLowerCase().replace(/\s+/g, ' ');
+        const correctAns = data[idx].ans.toLowerCase().trim();
+
+        if (userAns === correctAns) {
+            msgEl.innerText = "";
+            msgEl.className = "";
+            input.classList.remove('error');
+            input.classList.add('correct');
+            document.getElementById(`card-${idx}`).classList.add('completed');
+            document.getElementById(`card-${idx}`).classList.remove('active');
+            
+            currentStep++;
+            if (currentStep < data.length) {
+                document.getElementById(`card-${currentStep}`).classList.add('active');
+                document.getElementById(`input-${currentStep}`).focus();
+            } else {
+                showFinal();
+            }
+        } else {
+            wrongAttempts++;
+            input.classList.add('error');
+            // HIỆN ĐÁP ÁN ĐÚNG KHI SAI
+            msgEl.innerHTML = `❌ Sai rồi! Đáp án đúng: <b>${data[idx].ans}</b>`;
+            msgEl.className = "msg-wrong";
+            
+            setTimeout(() => input.classList.remove('error'), 500);
+        }
+    }
+
+    function showFinal() {
+        document.getElementById('quiz-flow').style.display = 'none';
+        msgEl.style.display = 'none';
+        
+        // Tính điểm: Lấy tổng câu trừ đi một phần điểm trừ cho mỗi lần sai để khuyến khích làm đúng lần đầu
+        let finalScore = ( (data.length / (data.length + (wrongAttempts * 0.15))) * 10).toFixed(2);
+        if(wrongAttempts === 0) finalScore = "10.00";
+
+        let lastUser = JSON.parse(localStorage.getItem('npc_writing_last')) || { name: "N/A", score: 0 };
+        let currentUserName = localStorage.getItem('ntt_user_id') || "Bạn";
+        
+        document.getElementById('score-display').innerText = `Điểm của bạn: ${finalScore}/10`;
+        document.getElementById('comparison-display').innerHTML = `
+            Người làm gần nhất: <b>${lastUser.name}</b> đạt <b>${lastUser.score}/10</b><br>
+            ${parseFloat(finalScore) >= parseFloat(lastUser.score) ? '🎉 Bạn đã duy trì hoặc vượt qua kỷ lục gần nhất!' : '💪 Hãy cố gắng làm đúng ngay từ lần đầu ở lượt sau nhé!'}
+        `;
+
+        localStorage.setItem('npc_writing_last', JSON.stringify({ name: currentUserName, score: finalScore }));
+        document.getElementById('result-area').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
