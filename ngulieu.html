@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>READING</title>
+    <title>ĐỌC HIỂU TIẾNG ANH</title>
     <style>
         :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
         .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        #timer { position: fixed; top: 20px; right: 20px; background: var(--danger); color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; z-index: 1000; }
+        #timer { position: fixed; top: 20px; right: 20px; background: var(--danger); color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
         .task-section { margin-bottom: 40px; padding: 25px; border: 2px solid #e2e8f0; border-radius: 10px; transition: 0.5s; position: relative; }
         .task-locked { opacity: 0.3; pointer-events: none; filter: blur(3px); }
         .task-title { background: var(--primary); color: white; padding: 10px 20px; border-radius: 5px; margin-top: -45px; margin-bottom: 20px; font-weight: bold; display: inline-block; border: 2px solid white; }
         
-        .passage { background: #f8fafc; padding: 15px; border-left: 4px solid var(--primary); margin-bottom: 20px; font-size: 0.95rem; white-space: pre-line; }
-        .question-item { margin-bottom: 25px; padding: 15px; border: 1px solid #f1f5f9; border-radius: 10px; transition: 0.3s; }
+        .passage { background: #f8fafc; padding: 20px; border-left: 4px solid var(--primary); margin-bottom: 20px; font-size: 1rem; white-space: pre-line; color: #334155; }
+        .question-item { margin-bottom: 25px; padding: 15px; border: 1px solid #f1f5f9; border-radius: 10px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         
-        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; font-weight: 500; }
+        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: white; font-weight: 500; }
         .opt:hover { border-color: var(--primary); background: #eff6ff; }
         .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
         .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); font-weight: bold; pointer-events: none; }
@@ -29,7 +29,7 @@
         #final-submit { background: var(--primary); color: white; }
 
         #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
-        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; }
+        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -37,7 +37,7 @@
 <div id="timer">45:00</div>
 
 <div class="container">
-    <h1 style="text-align:center; color: var(--primary); margin-bottom: 40px;">ĐỌC HIỂU</h1>
+    <h1 style="text-align:center; color: var(--primary); margin-bottom: 40px;">BÀI TẬP ĐỌC HIỂU</h1>
 
     <div id="task1-area" class="task-section">
         <div class="task-title">TASK 1: CLOZE TEXT</div>
@@ -47,30 +47,35 @@
         • Explore captivating images of endangered species in their natural (1) …………
         • Be impressed by pictures of wildlife (2) ………… by talented photographers
         • Discover inspiring conservation efforts to protect our planet's biodiversity
-        If you (3) ……… sustainable future nature, don't miss this opportunity!</div>
+        If you (3) ……… sustainable future nature, don't miss this opportunity! Join us and be part of the movement.
+        Date: March 8 | Location: City Youth Centre</div>
         <div id="group-1"></div>
 
         <div class="passage"><b>Join our Night Classes for Adults!</b>
         • Expand your horizons with our (4) ………… course offerings.
-        • Expert instructors dedicated (5) ………….. your success.</div>
+        • Convenient schedules tailored for working professionals.
+        • Expert instructors dedicated (5) ………….. your success.
+        Unlock new opportunities and pursue your passions after hours. Enroll now!</div>
         <div id="group-2"></div>
 
         <div class="passage"><b>Author Meet and Greet</b>
-        - (6) __________ with the brilliant mind behind the groundbreaking book...
+        Meet acclaimed author Jones Hansen at our exclusive meet and greet event!
+        - (6) __________ with the brilliant mind behind the groundbreaking book on lifelong learning.
+        - explore the author’s journey and the inspiration behind their enlightening work.
         - enjoy an (7) __________ discussion and Q&A session with the author.
         - meet (8) __________ individuals passionate about personal development.</div>
         <div id="group-3"></div>
 
         <div class="passage"><b>Online Learning</b>
-        access learning materials (9) _________ the Internet. However, students need to manage their time effectively to achieve good learning (10) _________.</div>
+        Online learning has become increasingly popular among students. It allows them to study at their own pace and access learning materials (9) _________ the Internet. However, students need to manage their time effectively to achieve good learning (10) _________.</div>
         <div id="group-4"></div>
 
         <div class="passage"><b>The World of Mass Media</b>
-        Mass media has (11) ______ a great impact... young people to rely heavily (12) ______ online sources... Many experts offer (13) _______ individuals improve...</div>
+        The world of mass media plays a crucial role in modern society and mass media has (11) ______ a great impact... It is common for young people to rely heavily (12) ______ online sources... Many experts offer (13) _______ individuals improve their media literacy skills...</div>
         <div id="group-5"></div>
 
         <div class="passage"><b>AI in Education</b>
-        This shift can drive significant (14) ______ in learning outcomes... (15) ______ the educational setting, AI is revolutionizing...</div>
+        This shift can drive significant (14) ______ in learning outcomes... (15) ______ the educational setting, AI is revolutionizing the learning experience...</div>
         <div id="group-6"></div>
 
         <button id="unlock-task2" class="btn-action" onclick="unlockTask2()">BẠN ĐÃ HOÀN THÀNH TASK 1 - NHẤN ĐỂ MỞ TASK 2 →</button>
@@ -79,7 +84,13 @@
     <div id="task2-area" class="task-section task-locked">
         <div class="task-title">TASK 2: READING COMPREHENSION</div>
         <div class="passage"><b>Lifelong Learning</b>
-        Lifelong learning is an essential part... Curiosity is the spark that ignites the fire of learning...Albert Einstein said: “I have no special talents. I am only passionately curious.”... Research also shows “curiosity to be associated with higher levels of positive emotions, lower levels of anxiety, and more satisfaction with life.”</div>
+        Lifelong learning is an essential part of personal and professional development. It is a continuous process that helps individuals stay relevant in their fields, keep up with changes in trends and adapt to unclearness.
+
+        Curiosity is the spark that ignites the fire of learning. It is the desire to explore, question and discover new knowledge and experiences, which is required for lifelong learning. Albert Einstein is often credited with saying, “I have no special talents. I am only passionately curious.”
+
+        Curiosity is the fuel that makes individuals seek out new information, skills and perspectives. Curious people listen and approach interactions with the hope of learning something valuable. When someone is sincerely interested in something, they tend to listen more closely - determined to uncover the facts, seek out answers and pile up deep knowledge along the way.
+
+        With more information and details at their disposal, they tend to be more motivated, more focused and, ultimately, more productive. Research also shows “curiosity to be associated with higher levels of positive emotions, lower levels of anxiety, and more satisfaction with life.” However, curiosity is only the driving force for the journey of lifelong learning.</div>
         <div id="group-7"></div>
         <button id="final-submit" class="btn-action" onclick="showResult()">NỘP BÀI TOÀN BỘ & XEM ĐIỂM</button>
     </div>
@@ -87,7 +98,7 @@
     <div id="result-area">
         <h2 id="score-text"></h2>
         <p id="comp-text"></p>
-        <a href="index.html" class="btn-home">Làm lại</a>
+        <button onclick="location.reload()" class="btn-home">Làm lại</button>
     </div>
 </div>
 
@@ -108,11 +119,11 @@
         { id: 13, q: "Question 13", opts: ["to helping", "to help", "help", "helping"], ans: 1, task: 1, group: "group-5" },
         { id: 14, q: "Question 14", opts: ["changes", "improvements", "comments", "exchanges"], ans: 1, task: 1, group: "group-6" },
         { id: 15, q: "Question 15", opts: ["Regardless of", "In addition to", "On account of", "According to"], ans: 1, task: 1, group: "group-6" },
-        { id: 16, q: "Question 16", opts: ["Only professional", "Essential for changes", "Lower productivity", "Irrelevant"], ans: 1, task: 2, group: "group-7" },
-        { id: 17, q: "Question 17", opts: ["light", "create", "refuse", "connect"], ans: 0, task: 2, group: "group-7" },
-        { id: 18, q: "Question 18", opts: ["spark", "learning", "curiosity", "desire"], ans: 2, task: 2, group: "group-7" },
-        { id: 19, q: "Question 19", opts: ["Curiosity is desire", "Interested focus more", "Curiosity seek info", "No relation to anxiety"], ans: 3, task: 2, group: "group-7" },
-        { id: 20, q: "Question 20", opts: ["Unnecessary", "Virtuous cycle", "Without curiosity, no motivation", "No vital role"], ans: 2, task: 2, group: "group-7" }
+        { id: 16, q: "Question 16: What does the passage suggest about lifelong learning?", opts: ["It is only professional", "Essential for adapting to changes", "Lower productivity", "Irrelevant"], ans: 1, task: 2, group: "group-7" },
+        { id: 17, q: "Question 17: The word 'ignite' is CLOSEST in meaning to:", opts: ["light", "create", "refuse", "connect"], ans: 0, task: 2, group: "group-7" },
+        { id: 18, q: "Question 18: The word 'It' in paragraph 2 refers to:", opts: ["spark", "learning", "curiosity", "desire"], ans: 2, task: 2, group: "group-7" },
+        { id: 19, q: "Question 19: Which is NOT true according to the passage?", opts: ["Curiosity is desire", "Interested focus more", "Curiosity seek info", "No relation to anxiety"], ans: 3, task: 2, group: "group-7" },
+        { id: 20, q: "Question 20: Which of the following can be inferred?", opts: ["Unnecessary", "Virtuous cycle", "Without curiosity, no motivation", "No vital role"], ans: 2, task: 2, group: "group-7" }
     ];
 
     let task1Done = 0;
@@ -139,16 +150,13 @@
         const item = questions.find(x => x.id === qId);
         const grid = document.getElementById(`grid-${qId}`);
 
-        // Ghi nhận lần click đầu tiên để tính điểm
         if (!attemptedQuestions.has(qId)) {
             if (idx === item.ans) firstTryCount++;
             attemptedQuestions.add(qId);
         }
 
         if (idx === item.ans) {
-            // ĐÚNG
             el.classList.add('correct');
-            // Khóa các lựa chọn khác
             Array.from(grid.children).forEach(child => {
                 if (!child.classList.contains('correct')) child.classList.add('disabled');
                 child.onclick = null;
@@ -162,7 +170,6 @@
                 if (task2Done === 5) document.getElementById('final-submit').style.display = 'block';
             }
         } else {
-            // SAI
             el.classList.add('wrong');
         }
     }
@@ -190,11 +197,11 @@
         document.getElementById('timer').style.display = 'none';
 
         const finalScore = (firstTryCount / questions.length * 10).toFixed(2);
-        document.getElementById('score-text').innerText = `Kết quả cuối cùng: ${finalScore}/10 (Số câu đúng lần đầu: ${firstTryCount}/${questions.length})`;
+        document.getElementById('score-text').innerText = `Kết quả cuối cùng: ${finalScore}/10 (Đúng lần đầu: ${firstTryCount}/${questions.length})`;
         
         let history = JSON.parse(localStorage.getItem('npc_quiz_history')) || { score: 0 };
         const diff = (finalScore - history.score).toFixed(2);
-        document.getElementById('comp-text').innerText = `Bạn đã ${diff >= 0 ? 'tiến bộ hơn' : 'kém hơn'} người làm trước ${Math.abs(diff)} điểm!`;
+        document.getElementById('comp-text').innerText = `Lần này bạn đạt ${finalScore} điểm. So với lần trước (${history.score}), bạn ${diff >= 0 ? 'tăng' : 'giảm'} ${Math.abs(diff)} điểm!`;
         
         localStorage.setItem('npc_quiz_history', JSON.stringify({ score: finalScore }));
         document.getElementById('result-area').style.display = 'block';
