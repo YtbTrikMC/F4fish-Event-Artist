@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luyện Nghe Tiếng Anh 12 - NTT</title>
     <style>
-        /* CSS giữ nguyên như bản trước */
         :root {
             --primary-color: #0b3d91;
             --accent-color: #00ffcc;
@@ -23,39 +22,106 @@
             margin: 0;
             padding: 15px;
             line-height: 1.6;
-            overflow-x: hidden;
-            display: none; /* Ẩn toàn bộ nội dung cho đến khi nhập đúng pass */
+            display: none; /* Ẩn cho đến khi nhập đúng pass */
         }
 
         .container { max-width: 800px; margin: 0 auto; }
-        header { text-align: center; padding: 20px 0; border-bottom: 2px solid var(--accent-color); margin-bottom: 30px; }
-        header h1 { color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; margin: 0; font-size: 1.5rem; }
-        .controls-global { position: sticky; top: 10px; z-index: 1000; display: flex; justify-content: center; margin-bottom: 25px; }
-        .btn { padding: 12px 25px; border-radius: 30px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--accent-color);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .controls-global {
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .btn-stop { background: var(--danger); color: white; box-shadow: 0 4px 15px rgba(252, 61, 33, 0.4); }
         .btn-play { background: var(--accent-color); color: #0b192e; font-size: 0.75rem; padding: 8px 15px; }
-        .part-box { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin-bottom: 25px; backdrop-filter: blur(10px); }
-        .part-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
-        .part-title { font-size: 1.1rem; color: var(--accent-color); font-weight: bold; flex: 1; }
-        .content-text { color: var(--text-dim); font-size: 1rem; white-space: pre-wrap; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
+
+        .part-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .part-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .part-title {
+            font-size: 1.05rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .content-text {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: justify;
+        }
+
         .speaker { color: #f1c40f; font-weight: bold; }
-        .reading { border: 1px solid var(--accent-color); background: rgba(0, 255, 204, 0.08); }
+
+        .reading {
+            border: 1px solid var(--accent-color);
+            background: rgba(0, 255, 204, 0.08);
+        }
+
         footer { text-align: center; margin-top: 40px; padding: 20px; font-size: 0.75rem; opacity: 0.5; }
     </style>
 
     <script>
-        // HỆ THỐNG KIỂM TRA MẬT KHẨU
         (function() {
-            const password = prompt("Hệ thống bảo mật: Vui lòng nhập mật khẩu để truy cập bài nghe:");
-            if (password === "LISTENING12A1") {
-                alert("Mật khẩu chính xác! Chào mừng bạn.");
-                // Cho phép hiển thị nội dung trang
+            const pass = prompt("Hệ thống bảo mật: Vui lòng nhập mật khẩu (LISTENING12A1):");
+            if (pass === "LISTENING12A1") {
                 document.addEventListener("DOMContentLoaded", function() {
                     document.body.style.display = "block";
                 });
             } else {
-                alert("Mật khẩu sai! Bạn sẽ được đưa quay lại trang chủ.");
-                window.location.href = "index.html"; // Chuyển về trang chủ
+                alert("Mật khẩu không đúng!");
+                window.location.href = "index.html";
             }
         })();
     </script>
@@ -64,8 +130,8 @@
 
 <div class="container">
     <header>
-        <h1>ENGLISH 12 - LISTENING</h1>
-        <p style="font-size: 0.9rem; margin-top: 5px;">Hệ thống luyện nghe tự động - NTT</p>
+        <h1>ENGLISH 12 - FULL LISTENING</h1>
+        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">Hệ thống luyện nghe NTT - THPT LTV</p>
     </header>
 
     <div class="controls-global">
@@ -78,18 +144,33 @@
 </div>
 
 <script>
-    // Phần nội dung dữ liệu và logic đọc giữ nguyên như cũ
-    const synth = window.speechSynthesis || null;
+    const synth = window.speechSynthesis;
     const data = [
-        { title: "Part 1: Wildlife Conservation Trip", text: `Lisa: Hey, I was looking into different options for our wildlife conservation trip...` },
-        { title: "Part 2: Endangered Species", text: `Good morning, everyone. Today, we're going to talk about endangered species...` },
-        { title: "Part 3: Fake News", text: `Fake news is nothing new, but silly stories can reach more people...` },
-        { title: "Part 4: Lifelong Learning", text: `The astonishing speed of technological development makes it necessary...` },
-        { title: "Part 5: Career in Teaching", text: `Mai Chi: Good morning, Ms. Hoa. Do you have a few minutes?...` },
-        { title: "Part 6: Job Interview", text: `Kathy Walker: Mr. Harris? Hi, I'm Kathy Walker. Would you like to come into the office?...` }
+        {
+            title: "Part 1: Wildlife Conservation Trip",
+            text: `Lisa: Hey, I was looking into different options for our wildlife conservation trip. There are a few interesting places we could go.\nMark: That sounds great. Which places are you considering?\nLisa: Well, there's a project in Kenya focusing on elephant conservation, one in Australia working with koalas, and another in the Amazon rainforest aiming to protect various endangered species.\nMark: Wow, those all sound amazing. I think the Amazon one sounds particularly intriguing. What exactly do they do there?\nLisa: They do a lot of things, but mainly, they focus on habitat restoration and anti-poaching efforts. Volunteers get to help with monitoring wildlife and even some reforestation activities.\nMark: That sounds like a lot of hard work, but also very rewarding. What about the one in Australia?\nLisa: In Australia, the focus is more on medical care and rehabilitation for injured koalas. It's a bit different, but still very important work.\nMark: Hmm. Tough choice. How about the project in Kenya?\nLisa: In Kenya, it's all about protecting elephants from poachers. Volunteers help with tracking the movements of elephant herds and educating local communities about the importance of conservation.\nMark: I think I'm leaning towards the Amazon project. It seems like there's a lot of variety in the work we'd be doing.\nLisa: I agree. Plus, we'd get to experience one of the most biodiverse places on Earth. Let's go with the Amazon project, then.`
+        },
+        {
+            title: "Part 2: Endangered Species",
+            text: `Good morning, everyone. Today, we're going to talk about endangered species and the efforts being made to conserve them. One of the most well-known endangered species is the tiger. Tigers are primarily threatened by habitat loss and poaching. Conservationists are working to create protected areas where tigers can live and breed safely. Another critically endangered species is the Javan rhinoceros. There are fewer than 75 individuals left in the wild. The primary threat to these rhinos is habitat destruction due to agricultural expansion. Conservation efforts include habitat restoration and strict anti-poaching laws. In marine environments, the vaquita, a small porpoise found in the Gulf of California, is on the brink of extinction with less than 30 individuals remaining. The main threat to vaquitas is bycatch from illegal fishing. Conservationists are advocating for the use of safer fishing methods and the establishment of marine protected areas.\n\nEfforts to save these and other species include breeding programs, habitat restoration, and international cooperation. The key to success in these efforts is community involvement and education, which help ensure that local people are engaged in and benefit from conservation activities.`
+        },
+        {
+            title: "Part 3: Fake News",
+            text: `Fake news is nothing new, but silly stories can reach more people more quickly via social media. A lot of these viral claims aren't news at all, but efforts to fool readers into thinking they're real. Here are some strategies to protect yourself from fake news. Are you familiar with the source? Is it legitimate? Has it been reliable in the past? If a provocative headline draws your attention, read a little further before you decide to pass along the shocking information. Even in legitimate news stories, the headline doesn't always tell the whole story. But fake news, particularly efforts to be comic, can include several revealing signs in the text. Another telltale sign of a fake story is often the author. In some cases, the authors are not even real.\n\nOne story was credited to a doctor who won 14 awards and a handful prizes, which would be very impressive if it wasn't also totally made up. Many times, these stories will cite official or official-sounding sources, but once you look into it, this source doesn't back up the claim. Some false stories aren't completely faked, but rather distortions of real events. Bias leads people to be more interested in information that confirms their beliefs, and question information that doesn't. But the next time you're automatically annoyed at some social media posts concerning a belief you oppose, take a moment to check it out. Try this simple test. What other stories have been posted to the news website? You may be sure to believe a story about a thing you don't like, but if the news site also features a ridiculous story, maybe you should think twice before sharing.`
+        },
+        {
+            title: "Part 4: Lifelong Learning",
+            text: `The astonishing speed of technological development makes it necessary for individuals to learn new skills and keep improving them throughout their lives. The term "lifelong learning" refers to the continuous building of an individual's knowledge and skills. Apart from the knowledge, skills, attitudes, and behaviors people acquire in their everyday lives, lifelong learning consists of three forms: formal, non-formal, and informal learning. Formal learning is learning that happens in formal and organized settings, like schools and universities, and very often leads to certificates or degrees, while non-formal learning is considered learning gained in planned activities, like vocational skills training. Informal learning is learning acquired from daily life activities, viewing a video, reading articles, or chatting to a professional.\n\nLifelong learning offers a great number of merits to individuals, communities, and the country. First of all, it brings individuals knowledge, enhances their existing skills, stimulates learning experiences, and builds up systems of values necessary for them as social human beings. Secondly, knowledgeable individuals make communities more productive and creative with their up-to-date skills, abilities, and ideas. Today's fast-changing knowledge economy requires workers who are well prepared for new challenges by constant learning. Thirdly, lifelong learning facilitates the country to prosper. An able, skillful, and knowledgeable person can enormously contribute to his country's development and prosperity, which in turn contributes to the happiness and wellbeing of its citizens. Obviously, lifelong learning is so important that all individuals should learn throughout their lives.`
+        },
+        {
+            title: "Part 5: Career in Teaching",
+            text: `Mai Chi: Good morning, Ms. Hoa. Do you have a few minutes?\nMs. Hoa: Sure, Mai Chi. What's the matter?\nMai Chi: I've always wanted to become a teacher, but I don't know how to prepare for a career in teaching. May I ask you a few questions?\nMs. Hoa: No problem. What would you like to know?\nMai Chi: I know I love teaching, but I also need to be qualified as a teacher. What education and qualifications do I need?\nMs. Hoa: First, you need to choose what subject you want to teach.\nMai Chi: Okay, that's easy. I want to teach science. It's a fascinating subject.\nMs. Hoa: So you need to get a bachelor's degree in a science subject. Then you must complete a teacher training program to earn a teaching certificate.\nMai Chi: I see. I know that work experience is very important. How can I get that?\nMs. Hoa: Well, it'll be part of your teacher training course. You'll learn on the job in a school. However, you may also work as a tutor to gain experience working with children. Some parents may hire secondary school students to help their children.\nMai Chi: Good idea. What skills do you think I should start developing?\nMs. Hoa: Well, a good teacher needs to have communication and teamwork skills. It's also important to be able to understand other people's feelings.\nMai Chi: I'm also wondering what interests and hobbies are good for a career in teaching.\nMs. Hoa: This is an interesting question. I'd say reading is the most important as it helps us keep up with new knowledge.\nMai Chi: Sounds good. I like reading. And I like your idea of finding a tutoring job.\nMs. Hoa: Great. Let me know if you need a reference.\nMai Chi: Oh, what's a reference?\nMs. Hoa: Well, it's a person who agrees to give information about your character and abilities, and remember to keep a record of everything you have learned and done. You will need it later on to write your CV, or curriculum vitae, in order to apply for a job.`
+        },
+        {
+            title: "Part 6: Job Interview",
+            text: `Kathy Walker: Mr. Harris? Hi, I'm Kathy Walker. Would you like to come into the office?\nMr. Harris: Oh, hello. Yes, thank you.\nKathy Walker: Sit down. Now, I believe you want to be a train driver.\nMr. Harris: Oh, yes. It's always been a dream of mine.\nKathy Walker: Do you have any experience? What are you doing now?\nMr. Harris: Oh, well, my dad worked as a train driver, so I, I know a bit about it, but, no, I don't really have any experience. I'm a waiter at the moment in the new restaurant in the High Street.\nKathy Walker: Ah, yes, I know it. Next to the bus station. I worked as a driver there for a while years ago. Now, tell me a little about yourself.\nMr. Harris: O- okay. I'm 22... no, 23. It was my birthday a couple of days ago. And I live here in York.\nKathy Walker: It says on your application form that you went to a local college to study after leaving school. What did you do there?\nMr. Harris: Uh, I wanted to do maths, but my grades weren't really good enough. In the end, I did a couple of courses in economics. I spent a long time looking for a job connected to that, uh, but I couldn't find one. I decided to take the job I've got now, but it's not really what I want to do.\nKathy Walker: I see you also have some hobbies.\nMr. Harris: O- oh, yes. I started collecting stamps about 15 years ago when I was living in France with my family. Oh, we were living there for a couple of years, and my friends sent me letters and I kept the stamps. I also love cycling.\nKathy Walker: Good. We have a lot of people to see today, but thank you for coming, and we'll write to you soon with our decision.\nMr. Harris: Thank you.`
+        }
     ];
-
-    // (Tôi lược bớt phần Text chi tiết bên trên để code gọn hơn, bạn hãy bê nguyên phần text đầy đủ của bản trước vào nhé)
 
     function init() {
         const wrapper = document.getElementById('listening-content');
@@ -111,11 +192,11 @@
 
     function playAudio(index) {
         if (!synth) return;
-        stopAudio(); 
+        stopAudio();
         document.getElementById('box-' + index).classList.add('reading');
         const utterance = new SpeechSynthesisUtterance(data[index].text);
         utterance.lang = 'en-US';
-        utterance.rate = 0.85; 
+        utterance.rate = 0.85;
         utterance.onend = () => document.getElementById('box-' + index).classList.remove('reading');
         synth.speak(utterance);
     }
@@ -129,4 +210,3 @@
 </script>
 </body>
 </html>
-
