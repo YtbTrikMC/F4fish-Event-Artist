@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Công Nghệ 12 - NTT</title>
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .announcement {
+            background: rgba(142, 68, 173, 0.2);
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: #d1d5db;
+        }
+
+        h1 { text-align: center; color: var(--primary); margin-bottom: 5px; font-size: 1.5rem; }
+        .progress { text-align: center; margin-bottom: 20px; color: #94a3b8; font-weight: bold; }
+
+        .question-content { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; color: #fff; font-weight: 500; }
+        
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        
+        .option-item {
+            padding: 15px;
+            background: #334155;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-item:hover { background: #475569; }
+
+        .option-item.correct {
+            background-color: var(--success) !important;
+            border-color: #dcfce7 !important;
+            pointer-events: none;
+        }
+
+        .option-item.wrong {
+            background-color: var(--danger) !important;
+            animation: shake 0.3s;
+        }
+
+        #msg {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.2rem;
+        }
+
+        #result-area { display: none; text-align: center; padding: 40px 0; }
+        .final-score { font-size: 4rem; color: var(--success); margin: 20px 0; font-weight: 800; }
+        .btn-home {
+            display: inline-block;
+            padding: 12px 35px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="announcement">
+        Xin chào các bạn học thân mến về môn Công Nghệ, mình đã nhận được sự trợ giúp của một bạn ẩn danh làm phần trắc nghiệm này. Do mình không học công nghệ nên nếu có thiếu sót hãy báo cáo ngay với mình để sửa lại.
+    </div>
+
+    <div id="quiz-part">
+        <h1>TRẮC NGHIỆM CÔNG NGHỆ 12</h1>
+        <div class="progress" id="progress-text">Câu 1 / 60</div>
+        <div id="question-area"></div>
+        <div id="msg"></div>
+    </div>
+
+    <div id="result-area">
+        <h2>KẾT QUẢ CỦA BẠN</h2>
+        <div id="score-stats" style="font-size: 1.2rem; color: #94a3b8;">Đúng ngay lần đầu: 0/60</div>
+        <div class="final-score" id="score-val">0.0</div>
+        <p>Học tập là một hành trình, chúc bạn luôn vững bước!</p>
+        <a href="index.html" class="btn-home">LÀM LẠI</a>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { q: "Câu 1. Trong một số dịch vụ phổ biến có ứng dụng kĩ thuật điện tử, dịch vụ được thực hiện thông qua các thiết bị điện tử có kết nối internet như máy tính, rút tiền tự động (ATM), smartbanking là dịch vụ", options: ["A. viễn thông.", "B. tài chính.", "C. trong đào tạo.", "D. trong giao thông."], ans: 1 },
+        { q: "Câu 2. Kĩ thuật điện tử bao gồm:", options: ["A. điện tử tương tự và điện tử số.", "B. điện tử thông tin và truyền thông.", "C. kĩ thuật đo lường và tự động hóa.", "D. kĩ thuật điện và vô tuyến, viễn thông."], ans: 0 },
+        { q: "Câu 3. Kĩ thuật viên kĩ thuật điện tử trong các ngành nghề thuộc lĩnh vực kĩ thuật điện tử tương ứng với trình độ", options: ["A. đại học.", "B. cao đẳng.", "C. đại học hoặc cao đẳng nghề.", "D. trung cấp hoặc cao đẳng nghề."], ans: 2 },
+        { q: "Câu 4. Trong ngành kĩ thuật điện tử, công việc lắp đặt thiết bị điện tử cho các nhà máy sản xuất thường được thực hiện bởi", options: ["A. kĩ sư điện tử kết hợp với thợ điện tử có trình độ chuyên môn cao.", "B. thợ điện tử và có sự kiểm tra, giám sát của kĩ sư điện tử.", "C. thợ điện tử và có sự kiểm tra, giám sát của kĩ sư cơ khí.", "D. thợ điện tử kết hợp với thợ cơ khí."], ans: 3 },
+        { q: "Câu 5. Công dụng của điện trở là", options: ["A. hạn chế hoặc điều chỉnh dòng điện và phân chia điện áp trong mạch điện.", "B. hạn chế hoặc điều khiển dòng điện và phân chia điện áp trong mạch điện.", "C. cho phép dòng điện đi theo chiều nhất định.", "D. dẫn dòng một chiều, cản trở dòng điện xoay chiều đi qua."], ans: 0 },
+        { q: "Câu 6. Đại lượng đặc trưng khả năng tích lũy năng lượng từ trường khi có dòng điện chạy qua nó là", options: ["A. dung kháng (Xc).", "B. cảm kháng (XL).", "C. trị số điện cảm (L).", "D. trị số điện dung (C)."], ans: 2 },
+        { q: "Câu 7. Trên một tụ điện có ghi 160V - 100F. Các thông số này cho ta biết điều gì?", options: ["A. Điện áp định mức và trị số điện dung của tụ điện.", "B. Điện áp định mức và dung kháng của tụ điện.", "C. Điện áp đánh thủng và dung lượng của tụ điện.", "D. Điện áp cực đại và khả năng tích điện tối thiểu của tụ điện."], ans: 0 },
+        { q: "Câu 8. Một điện trở có các vòng màu theo thứ tự: cam, vàng, lục, bạc. Trị số đúng của điện trở là", options: ["A. 34x 10^5 KΩ ± 10%.", "B. 34x10^6 Ω ± 5%.", "C. 23x10^2 KΩ ± 5%.", "D. 23x10^6 Ω ±10%."], ans: 0 },
+        { q: "Câu 10. Một điện trở có giá trị 72x10^8 Ω ±5%. Vạch màu tương ứng theo thứ tự là", options: ["A. tím, đỏ, xám, nâu.", "B. tím, đỏ, xám, nhũ vàng.", "C. xanh lục, đỏ, xám, nhũ vàng.", "D. xanh lục, đỏ, nâu."], ans: 1 },
+        { q: "Câu 11: Kí hiệu của tụ không phân cực (tụ thường) là:", options: ["A. Kí hiệu tụ thường.", "B. Kí hiệu tụ hóa.", "C. Kí hiệu biến trở.", "D. Kí hiệu cuộn cảm."], ans: 0 },
+        { q: "Câu 12: Công dụng của cuộn cảm là", options: ["A. dẫn dòng điện một chiều, chặn dòng điện cao tần.", "B. dẫn dòng điện xoay chiều, chặn dòng điện một chiều.", "C. không cho dòng điện một chiều đi qua.", "D. tích lũy năng lượng điện trường trong cuộn cảm."], ans: 0 },
+        { q: "Câu 13: Giá trị điện cảm (L) cho biết:", options: ["A. Mức độ cản trở dòng điện của điện trở", "B. Khả năng tích lũy năng lượng điện trường của tụ điện khi có điện áp thuận đặt lên hai cực của nó", "C. Khả năng tích lũy năng lượng từ trường của cuộn cảm khi có dòng điện chạy qua nó", "D. Mức độ mạnh, yếu của dòng điện"], ans: 2 },
+        { q: "Câu 14: Công thức tính dung kháng (XC) của tụ điện là", options: ["A. XC = 2πfL", "B. XC = 1/(2πfC)", "C. XC = 2πfC", "D. XC = U/I"], ans: 1 },
+        { q: "Câu 15: Điôt ổn áp (Điôt zene) khác Điôt chỉnh lưu ở chỗ", options: ["A. bị đánh thủng mà vẫn không hỏng.", "B. chỉ cho dòng điện chạy qua theo một chiều từ anôt (A) sang catôt (K).", "C. không bị đánh thủng khi bị phân cực ngược.", "D. chịu được được áp ngược cao hơn mà không bị đánh thủng."], ans: 0 },
+        { q: "Câu 16: Linh kiện điện tử cho dòng ngược đi qua là", options: ["A. Điốt thường.", "B. Tirixto.", "C. Điốt tiếp mặt chỉnh lưu.", "D. Điốt Zêne."], ans: 3 },
+        { q: "Câu 17: Tranzito là linh kiện bán dẫn có", options: ["A. hai lớp tiếp giáp P - N, có ba cực là: bazơ (B), colectơ (C) và emitơ (E).", "B. ba lớp tiếp giáp P - N, có ba cực là: anôt (A), catôt (K) và điều khiển (G).", "C. một lớp tiếp giáp P - N, có hai cực là: anôt (A) và catôt (K).", "D. ba lớp tiếp giáp P - N, có ba cực là: bazơ (B), colectơ (C) và emitơ (E)."], ans: 0 },
+        { q: "Câu 18: Tranzito (loại PNP) chỉ làm việc khi", options: ["A. các cực bazơ (B), emitơ (E) được phân cực thuận và điện áp UCE < 0.", "B. các cực bazơ (B), emitơ (E) được phân cực thuận và điện áp UCE > 0.", "C. các cực bazơ (B), emitơ (E) được phân cực ngược và điện áp UCE < 0.", "D. các cực bazơ (B), emitơ (E) được phân cực ngược và điện áp UCE > 0."], ans: 0 },
+        { q: "Câu 19: Thông thường IC được bố trí theo kiểu hình răng lược có", options: ["A. hai hàng chân hoặc một hàng chân.", "B. hai hàng chân hoặc ba hàng chân.", "C. ba hàng chân hoặc bốn hàng chân.", "D. bốn hàng chân hoặc năm hàng chân."], ans: 0 },
+        { q: "Câu 20. Khuếch đại thuật toán là", options: ["A. mạch điện tử tích hợp nhiều tầng khuếch đại dòng xoay chiều, có hệ số khuếch đại rất lớn.", "B. mạch điện tử tích hợp nhiều tầng khuếch đại dòng một chiều, có hệ số khuếch đại rất lớn.", "C. mạch điện tử tích hợp nhiều tầng khuếch đại dòng một chiều, có hệ số khuếch đại rất nhỏ.", "D. mạch điện tử tích hợp nhiều tầng khuếch đại dòng xoay chiều, có hệ số khuếch đại rất nhỏ."], ans: 1 },
+        { q: "Câu 21. Trong mạch khuếch đại đảo, tín hiệu sẽ được đưa vào đâu?", options: ["A. Đầu vào không đảo.", "B. Đầu vào đảo.", "C. Nối với mát.", "D. Điểm nào cũng được."], ans: 1 },
+        { q: "Câu 22. Tín hiệu điện áp ra so với tín hiệu điện áp vào trong mạch khuếch đại không đảo có tính chất như thế nào?", options: ["A. Tín hiệu điện áp ra cùng pha và có giá trị bé hơn điện áp vào.", "B. Tín hiệu điện áp ra ngược pha và có giá trị bé điện áp vào.", "C. Tín hiệu điện áp ra cùng pha và có giá trị lớn hơn hoặc bằng điện áp vào.", "D. Tín hiệu điện áp ra cùng pha và có giá trị lớn hơn bằng điện áp vào."], ans: 2 },
+        { q: "Câu 23. Khuếch đại thuật toán thực hiện khuếch đại sự chênh lệch giữa điện áp … (1) … và … (2) … sau đó kết quả đưa tới … (3) …", options: ["A. (1) lối vào không đảo, (2) lối ra, (3) lối vào đảo.", "B. (1) lối vào đảo, (2) không đảo; (3) lối ra.", "C. (1) lối ra, (2) lối vào đảo, (3) lối vào không đảo.", "D. (1) lối ra, (2) lối vào không đảo, (3) lối vào đảo."], ans: 1 },
+        { q: "Câu 24 Trong các ứng dụng điện tử, các IC khuếch đại thuật toán thường được sử dụng để làm gì?", options: ["A. Điều khiển motor.", "B. Đo đạc thời gian.", "C. Tăng cường và điều chỉnh tín hiệu điện.", "D. Phân tích âm thanh."], ans: 2 },
+        { q: "Câu 25. Công thức tính điện áp ra của mạch khuếch đại cộng đảo là", options: ["A. Ura=-R2/R1*Uvào", "B. Ura=-(Rf/R1*Uvào1 + Rf/R2*Uvào2)", "C. Ura=(1+Rf/Rg)*(R2/(R1+R2)*Uvào1 + R1/(R1+R2)*Uvào2)", "D. Ura=(1+R2/R1)*Uvào"], ans: 1 },
+        { q: "Câu 26. Cho các sơ đồ sau, đâu là sơ đồ của mạch cộng không đảo?", options: ["A. Sơ đồ A", "B. Sơ đồ B", "C. Sơ đồ C", "D. Sơ đồ D"], ans: 0 },
+        { q: "Câu 27. Cho mạch khuếch đại không đảo có R1 = 1kΩ, R2 = 9kΩ. Hệ số khuếch đại là", options: ["A. 9", "B. 10", "C. 11", "D. 1"], ans: 1 },
+        { q: "Câu 28. Mạch khuếch đại đảo có R1= 1kΩ, R2= 2,2kΩ. Hệ số khuếch đại là", options: ["A. 0,2", "B. 2", "C. 2,2", "D. -2,2"], ans: 2 },
+        { q: "Câu 29. Mạch cộng không đảo có R1= R2 = 2kΩ, Rf = Rg = 10kΩ, Uvào1 = 1V, Uvào2= 5V. Điện áp ra là", options: ["A. 8V", "B. 7V", "C. 6V", "D. 5V"], ans: 2 },
+        { q: "Câu 30. Mạch trừ có R1 = R3 = 1kΩ, R2 = R4 = 10kΩ, Uvào1 = 1V, Uvào2 = 5V. Điện áp ra là", options: ["A. 10V", "B. 20V", "C. 30V", "D. 40V"], ans: 3 },
+        { q: "Câu 31. Đây là sơ đồ mạch khuếch đại thuật toán nào?", options: ["A. Mạch cộng đảo.", "B. Mạch cộng không đảo.", "C. Mạch trừ.", "D. Mạch so sánh."], ans: 2 },
+        { q: "Câu 32. Mạch khuếch đại thuật toán có ưu điểm nổi trội gì so với mạch khuếch đại dùng Tranzitor?", options: ["A. Giá thành rẻ hơn", "B. Độ chính xác cao hơn", "C. Kích thước nhỏ gọn hơn", "D. Đơn giản, dễ lắp"], ans: 1 },
+        { q: "Câu 33. Ứng dụng nào sau đây không sử dụng khuếch đại thuật toán?", options: ["A. Mạch khuếch đại âm thanh", "B. Mạch điều chế biên độ", "C. Mạch tạo xung", "D. Mạch chỉnh lưu"], ans: 3 },
+        { q: "Câu 34. Trong mạch khuếch đại không đảo, nếu điện áp đầu vào là 2V và hệ số khuếch đại là 3, thì điện áp đầu ra là bao nhiêu?", options: ["A. 3V", "B. 5V", "C. 6V", "D. 8V"], ans: 2 },
+        { q: "Câu 35. Đặc điểm của tín hiệu ra so với tín hiệu vào của khuếch đại đảo là gì?", options: ["A. Cùng dấu và lớn hơn", "B. Cùng dấu và nhỏ hơn.", "C. Ngược dấu và lớn hơn.", "D. Ngược dấu và nhỏ hơn"], ans: 2 },
+        { q: "Câu 36. Hàm logic của cổng OR là:", options: ["A. y = x1 + x2", "B. y = x1 - x2", "C. y = x1.x2", "D. y = x1:x2"], ans: 0 },
+        { q: "Câu 37. Hàm logic của cổng AND là:", options: ["A. y = x1 + x2", "B. y = x1 - x2", "C. y = x1.x2", "D. y = x1:x2"], ans: 2 },
+        { q: "Câu 38. Cổng NOT được sử dụng để", options: ["A. đảo trạng thái mạch nhân logic.", "B. đảo trạng thái mạch cộng logic.", "C. đảo ngược trạng thái tín hiệu đầu vào.", "D. cộng logic các tín hiệu đầu vào."], ans: 2 },
+        { q: "Câu 39. Cổng NOR được sử dụng để", options: ["A. đảo ngược trạng thái của mạch nhân logic.", "B. đảo ngược trạng thái của mạch cộng logic.", "C. đảo ngược trạng thái tín hiệu đầu vào.", "D. cộng logic các tín hiệu."], ans: 1 },
+        { q: "Câu 40. Cổng NAND được sử dụng để", options: ["A. đảo ngược trạng thái của mạch nhân logic.", "B. đảo ngược trạng thái của mạch cộng logic.", "C. đảo ngược trạng thái tín hiệu đầu vào.", "D. nhân logic các tín hiệu."], ans: 0 },
+        { q: "Câu 41. Hình bên là kí hiệu logic cổng nào? (Hình 41)", options: ["A. NOT", "B. NOR", "C. OR", "D. AND"], ans: 0 },
+        { q: "Câu 42. Hình bên là kí hiệu logic cổng nào? (Hình 42)", options: ["A. NOT", "B. AND", "C. NAND", "D. NOR"], ans: 1 },
+        { q: "Câu 43. Hình bên là kí hiệu logic cổng nào? (Hình 43)", options: ["A. NOT", "B. NOR", "C. OR", "D. AND"], ans: 1 },
+        { q: "Câu 44. Hình bên là kí hiệu logic cổng nào? (Hình 44)", options: ["A. NOT", "B. NOR", "C. NAND", "D. AND"], ans: 3 },
+        { q: "Câu 45. Hình bên là kí hiệu logic cổng nào? (Hình 45)", options: ["A. NOT", "B. NOR", "C. OR", "D. AND"], ans: 2 },
+        { q: "Câu 46. Cổng NOR có thể được thiết lập bằng cách nào?", options: ["A. Mắc nối tiếp OR với NAND.", "B. Mắc nối tiếp OR với AND.", "C. Mắc nối tiếp NOT với AND.", "D. Mắc nối tiếp OR với NOT."], ans: 3 },
+        { q: "Câu 47. Cổng NAND có thể được tạo ra bằng cách nào?", options: ["A. Mắc nối tiếp NOR với NOT.", "B. Mắc nối tiếp AND với OR.", "C. Mắc nối tiếp AND với NOR.", "D. Mắc nối tiếp AND với NOT."], ans: 3 },
+        { q: "Câu 48. Mạch xử lí tín hiệu trong điện tử số được tạo nên từ các phần tử cơ bản nào?", options: ["A. Điện trở và tụ điện.", "B. Cổng logic.", "C. Biến trở và transistor.", "D. Điện cảm và diode."], ans: 1 },
+        { q: "Câu 49. Đặc điểm nổi bật của mạch tổ hợp là:", options: ["A. Có phần tử nhớ và hoạt động theo chu kỳ.", "B. Ra phụ thuộc vào tổ hợp vào và ra.", "C. Ra chỉ phụ thuộc vào tổ hợp các giá trị đầu vào.", "D. Có khả năng lưu trữ dữ liệu."], ans: 2 },
+        { q: "Câu 50. Mạch dãy có thể thực hiện được chức năng nào sau đây?", options: ["A. Cộng hai số nhị phân.", "B. Đếm số xung điện.", "C. So sánh hai tín hiệu số.", "D. Giải mã tín hiệu."], ans: 1 },
+        { q: "Câu 51. Flip-flop D được sử dụng trong mạch dãy có nhiệm vụ chính là:", options: ["A. Khuếch đại tín hiệu.", "B. Lưu giữ trạng thái logic.", "C. So sánh hai tín hiệu.", "D. Giải mã tín hiệu số."], ans: 1 },
+        { q: "Câu 52. Khi tín hiệu xung nhịp (CLK) chuyển từ mức 0 sang mức 1, flip-flop D sẽ:", options: ["A. Giữ nguyên giá trị Q.", "B. Lấy giá trị đầu vào D làm đầu ra Q.", "C. Tự đảo trạng thái Q.", "D. Ngắt hoạt động."], ans: 1 },
+        { q: "Câu 53. Mạch so sánh số nhị phân có chức năng:", options: ["A. Xác định giá trị lớn nhất.", "B. Kiểm tra hai tín hiệu có giống nhau hay không.", "C. Tính tổng hai tín hiệu.", "D. Chuyển đổi tín hiệu."], ans: 1 },
+        { q: "Câu 54. Thành phần nào không thuộc cấu trúc chức năng cơ bản của vi điều khiển?", options: ["A. Bộ nhớ chương trình.", "B. Bộ xử lý trung tâm (CPU).", "C. Mạch khuếch đại công suất.", "D. Các cổng tín hiệu vào/ra."], ans: 2 },
+        { q: "Câu 55. Trong vi điều khiển, RAM được dùng để:", options: ["A. Lưu các chương trình điều khiển cố định.", "B. Lưu dữ liệu tạm thời trong quá trình xử lí.", "C. Lưu địa chỉ các cổng vào/ra.", "D. Lưu dữ liệu cảm biến vĩnh viễn."], ans: 1 },
+        { q: "Câu 56. Vi điều khiển được khái niệm là", options: ["A. thiết bị dùng để khuếch đại tín hiệu điện.", "B. mạch tích hợp có thể lập trình để điều khiển.", "C. bộ nhớ dùng để lưu trữ dữ liệu.", "D. bộ nguồn cung cấp điện."], ans: 1 },
+        { q: "Câu 57. Thông thường cách phân loại vi điều khiển dựa trên", options: ["A. độ rộng dữ liệu.", "B. họ vi điều khiển.", "C. độ rộng dữ liệu và họ vi điều khiển.", "D. chức năng vi điều khiển."], ans: 2 },
+        { q: "Câu 58. Thành phần nào trong vi điều khiển chịu trách nhiệm thực hiện các lệnh?", options: ["A. Bộ nhớ chương trình (ROM).", "B. Bộ nhớ dữ liệu (RAM).", "C. Bộ xử lí trung tâm (CPU).", "D. Các cổng vào/ra (I/O)."], ans: 2 },
+        { q: "Câu 59. Học sinh muốn vi điều khiển bật đèn LED khi trời tối, cần làm bước nào?", options: ["A. Gắn cảm biến trực tiếp vào đèn LED.", "B. Lưu chương trình điều khiển vào bộ nhớ vi điều khiển.", "C. Cấp nguồn điện lớn hơn.", "D. Kết nối cảm biến với nguồn xoay chiều."], ans: 1 },
+        { q: "Câu 60. Muốn thay đổi ngưỡng độ ẩm để bơm hoạt động sớm hơn, cần thao tác gì?", options: ["A. Thay đổi loại cảm biến.", "B. Tăng điện áp cấp.", "C. Thay đổi thông số chương trình trong vi điều khiển.", "D. Gắn bổ sung thêm cảm biến."], ans: 2 }
+    ];
+
+    let currentQ = 0;
+    let firstTryCorrectCount = 0;
+    let hasFailedThisQuestion = false;
+    let isTransitioning = false;
+
+    function renderQuestion() {
+        if (isTransitioning) return;
+        const area = document.getElementById('question-area');
+        const progress = document.getElementById('progress-text');
+        const msg = document.getElementById('msg');
+        
+        area.innerHTML = '';
+        msg.innerText = '';
+        hasFailedThisQuestion = false;
+        
+        const data = quizData[currentQ];
+        progress.innerText = `Câu ${currentQ + 1} / ${quizData.length}`;
+
+        const qContent = document.createElement('div');
+        qContent.className = 'question-content';
+        qContent.innerText = data.q;
+        area.appendChild(qContent);
+
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'options-list';
+        
+        data.options.forEach((opt, idx) => {
+            const optItem = document.createElement('div');
+            optItem.className = 'option-item';
+            optItem.innerText = opt;
+            optItem.onclick = () => checkAnswer(idx, optItem);
+            optionsDiv.appendChild(optItem);
+        });
+        
+        area.appendChild(optionsDiv);
+    }
+
+    function checkAnswer(idx, element) {
+        if (isTransitioning) return;
+        const correctIdx = quizData[currentQ].ans;
+        const msgEl = document.getElementById('msg');
+
+        if (idx === correctIdx) {
+            // Đúng
+            element.classList.add('correct');
+            msgEl.style.color = "var(--success)";
+            msgEl.innerText = "Chính xác!";
+            
+            if (!hasFailedThisQuestion) {
+                firstTryCorrectCount++;
+            }
+
+            isTransitioning = true;
+            setTimeout(() => {
+                currentQ++;
+                isTransitioning = false;
+                if (currentQ < quizData.length) {
+                    renderQuestion();
+                } else {
+                    showFinalResult();
+                }
+            }, 1000);
+        } else {
+            // Sai
+            element.classList.add('wrong');
+            msgEl.style.color = "var(--danger)";
+            msgEl.innerText = "Hãy làm lại!";
+            hasFailedThisQuestion = true;
+            
+            setTimeout(() => {
+                element.classList.remove('wrong');
+            }, 500);
+        }
+    }
+
+    function showFinalResult() {
+        document.getElementById('quiz-part').style.display = 'none';
+        const resArea = document.getElementById('result-area');
+        resArea.style.display = 'block';
+        
+        const score = (firstTryCorrectCount / quizData.length) * 10;
+        document.getElementById('score-stats').innerText = `Đúng ngay lần đầu: ${firstTryCorrectCount}/${quizData.length} câu`;
+        document.getElementById('score-val').innerText = score.toFixed(1);
+    }
+
+    renderQuestion();
+</script>
+</body>
+</html>
