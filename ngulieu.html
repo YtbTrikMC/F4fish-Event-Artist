@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>READING</title>
+    <style>
+        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        #timer { position: fixed; top: 20px; right: 20px; background: var(--danger); color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; z-index: 1000; }
+        
+        .task-section { margin-bottom: 40px; padding: 25px; border: 2px solid #e2e8f0; border-radius: 10px; transition: 0.5s; position: relative; }
+        .task-locked { opacity: 0.3; pointer-events: none; filter: blur(3px); }
+        .task-title { background: var(--primary); color: white; padding: 10px 20px; border-radius: 5px; margin-top: -45px; margin-bottom: 20px; font-weight: bold; display: inline-block; border: 2px solid white; }
+        
+        .passage { background: #f8fafc; padding: 15px; border-left: 4px solid var(--primary); margin-bottom: 20px; font-size: 0.95rem; white-space: pre-line; }
+        .question-item { margin-bottom: 25px; padding: 15px; border: 1px solid #f1f5f9; border-radius: 10px; transition: 0.3s; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        
+        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; font-weight: 500; }
+        .opt:hover { border-color: var(--primary); background: #eff6ff; }
+        .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
+        .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); font-weight: bold; pointer-events: none; }
+        .opt.disabled { pointer-events: none; opacity: 0.6; }
+
+        .btn-action { display: none; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        #unlock-task2 { background: var(--success); color: white; }
+        #final-submit { background: var(--primary); color: white; }
+
+        #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
+        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="timer">45:00</div>
+
+<div class="container">
+    <h1 style="text-align:center; color: var(--primary); margin-bottom: 40px;">ĐỌC HIỂU</h1>
+
+    <div id="task1-area" class="task-section">
+        <div class="task-title">TASK 1: CLOZE TEXT</div>
+        
+        <div class="passage"><b>Wildlife Photography Exhibition</b>
+        Step into the wild with our stunning exhibition!
+        • Explore captivating images of endangered species in their natural (1) …………
+        • Be impressed by pictures of wildlife (2) ………… by talented photographers
+        • Discover inspiring conservation efforts to protect our planet's biodiversity
+        If you (3) ……… sustainable future nature, don't miss this opportunity!</div>
+        <div id="group-1"></div>
+
+        <div class="passage"><b>Join our Night Classes for Adults!</b>
+        • Expand your horizons with our (4) ………… course offerings.
+        • Expert instructors dedicated (5) ………….. your success.</div>
+        <div id="group-2"></div>
+
+        <div class="passage"><b>Author Meet and Greet</b>
+        - (6) __________ with the brilliant mind behind the groundbreaking book...
+        - enjoy an (7) __________ discussion and Q&A session with the author.
+        - meet (8) __________ individuals passionate about personal development.</div>
+        <div id="group-3"></div>
+
+        <div class="passage"><b>Online Learning</b>
+        access learning materials (9) _________ the Internet. However, students need to manage their time effectively to achieve good learning (10) _________.</div>
+        <div id="group-4"></div>
+
+        <div class="passage"><b>The World of Mass Media</b>
+        Mass media has (11) ______ a great impact... young people to rely heavily (12) ______ online sources... Many experts offer (13) _______ individuals improve...</div>
+        <div id="group-5"></div>
+
+        <div class="passage"><b>AI in Education</b>
+        This shift can drive significant (14) ______ in learning outcomes... (15) ______ the educational setting, AI is revolutionizing...</div>
+        <div id="group-6"></div>
+
+        <button id="unlock-task2" class="btn-action" onclick="unlockTask2()">BẠN ĐÃ HOÀN THÀNH TASK 1 - NHẤN ĐỂ MỞ TASK 2 →</button>
+    </div>
+
+    <div id="task2-area" class="task-section task-locked">
+        <div class="task-title">TASK 2: READING COMPREHENSION</div>
+        <div class="passage"><b>Lifelong Learning</b>
+        Lifelong learning is an essential part... Curiosity is the spark that ignites the fire of learning...Albert Einstein said: “I have no special talents. I am only passionately curious.”... Research also shows “curiosity to be associated with higher levels of positive emotions, lower levels of anxiety, and more satisfaction with life.”</div>
+        <div id="group-7"></div>
+        <button id="final-submit" class="btn-action" onclick="showResult()">NỘP BÀI TOÀN BỘ & XEM ĐIỂM</button>
+    </div>
+
+    <div id="result-area">
+        <h2 id="score-text"></h2>
+        <p id="comp-text"></p>
+        <a href="index.html" class="btn-home">Quay về index.html</a>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { id: 1, q: "Question 1", opts: ["nurseries", "grounds", "habitats", "primates"], ans: 2, task: 1, group: "group-1" },
+        { id: 2, q: "Question 2", opts: ["captured", "capturing", "capture", "have captured"], ans: 0, task: 1, group: "group-1" },
+        { id: 3, q: "Question 3", opts: ["loved", "had loved", "will love", "love"], ans: 3, task: 1, group: "group-1" },
+        { id: 4, q: "Question 4", opts: ["diversely", "diversity", "diverse", "diversify"], ans: 2, task: 1, group: "group-2" },
+        { id: 5, q: "Question 5", opts: ["for", "at", "of", "to"], ans: 3, task: 1, group: "group-2" },
+        { id: 6, q: "Question 6", opts: ["encourage", "connect", "do", "face"], ans: 1, task: 1, group: "group-3" },
+        { id: 7, q: "Question 7", opts: ["interact", "interacting", "interactive", "interaction"], ans: 2, task: 1, group: "group-3" },
+        { id: 8, q: "Question 8", opts: ["like-mind", "liked-mind", "like-minding", "like-minded"], ans: 3, task: 1, group: "group-3" },
+        { id: 9, q: "Question 9", opts: ["in", "on", "at", "by"], ans: 1, task: 1, group: "group-4" },
+        { id: 10, q: "Question 10", opts: ["results", "effects", "benefits", "reasons"], ans: 0, task: 1, group: "group-4" },
+        { id: 11, q: "Question 11", opts: ["done", "come", "got", "made"], ans: 3, task: 1, group: "group-5" },
+        { id: 12, q: "Question 12", opts: ["for", "to", "by", "on"], ans: 3, task: 1, group: "group-5" },
+        { id: 13, q: "Question 13", opts: ["to helping", "to help", "help", "helping"], ans: 1, task: 1, group: "group-5" },
+        { id: 14, q: "Question 14", opts: ["changes", "improvements", "comments", "exchanges"], ans: 1, task: 1, group: "group-6" },
+        { id: 15, q: "Question 15", opts: ["Regardless of", "In addition to", "On account of", "According to"], ans: 1, task: 1, group: "group-6" },
+        { id: 16, q: "Question 16", opts: ["Only professional", "Essential for changes", "Lower productivity", "Irrelevant"], ans: 1, task: 2, group: "group-7" },
+        { id: 17, q: "Question 17", opts: ["light", "create", "refuse", "connect"], ans: 0, task: 2, group: "group-7" },
+        { id: 18, q: "Question 18", opts: ["spark", "learning", "curiosity", "desire"], ans: 2, task: 2, group: "group-7" },
+        { id: 19, q: "Question 19", opts: ["Curiosity is desire", "Interested focus more", "Curiosity seek info", "No relation to anxiety"], ans: 3, task: 2, group: "group-7" },
+        { id: 20, q: "Question 20", opts: ["Unnecessary", "Virtuous cycle", "Without curiosity, no motivation", "No vital role"], ans: 2, task: 2, group: "group-7" }
+    ];
+
+    let task1Done = 0;
+    let task2Done = 0;
+    let firstTryCount = 0;
+    let attemptedQuestions = new Set();
+
+    function init() {
+        questions.forEach(item => {
+            const group = document.getElementById(item.group);
+            const div = document.createElement('div');
+            div.className = 'question-item';
+            div.innerHTML = `
+                <div style="font-weight:600; margin-bottom:8px;">${item.q}</div>
+                <div class="options-grid" id="grid-${item.id}">
+                    ${item.opts.map((o, i) => `<div class="opt" onclick="handleSelect(${item.id}, ${i}, this)">${String.fromCharCode(65+i)}. ${o}</div>`).join('')}
+                </div>
+            `;
+            group.appendChild(div);
+        });
+    }
+
+    function handleSelect(qId, idx, el) {
+        const item = questions.find(x => x.id === qId);
+        const grid = document.getElementById(`grid-${qId}`);
+
+        // Ghi nhận lần click đầu tiên để tính điểm
+        if (!attemptedQuestions.has(qId)) {
+            if (idx === item.ans) firstTryCount++;
+            attemptedQuestions.add(qId);
+        }
+
+        if (idx === item.ans) {
+            // ĐÚNG
+            el.classList.add('correct');
+            // Khóa các lựa chọn khác
+            Array.from(grid.children).forEach(child => {
+                if (!child.classList.contains('correct')) child.classList.add('disabled');
+                child.onclick = null;
+            });
+
+            if (item.task === 1) {
+                task1Done++;
+                if (task1Done === 15) document.getElementById('unlock-task2').style.display = 'block';
+            } else {
+                task2Done++;
+                if (task2Done === 5) document.getElementById('final-submit').style.display = 'block';
+            }
+        } else {
+            // SAI
+            el.classList.add('wrong');
+        }
+    }
+
+    function unlockTask2() {
+        document.getElementById('task2-area').classList.remove('task-locked');
+        document.getElementById('unlock-task2').style.display = 'none';
+        window.scrollTo({ top: document.getElementById('task2-area').offsetTop - 50, behavior: 'smooth' });
+    }
+
+    let timeLeft = 45 * 60;
+    const timerDisplay = document.getElementById('timer');
+    const timer = setInterval(() => {
+        timeLeft--;
+        let m = Math.floor(timeLeft/60);
+        let s = timeLeft % 60;
+        timerDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        if (timeLeft <= 0) showResult();
+    }, 1000);
+
+    function showResult() {
+        clearInterval(timer);
+        document.getElementById('task1-area').style.display = 'none';
+        document.getElementById('task2-area').style.display = 'none';
+        document.getElementById('timer').style.display = 'none';
+
+        const finalScore = (firstTryCount / questions.length * 10).toFixed(2);
+        document.getElementById('score-text').innerText = `Kết quả cuối cùng: ${finalScore}/10 (Số câu đúng lần đầu: ${firstTryCount}/${questions.length})`;
+        
+        let history = JSON.parse(localStorage.getItem('npc_quiz_history')) || { score: 0 };
+        const diff = (finalScore - history.score).toFixed(2);
+        document.getElementById('comp-text').innerText = `Bạn đã ${diff >= 0 ? 'tiến bộ hơn' : 'kém hơn'} người làm trước ${Math.abs(diff)} điểm!`;
+        
+        localStorage.setItem('npc_quiz_history', JSON.stringify({ score: finalScore }));
+        document.getElementById('result-area').style.display = 'block';
+    }
+
+    init();
+</script>
+
+</body>
+</html>
