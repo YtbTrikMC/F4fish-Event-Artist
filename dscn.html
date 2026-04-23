@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Đúng Sai Công Nghệ - NTT</title>
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .announcement {
+            background: rgba(142, 68, 173, 0.2);
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #d1d5db;
+        }
+
+        h1 { text-align: center; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
+        .progress { text-align: center; margin-bottom: 20px; color: #94a3b8; font-weight: bold; }
+
+        .q-card { animation: slideIn 0.4s ease-out; }
+
+        .question-content { font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6; color: #fff; }
+        
+        .options-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .options-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .statement { width: 75%; }
+        .choice-group { width: 25%; text-align: center; white-space: nowrap; }
+
+        .btn-choice {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 6px;
+            background: #334155;
+            margin: 0 3px;
+            transition: 0.2s;
+            user-select: none;
+            display: inline-block;
+            min-width: 45px;
+            border: 2px solid transparent;
+            font-weight: bold;
+            color: #cbd5e1;
+        }
+
+        /* Hiệu ứng khi đúng */
+        .choice-correct {
+            background-color: var(--success) !important;
+            color: white !important;
+            border-color: #dcfce7 !important;
+            pointer-events: none; /* Đúng rồi thì không cho bấm lại nữa */
+        }
+
+        /* Hiệu ứng khi sai */
+        .choice-wrong {
+            background-color: var(--danger) !important;
+            color: white !important;
+            animation: shake 0.3s;
+        }
+
+        #msg {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.1rem;
+        }
+
+        #result-area { display: none; text-align: center; }
+        .final-score { font-size: 3rem; color: var(--success); margin: 20px 0; }
+        .btn-home {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #475569;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="announcement">
+        Xin chào các bạn học thân mến về môn Công Nghệ, mình đã nhận được lời mời của một bạn ẩn danh làm phần đúng sai này. Do mình không học Công Nghệ nên nếu có thiếu sót hãy báo cáo ngay với mình để sửa lại.
+    </div>
+
+    <h1>Ôn Tập Công Nghệ 12</h1>
+    <div id="quiz-part">
+        <div class="progress" id="progress-text">Câu 1 / 8</div>
+        <div id="question-container"></div>
+        <div id="msg"></div>
+    </div>
+
+    <div id="result-area">
+        <h2>HOÀN THÀNH BÀI TẬP!</h2>
+        <div class="final-score">8 / 8</div>
+        <p>Chúc bạn có kỳ thi đạt kết quả cao!</p>
+        <a href="index.html" class="btn-home">Quay lại trang chủ</a>
+    </div>
+</div>
+
+<script>
+    const data = [
+        {
+            q: "Câu 1: Để nâng cao ứng dụng mạch điện tử cho học sinh, giáo viên đưa ra một mạch ứng dụng IC khuếch đại thuật toán như hình dưới đây. Cho biết: Điện trở R1 = 2 kΩ; Điện áp vào: Uvào = 2 V; Điện áp ra: Ura = 9 V. Một nhóm học sinh thảo luận và đưa ra các nhận định sau:",
+            statements: ["a. Nếu muốn điện áp Ura = 4Uvào thì giá trị điện trở R2 nằm trong khoảng 5,6 kΩ đến 6,2 kΩ.", "b. Mạch khuếch đại trong bài toán có điện áp đầu ra ngược pha với điện áp đầu vào.", "c. Với các giá trị đã cho, điện trở R2 của mạch có giá trị là: R2 = 7 kΩ.", "d. Hệ số khuếch đại của mạch điện được xác định theo công thức: G = 1 + R1/R2."],
+            ans: ["Đ", "S", "Đ", "S"]
+        },
+        {
+            q: "Câu 2: Trong giờ thực hành linh kiện điện tử, giáo viên giao cho một nhóm học sinh nghiên cứu transistor PNP theo sơ đồ dưới đây. Nhóm sử dụng đồng hồ vạn năng ở thang đo điện trở/diode để kiểm tra tình trạng của transistor và đưa ra các nhận xét sau:",
+            statements: ["a. Transistor PNP được tạo thành từ ba tiếp giáp P-N ghép lại với nhau trong cùng một linh kiện.", "b. Khi đo transistor PNP bằng đồng hồ vạn năng kim, nếu đo giữa E-B và C-B đều thấy kim lên (dẫn điện một chiều), còn đo ngược lại kim không lên thì transistor được coi là còn tốt.", "c. Có thể coi transistor PNP tương đương với hai diode mắc chung tại cực Base, trong đó hai diode đều phân cực thuận khi Base có điện áp âm so với Emitter và Collector.", "d. Trong transistor PNP, dòng điện chạy từ cực Collector sang cực Emitter không cần điều khiển bởi dòng điện nhỏ chạy qua cực Base."],
+            ans: ["S", "Đ", "Đ", "S"]
+        },
+        {
+            q: "Câu 3. Trong giờ học công nghệ một nhóm học sinh được giao nhiệm vụ tìm hiểu về các linh kiện điện tử cơ bản. Khi quan sát một mạch điện tử có sơ đồ như hình bên, nhóm học sinh đưa ra các ý kiến:",
+            statements: ["a) Điện trở dùng để lắp ráp mạch điện này có 3 vạch màu biểu thị giá trị lần lượt là nâu – đen – cam.", "b) Đây là mạch phân chia điện áp sử dụng điện trở R và biến trở VR.", "c) Muốn tăng giá trị dòng điện chạy trong mạch điện này, cần điều chỉnh để giá trị của biến trở VR tăng lên.", "d) Để giá trị điện thế tại điểm A là 3 V thì biến trở VR phải có giá trị bằng R/3."],
+            ans: ["S", "Đ", "S", "Đ"]
+        },
+        {
+            q: "Câu 4. Hình bên là sơ đồ nguyên lí của một mạch điện tử điều khiển LED thông qua việc đóng mở transistor lưỡng cực. Sau đây là các mô tả về mạch điện tử này:",
+            statements: ["a) Trong mạch sử dụng các linh kiện như điện trở, biến trở, LED, transistor lưỡng cực.", "b) Loại transistor lưỡng cực sử dụng trong mạch là PNP.", "c) LED sáng khi UBE = 0.", "d) Khi điều chỉnh biến trở RBT, độ sáng của LED thay đổi."],
+            ans: ["Đ", "S", "S", "Đ"]
+        },
+        {
+            q: "Câu 5. Khi thảo luận bài học về vi điều khiển, một số bạn học sinh đưa ra các phát biểu như sau:",
+            statements: ["a) Vi điều khiển là một hệ thống vi mạch có thể thực hiện các chương trình điều khiển tự động.", "b) Bộ nhớ của vi điều khiển chỉ có chức năng lưu trữ chương trình, không lưu được dữ liệu.", "c) Vi điều khiển có thể giao tiếp với các thiết bị ngoại vi thông qua các cổng vào/ra.", "d) Khi thiết kế hệ thống đèn giao thông tự động, có thể dùng vi điều khiển để điều khiển chu kỳ bật/tắt của đèn theo thời gian yêu cầu."],
+            ans: ["Đ", "S", "Đ", "Đ"]
+        },
+        {
+            q: "Câu 6. Trong một mạch điều khiển đèn tự động, kỹ thuật viên dùng các cổng logic AND, OR, NOT để xử lí tín hiệu cảm biến ánh sáng.",
+            statements: ["a) Cổng logic là phần tử cơ bản tạo nên mạch xử lí tín hiệu số.", "b) Mạch tổ hợp được tạo thành từ các cổng logic cơ bản.", "c) Mạch tổ hợp có phần tử nhớ để lưu trạng thái tín hiệu.", "d) Đầu ra của mạch tổ hợp phụ thuộc vào các giá trị đầu vào tại thời điểm đang xét."],
+            ans: ["Đ", "Đ", "S", "Đ"]
+        },
+        {
+            q: "Câu 7. Một nhóm học sinh trao đổi về linh kiện điện tử Diode mỗi người đưa ra 1 ý kiến.",
+            statements: ["a. Diode chỉ cho dòng điện đi qua theo một chiều.", "b. Diode chỉnh lưu được sử dụng chủ yếu để ổn định điện áp.", "c. Khi phân cực thuận, điện áp trên diode thường vào khoảng 0.7V đối với diode Silicon.", "d. LED (Diode phát quang) chỉ phát sáng khi được phân cực thuận."],
+            ans: ["Đ", "S", "Đ", "Đ"]
+        },
+        {
+            q: "Câu 8. Trong giờ học Công nghệ 12, giáo viên yêu cầu học sinh sử dụng một dịch vụ có ứng dụng kĩ thuật điện tử để xác định khoảng cách từ nhà đến trường em và học sinh sử dụng Google maps để thực hiện nhiệm vụ. Như vậy:",
+            statements: ["a. Google maps là một dịch vụ viễn thông.", "b. Dịch vụ google maps được sử dụng nhiều trong giao thông.", "c. Để sử dụng được Google maps, điện thoại cần kết nối internet.", "d. Không cần tốn phí hằng tháng khi sử dụng google maps."],
+            ans: ["S", "Đ", "Đ", "Đ"]
+        }
+    ];
+
+    let currentIdx = 0;
+    let correctPerQuestion = [false, false, false, false];
+
+    function renderQuestion() {
+        const container = document.getElementById('question-container');
+        const progressText = document.getElementById('progress-text');
+        const msgEl = document.getElementById('msg');
+        
+        container.innerHTML = '';
+        msgEl.innerText = '';
+        progressText.innerText = `Câu ${currentIdx + 1} / ${data.length}`;
+        correctPerQuestion = [false, false, false, false];
+
+        const item = data[currentIdx];
+        const card = document.createElement('div');
+        card.className = 'q-card';
+        
+        let tableHtml = `<div class="question-content">${item.q}</div><table class="options-table">`;
+        item.statements.forEach((st, sIdx) => {
+            tableHtml += `
+                <tr>
+                    <td class="statement">${st}</td>
+                    <td class="choice-group">
+                        <div class="btn-choice" id="btn-${sIdx}-d" onclick="handleChoice(${sIdx}, 'Đ')">Đ</div>
+                        <div class="btn-choice" id="btn-${sIdx}-s" onclick="handleChoice(${sIdx}, 'S')">S</div>
+                    </td>
+                </tr>
+            `;
+        });
+        tableHtml += `</table>`;
+        card.innerHTML = tableHtml;
+        container.appendChild(card);
+    }
+
+    function handleChoice(sIdx, userVal) {
+        const item = data[currentIdx];
+        const btnD = document.getElementById(`btn-${sIdx}-d`);
+        const btnS = document.getElementById(`btn-${sIdx}-s`);
+        const msgEl = document.getElementById('msg');
+
+        // Reset màu cả 2 nút của dòng đó trước khi check (nếu đang đỏ)
+        btnD.classList.remove('choice-wrong');
+        btnS.classList.remove('choice-wrong');
+
+        if (userVal === item.ans[sIdx]) {
+            // ĐÚNG
+            msgEl.innerText = "";
+            const correctBtn = (userVal === 'Đ') ? btnD : btnS;
+            const wrongBtn = (userVal === 'Đ') ? btnS : btnD;
+            
+            correctBtn.classList.add('choice-correct');
+            wrongBtn.style.opacity = "0.3";
+            wrongBtn.style.pointerEvents = "none";
+            
+            correctPerQuestion[sIdx] = true;
+            checkNextQuestion();
+        } else {
+            // SAI
+            msgEl.style.color = "var(--danger)";
+            msgEl.innerText = "Hãy làm lại!";
+            const wrongBtn = (userVal === 'Đ') ? btnD : btnS;
+            wrongBtn.classList.add('choice-wrong');
+        }
+    }
+
+    function checkNextQuestion() {
+        if (correctPerQuestion.every(status => status === true)) {
+            const msgEl = document.getElementById('msg');
+            msgEl.style.color = "var(--success)";
+            msgEl.innerText = "Tuyệt vời! Đang chuyển câu tiếp theo...";
+            
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < data.length) {
+                    renderQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1000);
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-part').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+    }
+
+    window.onload = renderQuestion;
+</script>
+
+</body>
+</html>
