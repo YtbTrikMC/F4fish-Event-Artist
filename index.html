@@ -155,7 +155,8 @@
     <div class="comment-stream-container" id="streamContainer"></div>
 
     <div class="container">
-        <div class="warning-text">THI TỐT NGHEN MẤY NÍ!</div>
+        <div class="warning-text" id="countdown-timer">HỆ THỐNG SẼ ĐÓNG CỬA SAU: 24:00:00</div>
+        
         <div class="announcement">
             📢 <b>THÔNG BÁO:</b> Hệ thống đã hoàn thành nhiệm vụ.
         </div>
@@ -195,6 +196,41 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwQXOMeU4M9tt3xqaL2rBjsh426TFxy6BOj-KWJezZrF-oNlMIvnvRNiIjL0QsxpJrm/exec";
 
+        // --- HÀM ĐẾM NGƯỢC ---
+        function startGlobalCountdown() {
+            const display = document.getElementById('countdown-timer');
+            const duration = 24 * 60 * 60 * 1000; // 24 giờ
+            let startTime = localStorage.getItem('ntt_countdown_start');
+
+            if (!startTime) {
+                startTime = new Date().getTime();
+                localStorage.setItem('ntt_countdown_start', startTime);
+            }
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = duration - (now - parseInt(startTime));
+
+                if (distance < 0) {
+                    display.innerText = "HỆ THỐNG ĐÃ ĐÓNG CỬA";
+                    return;
+                }
+
+                const hours = Math.floor(distance / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const h = hours < 10 ? "0" + hours : hours;
+                const m = minutes < 10 ? "0" + minutes : minutes;
+                const s = seconds < 10 ? "0" + seconds : seconds;
+
+                display.innerText = `HỆ THỐNG SẼ ĐÓNG CỬA SAU: ${h}:${m}:${s}`;
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        }
+
         function getUserId() {
             let id = localStorage.getItem('ntt_user_id');
             if (!id || id.startsWith("user#")) {
@@ -218,6 +254,7 @@
             document.getElementById('userDisplay').innerText = "Thí sinh: " + myId;
             initFireworks();
             startCommentStream(myId);
+            startGlobalCountdown(); // Khởi động đếm ngược khi load trang
 
             try {
                 const response = await fetch(API_URL);
@@ -301,3 +338,4 @@
     </script>
 </body>
 </html>
+
