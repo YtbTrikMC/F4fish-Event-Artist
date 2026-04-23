@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Tiếng Anh</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); line-height: 1.6; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary-color); }
+        #timer { position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; z-index: 100; }
+        .question-block { margin-bottom: 25px; padding: 15px; border-bottom: 1px solid #e2e8f0; }
+        .question-text { font-weight: 600; margin-bottom: 10px; display: block; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-item { border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .option-item:hover { background-color: #f1f5f9; }
+        .option-item.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        #result-area { display: none; text-align: center; margin-top: 30px; padding: 20px; background: #dcfce7; border-radius: 8px; }
+        .btn { display: block; width: 100%; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+        .btn-home { background: #64748b; text-decoration: none; display: inline-block; width: auto; padding: 10px 30px; margin-top: 15px; }
+        .correct { color: #16a34a; font-weight: bold; }
+        .wrong { color: #dc2626; text-decoration: line-through; }
+    </style>
+</head>
+<body>
+
+<div id="timer">Thời gian: 45:00</div>
+
+<div class="container">
+    <h1>TRẮC NGHIỆM 4 LỰA CHỌN</h1>
+    <div id="quiz-container"></div>
+    <button class="btn" id="submit-btn" onclick="calculateScore()">Nộp bài</button>
+
+    <div id="result-area">
+        <h2 id="score-text"></h2>
+        <p id="comparison-text" style="font-style: italic; color: #1e40af;"></p>
+        <a href="index.html" class="btn btn-home">Làm lại</a>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Question 1. Online courses allow learners to study at their own _________.", options: ["speed", "pace", "rate", "time"], correct: 1 },
+        { q: "Question 2. Virtual reality simulations offer _________ experiences, allowing users to interact with computer-made environments.", options: ["ready-made", "hands-on", "human-like", "spare"], correct: 1 },
+        { q: "Question 3. _______ provides flexibility for those who cannot attend traditional classes.", options: ["Self-motivation", "Distance learning", "Martial art", "Adult education"], correct: 1 },
+        { q: "Question 4. It may take employees quite a long time to ______ to the new working environment.", options: ["pursue", "socialize", "network", "adapt"], correct: 3 },
+        { q: "Question 5. __________ in the region has led to a decline in fish populations, so we need stricter conservation measures.", options: ["Deforestation", "Overfishing", "Forest clearance", "Captivity"], correct: 1 },
+        { q: "Question 6. Peter was bitterly disappointed at the test result, but I think he’ll soon _______ it.", options: ["get over", "put through", "make up", "turn into"], correct: 0 },
+        { q: "Question 7. The book I borrowed from the library was much ___________than I had expected.", options: ["much interested", "more interesting", "more interest", "less interestingly"], correct: 1 },
+        { q: "Question 8. We can get the home robot_________us with the household chores.", options: ["to help", "help", "helping", "helped"], correct: 0 },
+        { q: "Question 9. He talks to strangers __________ he knew them for years.", options: ["as", "like", "as if", "though"], correct: 2 },
+        { q: "Question 10. Choose the sentence that best expresses the idea: Robots are becoming more intelligent. They may take over some jobs.", options: ["Robots are becoming so intelligent that they may take over some jobs.", "Robots became intelligent because they take over some jobs.", "If robots become intelligent, they took over some jobs.", "Robots are intelligent although they may take over some jobs."], correct: 0 },
+        { q: "Question 11. Qualifications and _______ are two most important factors that help you get a good job.", options: ["politeness", "experience", "attention", "impression"], correct: 1 },
+        { q: "Question 12. To become successful in the increasingly competitive market, you have to _______ fashion knowledge.", options: ["put up with", "get through to", "keep up with", "look forward to"], correct: 2 },
+        { q: "Question 13. Smart robots are designed to _________ humans in doing dangerous tasks.", options: ["replace", "repeat", "reply", "require"], correct: 0 },
+        { q: "Question 14. __________ like newspapers and television are traditional sources of news.", options: ["Mass media", "Social media", "Fake news", "Digital media"], correct: 0 },
+        { q: "Question 15. Cutting down forests leads to serious environmental _________.", options: ["advantages", "benefits", "consequences", "solutions"], correct: 2 },
+        { q: "Question 16. Many efforts have been made to protect ____ nature.", options: ["danger", "dangerous", "endanger", "endangered"], correct: 3 },
+        { q: "Question 17. Forest clearance is _______ issue facing us.", options: ["more urgent than", "more urgent", "as urgent as", "the most urgent"], correct: 3 },
+        { q: "Question 18. I’m going to have the mechanic _________ my car tomorrow.", options: ["will be repaired", "repair", "repaired", "to be repaired"], correct: 1 },
+        { q: "Question 19. \"Are you going to the party tonight?\" he asked me.", options: ["if I was going / that night", "if was I going / tonight", "am I going / that night", "whether I am going / tonight"], correct: 0 },
+        { q: "Question 20. Choose the sentence that best expresses the idea: The water was too cold for me to swim in.", options: ["It was such cold water that I couldn’t swim in it.", "It was so cold a water that I couldn’t swim in it.", "It was such a cold water that I couldn’t swim in it.", "It was too cold water that I couldn’t swim in it."], correct: 0 },
+        { q: "Question 21. In the future, we might see more ______ of AI in every aspect of life.", options: ["applications", "applicable", "applicant", "apply"], correct: 0 },
+        { q: "Question 22. ________ is the existence of a wide variety of plant and animal species living in their natural environment.", options: ["Biodiversity", "Conservation", "Globe", "Individual"], correct: 0 },
+        { q: "Question 23. Almost half of the ________ are perfectly suitable for the vacancy.", options: ["employees", "competitors", "candidates", "applications"], correct: 2 },
+        { q: "Question 24. The host asked her ______________ tea or coffee.", options: ["whether she liked", "that she liked", "if she likes", "whether she like"], correct: 0 },
+        { q: "Question 25. Unemployment and poverty force people to engage in anti-social activities.", options: ["include", "engage", "take", "oppose"], correct: 1 },
+        { q: "Question 26. His teenage daughter is driving him crazy. He can't ____ her moods, her music, and her constant demand for money.", options: ["keep up with", "go on with", "put up with", "put up to"], correct: 2 },
+        { q: "Question 27. I'll have a new dress ____ for my daughter.", options: ["making", "to make", "make", "made"], correct: 3 },
+        { q: "Question 28. ______, he would have been able to pass the exam.", options: ["If he studied more", "If he were studying more", "Studying more", "Had he studied more"], correct: 3 },
+        { q: "Question 29. The integration of _________ technology into the new smartphone model has helped improve user experience.", options: ["advanced", "real – time", "effortless", "self – driving"], correct: 0 },
+        { q: "Question 30. To………………the robot, the technician input specific commands into its control system.", options: ["activate", "analyse", "interact", "imitate"], correct: 0 },
+        { q: "Question 31. Students use the library's computers to get ……………………..to the Internet.", options: ["format", "limit", "income", "access"], correct: 3 },
+        { q: "Question 32. Tram Chim National Park is home _________ many rare and endangered species of birds.", options: ["of", "to", "for", "with"], correct: 1 },
+        { q: "Question 33. Not only did the travel agent communicate with customers clearly, but she also helped them _________ cheaper options.", options: ["look down on", "come up with", "cut down on", "go in for"], correct: 1 },
+        { q: "Question 34. The government had the historic building ______ rather than demolished.", options: ["restore", "to restore", "restored", "restoring"], correct: 2 },
+        { q: "Question 35. _________ we hurry, we'll miss the beginning of the movie.", options: ["If", "Unless", "As long as", "As soon as"], correct: 1 }
+    ];
+
+    let userAnswers = new Array(questions.length).fill(null);
+    let lockedAnswers = new Array(questions.length).fill(false); // Để tính điểm lần đầu
+    let timeLeft = 45 * 60;
+
+    // Render Quiz
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = `
+            <span class="question-text">${item.q}</span>
+            <div class="options">
+                ${item.options.map((opt, i) => `
+                    <div class="option-item" onclick="selectOption(${index}, ${i}, this)">
+                        ${String.fromCharCode(65 + i)}. ${opt}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        quizContainer.appendChild(div);
+    });
+
+    // Chọn đáp án
+    function selectOption(qIdx, oIdx, element) {
+        if (document.getElementById('result-area').style.display === 'block') return;
+        
+        // Đánh dấu đã chọn (để tính điểm lần đầu không sửa)
+        if (userAnswers[qIdx] !== null) {
+            lockedAnswers[qIdx] = true; 
+        }
+
+        userAnswers[qIdx] = oIdx;
+        const parent = element.parentElement;
+        Array.from(parent.children).forEach(child => child.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    // Đếm ngược
+    const timerDisplay = document.getElementById('timer');
+    const countdown = setInterval(() => {
+        let mins = Math.floor(timeLeft / 60);
+        let secs = timeLeft % 60;
+        timerDisplay.innerText = `Thời gian: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            calculateScore();
+        }
+        timeLeft--;
+    }, 1000);
+
+    function calculateScore() {
+        clearInterval(countdown);
+        let correctCount = 0;
+        let firstTimeCorrect = 0;
+
+        questions.forEach((item, index) => {
+            if (userAnswers[index] === item.correct) {
+                correctCount++;
+                // Nếu chưa từng bị "khóa" (chọn lại) thì tính là đúng lần đầu
+                if (!lockedAnswers[index]) {
+                    firstTimeCorrect++;
+                }
+            }
+        });
+
+        const finalScore = (correctCount / questions.length * 10).toFixed(2);
+        document.getElementById('score-text').innerText = `Điểm của bạn: ${finalScore}/10 (Đúng ${correctCount}/${questions.length} câu)`;
+        
+        // Xử lý so sánh dữ liệu
+        let lastUser = JSON.parse(localStorage.getItem('lastQuizUser')) || { score: 0, count: 0 };
+        const diffScore = (finalScore - lastUser.score).toFixed(2);
+        const diffCount = correctCount - lastUser.count;
+
+        document.getElementById('comparison-text').innerText = `Bạn đã vượt qua người làm gần nhất ${diffCount > 0 ? diffCount : 0} câu và hơn ${diffScore > 0 ? diffScore : 0} điểm!`;
+
+        // Lưu dữ liệu người hiện tại cho người sau
+        localStorage.setItem('lastQuizUser', JSON.stringify({ score: finalScore, count: correctCount }));
+
+        document.getElementById('submit-btn').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+</body>
+</html>
