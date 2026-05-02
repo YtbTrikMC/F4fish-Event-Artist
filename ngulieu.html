@@ -3,211 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ĐỌC HIỂU TIẾNG ANH</title>
+    <title>Hệ Thống Trắc Nghiệm Ngữ Liệu - NTT</title>
     <style>
-        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        #timer { position: fixed; top: 20px; right: 20px; background: var(--danger); color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        .task-section { margin-bottom: 40px; padding: 25px; border: 2px solid #e2e8f0; border-radius: 10px; transition: 0.5s; position: relative; }
-        .task-locked { opacity: 0.3; pointer-events: none; filter: blur(3px); }
-        .task-title { background: var(--primary); color: white; padding: 10px 20px; border-radius: 5px; margin-top: -45px; margin-bottom: 20px; font-weight: bold; display: inline-block; border: 2px solid white; }
-        
-        .passage { background: #f8fafc; padding: 20px; border-left: 4px solid var(--primary); margin-bottom: 20px; font-size: 1rem; white-space: pre-line; color: #334155; }
-        .question-item { margin-bottom: 25px; padding: 15px; border: 1px solid #f1f5f9; border-radius: 10px; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        
-        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; background: white; font-weight: 500; }
-        .opt:hover { border-color: var(--primary); background: #eff6ff; }
-        .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
-        .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); font-weight: bold; pointer-events: none; }
-        .opt.disabled { pointer-events: none; opacity: 0.6; }
+        :root {
+            --primary: #0b3d91;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #0b192e;
+            --card: #ffffff;
+            --accent: #fc3d21;
+        }
 
-        .btn-action { display: none; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        #unlock-task2 { background: var(--success); color: white; }
-        #final-submit { background: var(--primary); color: white; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(white, rgba(255,255,255,0.1) 1px, transparent 20px);
+            background-size: 40px 40px;
+            color: #334155;
+            margin: 0;
+            padding: 20px;
+        }
 
-        #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
-        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; border: none; cursor: pointer; }
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .exercise-container {
+            margin-bottom: 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .exercise-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .passage-box {
+            background: #f1f5f9;
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            font-style: normal;
+            line-height: 1.8;
+            white-space: pre-line;
+            font-size: 1.05rem;
+        }
+
+        .question-item {
+            padding: 20px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .question-text {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 650px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .option-btn {
+            padding: 12px 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: white;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .option-btn.correct {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: var(--success);
+            pointer-events: none;
+        }
+
+        .option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: var(--danger);
+            animation: shake 0.4s;
+        }
+
+        .option-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .final-footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #f8fafc;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
 
-<div id="timer">45:00</div>
-
 <div class="container">
-    <h1 style="text-align:center; color: var(--primary); margin-bottom: 40px;">BÀI TẬP ĐỌC HIỂU</h1>
-
-    <div id="task1-area" class="task-section">
-        <div class="task-title">TASK 1: CLOZE TEXT</div>
-        
-        <div class="passage"><b>Wildlife Photography Exhibition</b>
-        Step into the wild with our stunning exhibition!
-        • Explore captivating images of endangered species in their natural (1) …………
-        • Be impressed by pictures of wildlife (2) ………… by talented photographers
-        • Discover inspiring conservation efforts to protect our planet's biodiversity
-        If you (3) ……… sustainable future nature, don't miss this opportunity! Join us and be part of the movement.
-        Date: March 8 | Location: City Youth Centre</div>
-        <div id="group-1"></div>
-
-        <div class="passage"><b>Join our Night Classes for Adults!</b>
-        • Expand your horizons with our (4) ………… course offerings.
-        • Convenient schedules tailored for working professionals.
-        • Expert instructors dedicated (5) ………….. your success.
-        Unlock new opportunities and pursue your passions after hours. Enroll now!</div>
-        <div id="group-2"></div>
-
-        <div class="passage"><b>Author Meet and Greet</b>
-        Meet acclaimed author Jones Hansen at our exclusive meet and greet event!
-        - (6) __________ with the brilliant mind behind the groundbreaking book on lifelong learning.
-        - explore the author’s journey and the inspiration behind their enlightening work.
-        - enjoy an (7) __________ discussion and Q&A session with the author.
-        - meet (8) __________ individuals passionate about personal development.</div>
-        <div id="group-3"></div>
-
-        <div class="passage"><b>Online Learning</b>
-        Online learning has become increasingly popular among students. It allows them to study at their own pace and access learning materials (9) _________ the Internet. However, students need to manage their time effectively to achieve good learning (10) _________.</div>
-        <div id="group-4"></div>
-
-        <div class="passage"><b>The World of Mass Media</b>
-        The world of mass media plays a crucial role in modern society and mass media has (11) ______ a great impact... It is common for young people to rely heavily (12) ______ online sources... Many experts offer (13) _______ individuals improve their media literacy skills...</div>
-        <div id="group-5"></div>
-
-        <div class="passage"><b>AI in Education</b>
-        This shift can drive significant (14) ______ in learning outcomes... (15) ______ the educational setting, AI is revolutionizing the learning experience...</div>
-        <div id="group-6"></div>
-
-        <button id="unlock-task2" class="btn-action" onclick="unlockTask2()">BẠN ĐÃ HOÀN THÀNH TASK 1 - NHẤN ĐỂ MỞ TASK 2 →</button>
-    </div>
-
-    <div id="task2-area" class="task-section task-locked">
-        <div class="task-title">TASK 2: READING COMPREHENSION</div>
-        <div class="passage"><b>Lifelong Learning</b>
-        Lifelong learning is an essential part of personal and professional development. It is a continuous process that helps individuals stay relevant in their fields, keep up with changes in trends and adapt to unclearness.
-
-        Curiosity is the spark that ignites the fire of learning. It is the desire to explore, question and discover new knowledge and experiences, which is required for lifelong learning. Albert Einstein is often credited with saying, “I have no special talents. I am only passionately curious.”
-
-        Curiosity is the fuel that makes individuals seek out new information, skills and perspectives. Curious people listen and approach interactions with the hope of learning something valuable. When someone is sincerely interested in something, they tend to listen more closely - determined to uncover the facts, seek out answers and pile up deep knowledge along the way.
-
-        With more information and details at their disposal, they tend to be more motivated, more focused and, ultimately, more productive. Research also shows “curiosity to be associated with higher levels of positive emotions, lower levels of anxiety, and more satisfaction with life.” However, curiosity is only the driving force for the journey of lifelong learning.</div>
-        <div id="group-7"></div>
-        <button id="final-submit" class="btn-action" onclick="showResult()">NỘP BÀI TOÀN BỘ & XEM ĐIỂM</button>
-    </div>
-
-    <div id="result-area">
-        <h2 id="score-text"></h2>
-        <p id="comp-text"></p>
-        <button onclick="location.reload()" class="btn-home">Làm lại</button>
-    </div>
+    <h1>HỆ THỐNG LUYỆN TẬP ĐỌC HIỂU & ĐIỀN TỪ</h1>
+    <div id="main-quiz"></div>
 </div>
 
+<div class="final-footer">Thiết kế bởi NTT@THPTLTV-2026</div>
+
 <script>
-    const questions = [
-        { id: 1, q: "Question 1", opts: ["nurseries", "grounds", "habitats", "primates"], ans: 2, task: 1, group: "group-1" },
-        { id: 2, q: "Question 2", opts: ["captured", "capturing", "capture", "have captured"], ans: 0, task: 1, group: "group-1" },
-        { id: 3, q: "Question 3", opts: ["loved", "had loved", "will love", "love"], ans: 3, task: 1, group: "group-1" },
-        { id: 4, q: "Question 4", opts: ["diversely", "diversity", "diverse", "diversify"], ans: 2, task: 1, group: "group-2" },
-        { id: 5, q: "Question 5", opts: ["for", "at", "of", "to"], ans: 3, task: 1, group: "group-2" },
-        { id: 6, q: "Question 6", opts: ["encourage", "connect", "do", "face"], ans: 1, task: 1, group: "group-3" },
-        { id: 7, q: "Question 7", opts: ["interact", "interacting", "interactive", "interaction"], ans: 2, task: 1, group: "group-3" },
-        { id: 8, q: "Question 8", opts: ["like-mind", "liked-mind", "like-minding", "like-minded"], ans: 3, task: 1, group: "group-3" },
-        { id: 9, q: "Question 9", opts: ["in", "on", "at", "by"], ans: 1, task: 1, group: "group-4" },
-        { id: 10, q: "Question 10", opts: ["results", "effects", "benefits", "reasons"], ans: 0, task: 1, group: "group-4" },
-        { id: 11, q: "Question 11", opts: ["done", "come", "got", "made"], ans: 3, task: 1, group: "group-5" },
-        { id: 12, q: "Question 12", opts: ["for", "to", "by", "on"], ans: 3, task: 1, group: "group-5" },
-        { id: 13, q: "Question 13", opts: ["to helping", "to help", "help", "helping"], ans: 1, task: 1, group: "group-5" },
-        { id: 14, q: "Question 14", opts: ["changes", "improvements", "comments", "exchanges"], ans: 1, task: 1, group: "group-6" },
-        { id: 15, q: "Question 15", opts: ["Regardless of", "In addition to", "On account of", "According to"], ans: 1, task: 1, group: "group-6" },
-        { id: 16, q: "Question 16: What does the passage suggest about lifelong learning?", opts: ["It is only professional", "Essential for adapting to changes", "Lower productivity", "Irrelevant"], ans: 1, task: 2, group: "group-7" },
-        { id: 17, q: "Question 17: The word 'ignite' is CLOSEST in meaning to:", opts: ["light", "create", "refuse", "connect"], ans: 0, task: 2, group: "group-7" },
-        { id: 18, q: "Question 18: The word 'It' in paragraph 2 refers to:", opts: ["spark", "learning", "curiosity", "desire"], ans: 2, task: 2, group: "group-7" },
-        { id: 19, q: "Question 19: Which is NOT true according to the passage?", opts: ["Curiosity is desire", "Interested focus more", "Curiosity seek info", "No relation to anxiety"], ans: 3, task: 2, group: "group-7" },
-        { id: 20, q: "Question 20: Which of the following can be inferred?", opts: ["Unnecessary", "Virtuous cycle", "Without curiosity, no motivation", "No vital role"], ans: 2, task: 2, group: "group-7" }
-    ];
+const quizData = [
+    {
+        title: "Ex 1: JOB - MARKETING STAFF",
+        passage: `REQUIREMENTS:\n* Experienced in marketing, communications or related fields.\n* Knowledge of current marketing trends, techniques and best practices.\n* Ability (1)_______ develop and (2)_______ marketing plans and strategies\nAPPLY NOW\n(3)_______ you be ready, please send us at email address: hello@reallygreatsite.com`,
+        questions: [
+            { q: "Question 1", opts: ["A. to", "B. from", "C. of", "D. at"], ans: 0 },
+            { q: "Question 2", opts: ["A. implement", "B. impair", "C. import", "D. impoverish"], ans: 0 },
+            { q: "Question 3", opts: ["A. Do", "B. Should", "C. If only", "D. Were"], ans: 1 }
+        ]
+    },
+    {
+        title: "Ex 2: ANNOUNCEMENT OF THE MID-TERM TESTS",
+        passage: `The school administrators would like to announce\n➢ All students (1)______ present by 7:30, from Dec 26 upto Dec 29.\n➢ (2)______ cheating during your tests.\n➢ Bringing along mobile devices (3)_______ stopping your tests.`,
+        questions: [
+            { q: "Question 1", opts: ["A. must", "B. required", "C. have to be", "D. receive"], ans: 2 },
+            { q: "Question 2", opts: ["A. Without", "B. Not", "C. No", "D. Hardly"], ans: 2 },
+            { q: "Question 3", opts: ["A. means", "B. equal", "C. requires", "D. refers"], ans: 0 }
+        ]
+    },
+    {
+        title: "Ex 3: Cooking Vocational School",
+        passage: `Interested in cooking? Join our vocational school's cooking courses!\n•No (1)_______ prior experience required; anyone should enroll.\n•Learn essential culinary skills (2)_______ experienced instructors.\n•For more information and registration, contact us via the provided contact information below.\nWhether you're a complete novice or looking to refine your cooking abilities, our courses cater to all skill levels. Explore (3)_______ cuisines, master cooking techniques, and unleash your creativity in the kitchen. Don't hesitate – sign up now and embark on your culinary journey with us!`,
+        questions: [
+            { q: "Question 1", opts: ["A. a", "B. an", "C. the", "D. Ø (no article)"], ans: 3 },
+            { q: "Question 2", opts: ["A. from", "B. on", "C. at", "D. for"], ans: 0 },
+            { q: "Question 3", opts: ["A. diversity", "B. diverse", "C. biodiversity", "D. diversify"], ans: 1 }
+        ]
+    },
+    {
+        title: "Ex 4: Water Conservation",
+        passage: `Man and most animals need a constant supply of water to live. Farmers need water for their crops. Hydroelectric dams hold back needed water and provide power for homes and industries.\nTrees and grass, and other plant life play an important part in the natural circulation of water, thus help conserve it. Without plants, most water would run off as soon as it falls, taking away valuable soil. Rapid runoff would cause frequent floods, and leave little water during dry seasons.\nNature has many ways of conserving and controlling water. But man often upsets the water balance in his desire to grow more crops. He drains ponds, swamps and wet land. He ploughs under the natural soil, cuts timber, and dredges and straightens streams. These changes reduce natural storage of water and speed runoff.\nWater can be held on the land by planting vegetation. Forests and grass should be planted where there are no natural growths. Dams built across rivers help hold back the water. Reservoirs behind the dams store water during wet seasons for use in dry seasons. Dams help prevent floods by controlling the flow of water.\nNote: to dredge = to make a river deeper`,
+        questions: [
+            { q: "1. What is the topic of the passage?", opts: ["A. Water circulation", "B. Water conservation", "C. Controlling water", "D. Use of water"], ans: 1 },
+            { q: "2. What is the consequence of having no plants on land?", opts: ["A. no water", "B. frequent floods", "C. dry crops", "D. valuable soil"], ans: 1 },
+            { q: "3. Which is one of the ways that men do to affect the water balance?", opts: ["A. shortening streams", "B. cutting down trees", "C. preserving water", "D. protecting ponds and swamps"], ans: 1 },
+            { q: "4. What is NOT a natural way of conserving and controlling water?", opts: ["A. ponds", "B. streams", "C. swamps", "D. reservoirs"], ans: 3 },
+            { q: "5. What do people use reservoirs for?", opts: ["A. growing plants", "B. building dams", "C. storing water", "D. preventing floods"], ans: 2 }
+        ]
+    },
+    {
+        title: "Ex 5: The Nelson Family",
+        passage: `Mr. and Mrs. Nelson have two children, Lara 10 and Peter is 16. Mrs. Nelson first discovered that Peter was getting into trouble when school rang her to say that he hadn’t turned up that day, or the day before. She realized right away that he had been truanting.\nPeter’s behaviour was causing conflict in the house and Mr. and Mrs. Nelson were both concerned. They had different views of how they should deal with Peter’s behaviour and this led to rows that upset the whole family. They decided to prevent Peter from going out with his friends, but this just made him more stubborn, and he would continue to miss school and stay outside his curfew.\nOver the coming weeks, family life became more and more difficult. Mr. and Mrs. Nelson felt that they could no longer do this on their own and asked the school to help. The school arranged for Peter to talk to someone he trusted, and they made an agreement for him to start gradually attending school again. He was also given some time to catch up with the work he had missed.\nAs he started to talk it through, Peter realized that he had been unhappy at school for a while. He admitted that he had felt lonely since his best friend moved away and another group of friends had persuaded him to skip school. As he missed more and more school, it became harder to go back.\nPeter was encouraged to tell his parents how much he missed his friend and that he wanted to spend time with his dad playing football or fishing. Mr. Nelson thought he had grown out of that a long time ago but was pleased to spend time with Peter again.\nMr. and Mrs. Nelson tried to notice every day when Peter achieved his goal of attending school, being on time and remembering to do his homework. It took a little longer for Peter’s friendships to return to normal and Peter has had to learn to prove himself trustworthy to his parents, but gradually Mr. and Mrs. Nelson are learning to trust Peter again.`,
+        questions: [
+            { q: "1. The conflict in the Nelsons was due to the fact that ______.", opts: ["A. Peter had been truanting at school", "B. Peter was getting into trouble at school", "C. they paid too much attention to Lara", "D. they didn’t agree on the solution to Peter’s problem"], ans: 3 },
+            { q: "2. When Mr. and Mrs. Nelson applied severe punishment to Peter, ______.", opts: ["A. Peter stopped going out with his friends", "B. it had no effect and made the situation worse", "C. he missed his friends and stayed outside his curfew", "D. the family didn’t know how to deal with his behaviour"], ans: 1 },
+            { q: "3. The school applied all the following things to help Peter EXCEPT that ______.", opts: ["A. they helped the Nelsons solve the problem on their own", "B. they agreed to allow him to come back to school", "C. they helped him to catch up with his study", "D. they tried to make his communication with his friends better"], ans: 3 },
+            { q: "4. The reason why Peter got into trouble was that ______.", opts: ["A. it became harder for him to miss school", "B. he couldn’t talk about his problem at home and at school", "C. some of his friends had negative impact on him", "D. he wanted to move away with his best friend"], ans: 2 },
+            { q: "5. The best solution to Peter’s problem was that ______.", opts: ["A. he went fishing with his dad again", "B. the school and family have helped and trusted him", "C. he could do his homework and go to school on time", "D. it took him a long time to have normal friendship again"], ans: 1 }
+        ]
+    }
+];
 
-    let task1Done = 0;
-    let task2Done = 0;
-    let firstTryCount = 0;
-    let attemptedQuestions = new Set();
+const mainQuiz = document.getElementById('main-quiz');
 
-    function init() {
-        questions.forEach(item => {
-            const group = document.getElementById(item.group);
-            const div = document.createElement('div');
-            div.className = 'question-item';
-            div.innerHTML = `
-                <div style="font-weight:600; margin-bottom:8px;">${item.q}</div>
-                <div class="options-grid" id="grid-${item.id}">
-                    ${item.opts.map((o, i) => `<div class="opt" onclick="handleSelect(${item.id}, ${i}, this)">${String.fromCharCode(65+i)}. ${o}</div>`).join('')}
-                </div>
-            `;
-            group.appendChild(div);
+quizData.forEach((ex, exIdx) => {
+    const exDiv = document.createElement('div');
+    exDiv.className = 'exercise-container';
+
+    const header = document.createElement('div');
+    header.className = 'exercise-header';
+    header.innerText = ex.title;
+    exDiv.appendChild(header);
+
+    if(ex.passage) {
+        const passage = document.createElement('div');
+        passage.className = 'passage-box';
+        passage.innerText = ex.passage;
+        exDiv.appendChild(passage);
+    }
+
+    ex.questions.forEach((q, qIdx) => {
+        const qItem = document.createElement('div');
+        qItem.className = 'question-item';
+
+        const qText = document.createElement('span');
+        qText.className = 'question-text';
+        qText.innerText = q.q;
+        qItem.appendChild(qText);
+
+        const optGrid = document.createElement('div');
+        optGrid.className = 'options-grid';
+
+        q.opts.forEach((optStr, oIdx) => {
+            const btn = document.createElement('div');
+            btn.className = 'option-btn';
+            btn.innerText = optStr;
+            btn.onclick = () => {
+                if(oIdx === q.ans) {
+                    btn.classList.add('correct');
+                    optGrid.querySelectorAll('.option-btn').forEach(b => {
+                        if(!b.classList.contains('correct')) b.classList.add('disabled');
+                    });
+                } else {
+                    btn.classList.add('wrong');
+                    setTimeout(() => btn.classList.remove('wrong'), 400);
+                }
+            };
+            optGrid.appendChild(btn);
         });
-    }
 
-    function handleSelect(qId, idx, el) {
-        const item = questions.find(x => x.id === qId);
-        const grid = document.getElementById(`grid-${qId}`);
+        qItem.appendChild(optGrid);
+        exDiv.appendChild(qItem);
+    });
 
-        if (!attemptedQuestions.has(qId)) {
-            if (idx === item.ans) firstTryCount++;
-            attemptedQuestions.add(qId);
-        }
-
-        if (idx === item.ans) {
-            el.classList.add('correct');
-            Array.from(grid.children).forEach(child => {
-                if (!child.classList.contains('correct')) child.classList.add('disabled');
-                child.onclick = null;
-            });
-
-            if (item.task === 1) {
-                task1Done++;
-                if (task1Done === 15) document.getElementById('unlock-task2').style.display = 'block';
-            } else {
-                task2Done++;
-                if (task2Done === 5) document.getElementById('final-submit').style.display = 'block';
-            }
-        } else {
-            el.classList.add('wrong');
-        }
-    }
-
-    function unlockTask2() {
-        document.getElementById('task2-area').classList.remove('task-locked');
-        document.getElementById('unlock-task2').style.display = 'none';
-        window.scrollTo({ top: document.getElementById('task2-area').offsetTop - 50, behavior: 'smooth' });
-    }
-
-    let timeLeft = 45 * 60;
-    const timerDisplay = document.getElementById('timer');
-    const timer = setInterval(() => {
-        timeLeft--;
-        let m = Math.floor(timeLeft/60);
-        let s = timeLeft % 60;
-        timerDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (timeLeft <= 0) showResult();
-    }, 1000);
-
-    function showResult() {
-        clearInterval(timer);
-        document.getElementById('task1-area').style.display = 'none';
-        document.getElementById('task2-area').style.display = 'none';
-        document.getElementById('timer').style.display = 'none';
-
-        const finalScore = (firstTryCount / questions.length * 10).toFixed(2);
-        document.getElementById('score-text').innerText = `Kết quả cuối cùng: ${finalScore}/10 (Đúng lần đầu: ${firstTryCount}/${questions.length})`;
-        
-        let history = JSON.parse(localStorage.getItem('npc_quiz_history')) || { score: 0 };
-        const diff = (finalScore - history.score).toFixed(2);
-        document.getElementById('comp-text').innerText = `Lần này bạn đạt ${finalScore} điểm. So với lần trước (${history.score}), bạn ${diff >= 0 ? 'tăng' : 'giảm'} ${Math.abs(diff)} điểm!`;
-        
-        localStorage.setItem('npc_quiz_history', JSON.stringify({ score: finalScore }));
-        document.getElementById('result-area').style.display = 'block';
-    }
-
-    init();
+    mainQuiz.appendChild(exDiv);
+});
 </script>
 
 </body>
