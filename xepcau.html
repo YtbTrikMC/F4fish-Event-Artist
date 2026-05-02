@@ -3,256 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sắp xếp câu</title>
+    <title>Hệ Thống Trắc Nghiệm Sắp Xếp Câu - NTT</title>
     <style>
-        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
-        .container { max-width: 850px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        
-        .question-block { margin-bottom: 30px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
-        .sentence-list { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; border-left: 4px solid var(--primary); }
-        .sentence-item { margin-bottom: 5px; }
-        
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; text-align: center; font-weight: bold; }
-        
-        .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
-        .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); pointer-events: none; }
-        .opt.disabled { pointer-events: none; opacity: 0.5; }
+        :root {
+            --primary: #0b3d91;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #0b192e;
+            --card: #ffffff;
+            --accent: #00ffcc;
+        }
 
-        #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
-        .comparison-box { margin: 15px 0; padding: 10px; background: #fff; border-radius: 8px; border: 1px dashed var(--success); color: #166534; font-style: italic; }
-        
-        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; transition: 0.3s; }
-        .btn-home:hover { background: #475569; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 20px);
+            background-size: 50px 50px;
+            color: #334155;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .exercise-title {
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-block {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .content-area {
+            background: #fff;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            white-space: pre-line; /* Giữ nguyên xuống dòng của ngữ liệu */
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt {
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            text-align: center;
+            background: white;
+        }
+
+        .opt:hover { border-color: var(--primary); background: #f1f5f9; }
+
+        .opt.correct {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: var(--success);
+            pointer-events: none;
+        }
+
+        .opt.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: var(--danger);
+            animation: shake 0.4s;
+        }
+
+        .opt.disabled { opacity: 0.5; pointer-events: none; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #finish-msg {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="text-align:center; color: var(--primary)">SẮP XẾP CÂU THÀNH ĐOẠN VĂN HỢP LÝ</h1>
-    <p style="text-align:center; color: #64748b;"><i>Chọn đáp án đúng (A, B, C, D) để vượt qua từng câu</i></p>
-
+    <h1>HỆ THỐNG TRẮC NGHIỆM SẮP XẾP CÂU (REORDERING)</h1>
     <div id="quiz-container"></div>
-
-    <button id="final-btn" class="btn" style="display:none;" onclick="showFinalResult()">NỘP BÀI & XEM KẾT QUẢ</button>
-
-    <div id="result-area">
-        <h2 id="score-text"></h2>
-        <div id="comparison-text" class="comparison-box"></div>
-        <a href="index.html" class="btn-home">Làm bài tập khác (Quay về trang chủ)</a>
+    
+    <div id="finish-msg">
+        🎉 XUẤT SẮC! BẠN ĐÃ HOÀN THÀNH TẤT CẢ CÁC CÂU HỎI.
+        <br><button onclick="location.reload()" style="margin-top:10px; cursor:pointer; padding:5px 15px;">Làm lại bài</button>
     </div>
+
+    <div class="footer">Thiết kế bởi NTT@THPTLTV-2026</div>
 </div>
 
 <script>
-    const questions = [
-        { 
-            id: 1, 
-            sentences: [
-                "a. Nam: Hi, Jessica. I'm so excited as I've never met a talking robot before. Let's have a photo taken together!", 
-                "b. Teacher: Hello, class. Please meet Jessica. She's a human-like robot and will be your guide today.", 
-                "c. Jessica: Good morning, everybody. Welcome to the New Tech Centre."
-            ], 
-            opts: ["a – b – c", "b – a – c", "c – a – b", "b – c – a"], 
-            ans: 3 
-        },
-        { 
-            id: 2, 
-            sentences: [
-                "a. He can speak English fluently and has experience working with international clients.", 
-                "b. Mr. John is applying for the position of project manager.", 
-                "c. He graduated from London University in 2018 with a degree in Business Administration.", 
-                "d. He is a hard-working person who always tries his best."
-            ], 
-            opts: ["c – a – b – d", "b – c – a – d", "b – a – c – d", "d – b – c – a"], 
-            ans: 1 
-        },
-        { 
-            id: 3, 
-            sentences: [
-                "a. I wanted to tell you that I’ve recently accepted a new job in New York, and I’ll be moving there next month. It’s a big change, but I’m really excited about this new chapter in my life.", 
-                "b. Dear Emily,", 
-                "c. I’m planning to visit my family before the big move, and I’d love to see you if you’re free during that time.", 
-                "d. Hope this message finds you well! I wanted to catch you up on some recent news.", 
-                "e. Take care, and I hope to see you soon!"
-            ], 
-            opts: ["b – d – a – c – e", "d – a – b – c – e", "b – a – d – c – e", "a – b – d – e – c"], 
-            ans: 0 
-        },
-        { 
-            id: 4, 
-            sentences: [
-                "a. First of all, lifelong learning can offer benefits for your professional development.", 
-                "b. Another benefit is personal development, like taking a yoga class or learning how to cook a new dish you like.", 
-                "c. Over all, lifelong learning is an important part of personal and professional development.", 
-                "d. Lifelong learning also helps your social life.", 
-                "e. Lifelong learning means continuing to acquire new knowledge and skills throughout your life.", 
-                "f. It is an enjoyable process that can bring many opportunities to help you improve your work life, meet new friends, and achieve personal satisfaction."
-            ], 
-            opts: ["e – a – b – d – c – f", "d – f – e – b – c – a", "a – d – c – f – b – e", "f – c – b – e – d – a"], 
-            ans: 0 
-        },
-        { 
-            id: 5, 
-            sentences: [
-                "a. Thank you very much for your kind invitation.", 
-                "b. Dear Mr. Brown,", 
-                "c. I regret to inform you that I cannot attend the meeting due to a family emergency.", 
-                "d. I hope we can meet another time."
-            ], 
-            opts: ["b – a – c – d", "a – b – c – d", "b – c – a – d", "c – b – d – a"], 
-            ans: 0 
-        },
-        { 
-            id: 6, 
-            sentences: [
-                "a. Alex: That makes sense, but I don't think AI is suitable for basic tasks.", 
-                "b. Nick: Definitely. A doctor's job is such a tedious one that AI will likely take over.", 
-                "c. Nick: You're right. Basic jobs may be perfect for AI, but humans may not want to relinquish control of more boring tasks.", 
-                "d. Alex: Do you think AI will affect the role of doctors?"
-            ], 
-            opts: ["d – c – a – b", "d – b – a – c", "d – b – c – a", "a – d – c – b"], 
-            ans: 1 
-        },
-        { 
-            id: 7, 
-            sentences: [
-                "a. Then discover how AI can personalize learning experiences for every student.", 
-                "b. First, explore innovative AI technologies reshaping classrooms worldwide.", 
-                "c. Together with the use for your students, learn practical strategies for integrating AI tools into your teaching practices.", 
-                "d. Here's what you'll learn in the workshop on AI.", 
-                "e. Finally, engage in hands-on activities and interactive discussions led by AI experts."
-            ], 
-            opts: ["d – a – b – e – c", "d – b – a – c – e", "b – e – a – c – d", "b – c – a – e – d"], 
-            ans: 1 
-        },
-        { 
-            id: 8, 
-            sentences: [
-                "a. Furthermore, vocational training may not always provide opportunities for advancement or career growth beyond a certain point, especially in rapidly evolving industries where new skills are constantly in demand.", 
-                "b. Firstly, it can sometimes be considered as limiting, as it focuses primarily on specific skill sets related to certain trades or professions, potentially narrowing future career options.", 
-                "c. Secondly, vocational programs may not always offer the same level of theoretical knowledge as traditional higher education, which could be a disadvantage in certain industries that prioritize academic knowledge.", 
-                "d. Vocational education, while valuable for many, also comes with its drawbacks.", 
-                "e. Lastly, the practical nature of vocational education might not suit everyone’s learning style, as some individuals may thrive in more traditional classroom settings."
-            ], 
-            opts: ["d – c – e – a – b", "d – b – c – a – e", "c – d – a – e – b", "b – d – c – e – a"], 
-            ans: 1 
-        },
-        { 
-            id: 9, 
-            sentences: [
-                "a. Nam: Yes! I'm also trying to build a small AI Chabot for my work.", 
-                "b. Mark: Hi Nam! Thanks. I've been learning about AI and how it's impacting industries. How about you, do you follow this field?", 
-                "c. Nam: Hi, Mark! Long time no see. You seem to be more tech-savvy!"
-            ], 
-            opts: ["c-a-b", "b-c-a", "c-b-a", "a-c-b"], 
-            ans: 2 
-        },
-        { 
-            id: 10, 
-            sentences: [
-                "a. Jack: That sounds like a great idea. I hope it works out for you!", 
-                "b. Emma: I'm going to apply for a management position in my company.", 
-                "c. Jack: How do you plan to advance in your career?", 
-                "d. Emma: I want to develop leadership skills and take on more responsibility.", 
-                "e. Jack: Why a management position?"
-            ], 
-            opts: ["b-d-e-c-a", "c-b-e-d-a", "d-b-a-e-c", "d-a-c-b-e"], 
-            ans: 1 
-        },
-        { 
-            id: 11, 
-            sentences: [
-                "a. Please let me know if you can make it so I can prepare everything accordingly.", 
-                "b. I’m going to have a birthday party at 6.30 p.m next Monday at my house. Are you free to come?", 
-                "c. I’ve also invited some of our classmates, so it will be a great chance to catch up and have fun together.", 
-                "d. There will be about 20 people at the party, most of them are my family and relatives.", 
-                "e. There will be games, music, and plenty of food and drinks for everyone to enjoy then."
-            ], 
-            opts: ["b - e - c - d - a", "b - a - c - d – e", "b - d - c – e – a", "b - c - a - d - e"], 
-            ans: 2 
-        },
-        { 
-            id: 12, 
-            sentences: [
-                "a. It has transformed beliefs, art, and customs while encouraging cultural diversity.", 
-                "b. Globalisation has made the world increasingly interconnected, bringing significant changes to people's lives and cultures.", 
-                "c. Although lifestyles worldwide are becoming more similar, this connection has enriched societies with unique cultural exchanges.", 
-                "d. As a result, globalisation has reshaped the way we live, fostering both unity and diversity.", 
-                "e. Through globalisation, people can now experience food, fashion, and traditions from different parts of the world."
-            ], 
-            opts: ["b - d - a - e – c", "b - e - c- d - a", "b - c - a - d – e", "b - a - e - c - d"], 
-            ans: 3 
-        }
-    ];
+const quizData = [
+    {
+        id: 1,
+        text: `a. Nam: Hi, Mark! Long time no see. You look so good!\nb. Nam: Yes, I have. I exercise every morning and eat more healthy food.\nc. Mark: Hi, Nam! Thanks. You look so fit, too. Have you worked out a lot lately?`,
+        opts: ["A. c – a – b", "B. b – c – a", "C. c – b – a", "D. a – c – b"],
+        ans: 3 // D
+    },
+    {
+        id: 2,
+        text: `a. Alex: Why online classes ?\nb. Sue: I'm going to try online classes.\nc. Alex: How are you going to improve your English?\nd. Alex: I think online classes are too expensive. I don't think I'll try them.\ne. Sue: They improve our communication skills, and they have flexible schedules.`,
+        opts: ["A. c – b – a – e – d", "B. c – e – d – b – a", "C. d – b – a – e – c", "D. d – e – a – b – c"],
+        ans: 0 // A
+    },
+    {
+        id: 3,
+        text: `a. Jack: I think self-study is too difficult. I don’t have enough discipline.\nb. Linda: I’m going to try self-study courses.\nc. Jack: How are you planning to improve your skills?\nd. Jack: Why self-study courses?\ne. Linda: They help improve time management, and I can learn at my own pace.`,
+        opts: ["A. d – b – a – e – c", "B. c – b – d – e – a", "C. c – e – d – b – a", "D. d – e – a – b – c"],
+        ans: 1 // B
+    },
+    {
+        id: 4,
+        text: `a. Overall, a trip to Trang An offers a unique experience for nature lovers and history buffs alike.\nb. It is a scenic landscape complex that includes limestone karst mountains, caves, rivers, and rice paddies. The area is famous for its natural beauty and cultural significance, as it was once the capital of Vietnam during the Dinh and Le dynasties.\nc. Visitors can take a boat tour through the complex, which typically lasts around two to three hours. During the tour, you can see the breathtaking views of limestone cliffs, explore the caves, and visit the temples and pagodas located throughout the complex.\nd. Trang An is a UNESCO World Heritage Site located in Ninh Binh Province, Vietnam.\ne. Trang An is also home to several endangered species, including the Delacour's langur, a species of leaf monkey. The complex has been recognized as an important site for biodiversity conservation and ecotourism.`,
+        opts: ["A. d – b – c – e – a", "B. c – d – a – e – b", "C. a – e – d – c – b", "D. d – a – b – e – c"],
+        ans: 0 // A
+    },
+    {
+        id: 5,
+        text: `a. First, Bullying is when someone hurts another person on purpose. This can happen at school, online, or in the workplace. Bullying can cause serious problems for the person being bullied. They may feel sad and hopeless. Sometimes they don't want to go to school or work. In some cases, bullying can even lead to depression and suicide.\nb. These are just a few examples of the many social issues people face every day. It's important to talk about these problems and find solutions so that everyone can live a happy and healthy life.\nc. People today face many social issues. Some of these are overpopulation, poverty, and crime. In this article, I want to talk about three other important social issues: bullying, body shaming, and peer pressure.\nd. Peer pressure is when people try to get others to do something they don't want to do. This is often a problem for young people. For example, a teenager might feel pressure to smoke cigarettes or drink alcohol because their friends are doing it. Peer pressure can be very hard to resist. It can cause stress and anxiety.\ne. Body shaming is the second issues, it is when someone makes fun of another person's body. This can happen if a person person is too thin, too fat, or has some other physical difference. Body shaming can hurt people very much. It can make them feel bad about themselves. Sometimes it can even lead to eating disorders or other health problems.`,
+        opts: ["A. c - a - e - b - d", "B. c - a - e - d – b", "C. c - a - d - e - b", "D. a - c - b - d – e"],
+        ans: 1 // B
+    },
+    {
+        id: 6,
+        text: `a. Best wishes.\nb. First of all, self-study gives learners more freedom. They decide what they should study and how to learn depending on their abilities.\nc. Dear Lucy; I hope you are well. I am thinking about the advantages of self-study - learning at home without a teacher.\nd. Secondly, they can make learners responsible. They set their learning goals and make study plans to achieve them.\ne. Finally, it makes them more confident. Completing tasks and solving problems on their own boost learners' confidence.`,
+        opts: ["A. a – b – d – e – c", "B. c – b – d – e – a", "C. a – b – e – c – d", "D. c – e – b – d – a"],
+        ans: 1 // B
+    },
+    {
+        id: 7,
+        text: `a. I am writing to enquire about the tour guide training courses offered by SGV Vocational School. I am very interested in exploring different cultures and would like to know more about the courses.\nb. Dear Sir / Madam,\nc. Secondly, I would appreciate it if you could inform me if SGV Vocational School offers any discounts for students who are financially disadvantaged. This would greatly assist me in planning for the cost of the training.\nd. Lastly, I would like to enquire about the daily wage for the apprenticeships provided by SGV Vocational School. It would be great if you could provide me with more information about this opportunity.\ne. Thank you for considering my request. I look forward to hearing from you soon.\nYours faithfully,\nLan\nf. Firstly, I would like to ask if there is a test requirement to enroll in the tour guide training courses. As I do not have any previous qualifications in this field, I would like to know if there are any specific requirements for admission.`,
+        opts: ["A. b – a – f – c – d - e", "B. b – a – c – f – d - e", "C. b – a – f – d – c - e", "D. b – a – f – e – c - d"],
+        ans: 0 // A
+    },
+    {
+        id: 8,
+        text: `a. In addition, I think the time of training is quite short, and the cost is also affordable for me and my family.\nb. I like the fact that this course also provides apprenticeship opportunities.\nc. This will help me fіnd a suitable job immediately after I fіnish the course.\nd. Good morning, Ms Hoa.\ne. I’d be interested in a cooking course because cooking has always been my hobby.`,
+        opts: ["A. e – d – b – a – c", "B. d – e – a– b – c", "C. b – a – c – d - e", "D. c – a – e – d – b"],
+        ans: 1 // B
+    },
+    {
+        id: 9,
+        text: `a. Additionally, I am able to make friends with a lot of students coming from different universities in Hanoi.\nb. Firstly, this is certainly a chance for me to practise speaking English as much as possible.\nc. Also, a good thing about joining the club is that I must become more confident when I often present my ideas in front of the crowd.\nd. All the best.\ne. It’s a good way for me not only to improve my English but to practise my soft skills as well.\nf. Dear Jason, I hope you are doing well recently. I am writing this letter to let you know about why I have decided to participate in the English speaking club.`,
+        opts: ["A. f- e – a - c – b - d", "B. f - c – a - b – e - d", "C. f- b - a - c – e - d", "D. f - a – b - c – e - d"],
+        ans: 2 // C
+    },
+    {
+        id: 10,
+        text: `a. Teenagers may want to work part-time while still in school. Let's look at the pros and cons of teens having part- time jobs.\nb. So, if teenagers fail to balance work and study, they may not be able to get good grades or may even drop out of school.\nc. Secondly, they can learn to manage their time better.\nd. First, a part-time job provides extra pocket money.\ne. In conclusion, teenagers should be aware of both the pros and cons of working part-time.\nf. On the other hand, working teens may become tired and stressed as they will have less time to rest and study.`,
+        opts: ["A. a – d– c – f – b – e", "B. a – d – f – c – b – e", "C. a – b – f – c – d – e", "D. a – b – d – c – f – e"],
+        ans: 0 // A
+    }
+];
 
-    let finishedCount = 0;
-    let firstTimeCorrect = 0;
-    let attempted = new Set();
+const container = document.getElementById('quiz-container');
+let correctCount = 0;
 
-    const container = document.getElementById('quiz-container');
+quizData.forEach((q, idx) => {
+    const block = document.createElement('div');
+    block.className = 'question-block';
+    block.id = `block-${idx}`;
 
-    questions.forEach((q, idx) => {
-        const div = document.createElement('div');
-        div.className = 'question-block';
-        div.innerHTML = `
-            <div style="font-weight:bold; margin-bottom:10px;">Question ${idx+1}:</div>
-            <div class="sentence-list">
-                ${q.sentences.map(s => `<div class="sentence-item">${s}</div>`).join('')}
-            </div>
-            <div class="options-grid" id="grid-${idx}">
-                ${q.opts.map((opt, i) => `
-                    <div class="opt" onclick="checkAnswer(${idx}, ${i}, this)">
-                        ${String.fromCharCode(65+i)}. ${opt}
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(div);
+    const title = document.createElement('div');
+    title.className = 'exercise-title';
+    title.innerHTML = `<span>Question ${q.id}</span>`;
+    
+    const content = document.createElement('div');
+    content.className = 'content-area';
+    content.innerText = q.text;
+
+    const grid = document.createElement('div');
+    grid.className = 'options-grid';
+
+    q.opts.forEach((text, optIdx) => {
+        const btn = document.createElement('div');
+        btn.className = 'opt';
+        btn.innerText = text;
+        btn.onclick = () => {
+            if (optIdx === q.ans) {
+                btn.classList.add('correct');
+                grid.querySelectorAll('.opt').forEach(b => b.classList.add('disabled'));
+                correctCount++;
+                if (correctCount === quizData.length) {
+                    document.getElementById('finish-msg').style.display = 'block';
+                }
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 400);
+            }
+        };
+        grid.appendChild(btn);
     });
 
-    function checkAnswer(qIdx, oIdx, el) {
-        const correctIdx = questions[qIdx].ans;
-        const grid = document.getElementById(`grid-${qIdx}`);
-
-        if (!attempted.has(qIdx)) {
-            if (oIdx === correctIdx) firstTimeCorrect++;
-            attempted.add(qIdx);
-        }
-
-        if (oIdx === correctIdx) {
-            el.classList.add('correct');
-            Array.from(grid.children).forEach(child => {
-                if (!child.classList.contains('correct')) child.classList.add('disabled');
-                child.onclick = null;
-            });
-            finishedCount++;
-            if (finishedCount === questions.length) {
-                document.getElementById('final-btn').style.display = 'block';
-            }
-        } else {
-            el.classList.add('wrong');
-        }
-    }
-
-    function showFinalResult() {
-        document.getElementById('quiz-container').style.display = 'none';
-        document.getElementById('final-btn').style.display = 'none';
-        
-        const finalScore = (firstTimeCorrect / questions.length * 10).toFixed(2);
-        document.getElementById('score-text').innerText = `Hoàn thành! Điểm thực tế: ${finalScore}/10`;
-        
-        let lastResult = JSON.parse(localStorage.getItem('npc_arrange_last_score')) || { score: 0, count: 0 };
-        const diffCount = firstTimeCorrect - lastResult.count;
-
-        let compMsg = (lastResult.count === 0) ? "Đây là lượt làm bài đầu tiên." : `So với lần trước: ${diffCount >= 0 ? 'Tăng' : 'Giảm'} ${Math.abs(diffCount)} câu đúng.`;
-        document.getElementById('comparison-text').innerText = compMsg;
-
-        localStorage.setItem('npc_arrange_last_score', JSON.stringify({ score: finalScore, count: firstTimeCorrect }));
-        document.getElementById('result-area').style.display = 'block';
-        window.scrollTo(0, 0);
-    }
+    block.appendChild(title);
+    block.appendChild(content);
+    block.appendChild(grid);
+    container.appendChild(block);
+});
 </script>
 
 </body>
