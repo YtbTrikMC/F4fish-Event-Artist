@@ -3,171 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc Nghiệm Tiếng Anh - Npc</title>
+    <title>Hệ Thống Trắc Nghiệm Ôn Tập - NTT</title>
     <style>
-        :root { --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1e293b; line-height: 1.6; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        #timer { position: fixed; top: 20px; right: 20px; background: var(--danger); color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; z-index: 1000; }
-        
-        .question-block { margin-bottom: 25px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; transition: 0.3s; }
-        .question-text { font-weight: 600; margin-bottom: 15px; display: block; font-size: 1.05rem; }
-        
-        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt { border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; font-weight: 500; }
-        
-        /* Hiệu ứng đúng/sai lập tức */
-        .opt.wrong { background: #fee2e2; border-color: var(--danger); color: var(--danger); pointer-events: none; }
-        .opt.correct { background: #dcfce7; border-color: var(--success); color: var(--success); font-weight: bold; pointer-events: none; }
-        .opt.disabled { pointer-events: none; opacity: 0.6; }
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #0f172a;
+            --card: #ffffff;
+        }
 
-        .btn { display: block; width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .btn:hover { background: #1d4ed8; }
-        
-        #result-area { display: none; text-align: center; margin-top: 30px; padding: 30px; background: #f0fdf4; border-radius: 15px; border: 2px solid var(--success); }
-        .btn-home { background: #64748b; color: white; padding: 12px 30px; text-decoration: none; display: inline-block; border-radius: 8px; margin-top: 20px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #334155;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .exercise-title {
+            background: #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 30px;
+            color: #1e293b;
+            font-size: 1.2rem;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt {
+            padding: 12px 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+            font-weight: 500;
+        }
+
+        .opt:hover {
+            background: #f1f5f9;
+            border-color: var(--primary);
+        }
+
+        .opt.correct {
+            background: #dcfce7 !important;
+            border-color: var(--success) !important;
+            color: var(--success);
+            pointer-events: none;
+        }
+
+        .opt.wrong {
+            background: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: var(--danger);
+            animation: shake 0.4s;
+        }
+
+        .opt.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        #result-btn {
+            display: none;
+            width: 100%;
+            padding: 20px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
 
-<div id="timer">45:00</div>
-
 <div class="container">
-    <h1 style="text-align:center; color: var(--primary)">LUYỆN TẬP TIẾNG ANH (35 CÂU)</h1>
-    <p style="text-align:center; color: #64748b;"><i>Chọn đáp án đúng để hoàn thành từng câu hỏi</i></p>
-    
-    <div id="quiz-container"></div>
-    
-    <button class="btn" id="submit-btn" style="display:none;" onclick="showFinalResult()">NỘP BÀI & XEM KẾT QUẢ</button>
-
-    <div id="result-area">
-        <h2 id="score-text"></h2>
-        <p id="comparison-text" style="font-style: italic; color: #166534;"></p>
-        <a href="index.html" class="btn-home">Làm lại bài mới</a>
-    </div>
+    <h1>BÀI TẬP TRẮC NGHIỆM TỔNG HỢP</h1>
+    <div id="quiz-content"></div>
+    <button id="result-btn" onclick="location.reload()">HOÀN THÀNH - LÀM LẠI BÀI</button>
+    <div class="footer">Lập trình bởi NTT@THPTLTV-2026 - Npc xin trả lời</div>
 </div>
 
 <script>
-    const questions = [
-        { id: 1, q: "Question 1. Online courses allow learners to study at their own _________.", options: ["speed", "pace", "rate", "time"], correct: 1 },
-        { id: 2, q: "Question 2. Virtual reality simulations offer _________ experiences, allowing users to interact with computer-made environments.", options: ["ready-made", "hands-on", "human-like", "spare"], correct: 1 },
-        { id: 3, q: "Question 3. _______ provides flexibility for those who cannot attend traditional classes.", options: ["Self-motivation", "Distance learning", "Martial art", "Adult education"], correct: 1 },
-        { id: 4, q: "Question 4. It may take employees quite a long time to ______ to the new working environment.", options: ["pursue", "socialize", "network", "adapt"], correct: 3 },
-        { id: 5, q: "Question 5. __________ in the region has led to a decline in fish populations, so we need stricter conservation measures.", options: ["Deforestation", "Overfishing", "Forest clearance", "Captivity"], correct: 1 },
-        { id: 6, q: "Question 6. Peter was bitterly disappointed at the test result, but I think he’ll soon _______ it.", options: ["get over", "put through", "make up", "turn into"], correct: 0 },
-        { id: 7, q: "Question 7. The book I borrowed from the library was much ___________than I had expected.", options: ["much interested", "more interesting", "more interest", "less interestingly"], correct: 1 },
-        { id: 8, q: "Question 8. We can get the home robot_________us with the household chores.", options: ["to help", "help", "helping", "helped"], correct: 0 },
-        { id: 9, q: "Question 9. He talks to strangers __________ he knew them for years.", options: ["as", "like", "as if", "though"], correct: 2 },
-        { id: 10, q: "Question 10. Robots are becoming more intelligent. They may take over some jobs.", options: ["Robots are becoming so intelligent that they may take over some jobs.", "Robots became intelligent because they take over some jobs.", "If robots become intelligent, they took over some jobs.", "Robots are intelligent although they may take over some jobs."], correct: 0 },
-        { id: 11, q: "Question 11. Qualifications and _______ are two most important factors that help you get a good job.", options: ["politeness", "experience", "attention", "impression"], correct: 1 },
-        { id: 12, q: "Question 12. To become successful in the increasingly competitive market, you have to _______ fashion knowledge.", options: ["put up with", "get through to", "keep up with", "look forward to"], correct: 2 },
-        { id: 13, q: "Question 13. Smart robots are designed to _________ humans in doing dangerous tasks.", options: ["replace", "repeat", "reply", "require"], correct: 0 },
-        { id: 14, q: "Question 14. __________ like newspapers and television are traditional sources of news.", options: ["Mass media", "Social media", "Fake news", "Digital media"], correct: 0 },
-        { id: 15, q: "Question 15. Cutting down forests leads to serious environmental _________.", options: ["advantages", "benefits", "consequences", "solutions"], correct: 2 },
-        { id: 16, q: "Question 16. Many efforts have been made to protect ____ nature.", options: ["danger", "dangerous", "endanger", "endangered"], correct: 3 },
-        { id: 17, q: "Question 17. Forest clearance is _______ issue facing us.", options: ["more urgent than", "more urgent", "as urgent as", "the most urgent"], correct: 3 },
-        { id: 18, q: "Question 18. I’m going to have the mechanic _________ my car tomorrow.", options: ["will be repaired", "repair", "repaired", "to be repaired"], correct: 1 },
-        { id: 19, q: "Question 19. \"Are you going to the party tonight?\" he asked me.", options: ["if I was going / that night", "if was I going / tonight", "am I going / that night", "whether I am going / tonight"], correct: 0 },
-        { id: 20, q: "Question 20. The water was too cold for me to swim in.", options: ["It was such cold water that I couldn’t swim in it.", "It was so cold a water that I couldn’t swim in it.", "It was such a cold water that I couldn’t swim in it.", "It was too cold water that I couldn’t swim in it."], correct: 0 },
-        { id: 21, q: "Question 21. In the future, we might see more ______ of AI in every aspect of life.", options: ["applications", "applicable", "applicant", "apply"], correct: 0 },
-        { id: 22, q: "Question 22. ________ is the existence of a wide variety of plant and animal species living in their natural environment.", options: ["Biodiversity", "Conservation", "Globe", "Individual"], correct: 0 },
-        { id: 23, q: "Question 23. Almost half of the ________ are perfectly suitable for the vacancy.", options: ["employees", "competitors", "candidates", "applications"], correct: 2 },
-        { id: 24, q: "Question 24. The host asked her ______________ tea or coffee.", options: ["whether she liked", "that she liked", "if she likes", "whether she like"], correct: 0 },
-        { id: 25, q: "Question 25. Unemployment and poverty force people to engage in anti-social activities.", options: ["include", "engage", "take", "oppose"], correct: 1 },
-        { id: 26, q: "Question 26. His teenage daughter can't ____ her moods, her music, and her constant demand for money.", options: ["keep up with", "go on with", "put up with", "put up to"], correct: 2 },
-        { id: 27, q: "Question 27. I'll have a new dress ____ for my daughter.", options: ["making", "to make", "make", "made"], correct: 3 },
-        { id: 28, q: "Question 28. ______, he would have been able to pass the exam.", options: ["If he studied more", "If he were studying more", "Studying more", "Had he studied more"], correct: 3 },
-        { id: 29, q: "Question 29. The integration of _________ technology has helped improve user experience.", options: ["advanced", "real – time", "effortless", "self – driving"], correct: 0 },
-        { id: 30, q: "Question 30. To………………the robot, the technician input specific commands.", options: ["activate", "analyse", "interact", "imitate"], correct: 0 },
-        { id: 31, q: "Question 31. Students use the library's computers to get ……………………..to the Internet.", options: ["format", "limit", "income", "access"], correct: 3 },
-        { id: 32, q: "Question 32. Tram Chim National Park is home _________ many rare and endangered species.", options: ["of", "to", "for", "with"], correct: 2 },
-        { id: 33, q: "Question 33. The agent helped them _________ cheaper options.", options: ["look down on", "come up with", "cut down on", "go in for"], correct: 1 },
-        { id: 34, q: "Question 34. The government had the historic building ______ rather than demolished.", options: ["restore", "to restore", "restored", "restoring"], correct: 2 },
-        { id: 35, q: "Question 35. _________ we hurry, we'll miss the beginning of the movie.", options: ["If", "Unless", "As long as", "As soon as"], correct: 1 }
-    ];
+const data = [
+    {
+        ex: "Exercise 1: Phonetics",
+        questions: [
+            { q: "1. A. routine B. talent C. tourist D. patient", opts: ["A", "B", "C", "D"], ans: 3 },
+            { q: "2. A. hard B. horse C. hour D. house", opts: ["A", "B", "C", "D"], ans: 2 },
+            { q: "3. A. intact B. dynasty C. excavation D. citadel", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "4. A. ancient B. concern C. associate D. special", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "5. A. appreciate B. psychology C. programme D. respectively", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "6. A. limestone B. geographical C. heritage D. citadel", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "7. A. tomb B. dome C. mosaic D. poetic", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "8. A. bachelor B. chapter C. chemistry D. teacher", opts: ["A", "B", "C", "D"], ans: 2 },
+            { q: "9. A. touch B. round C. ground D. shout", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "10. A. breath B. threat C. learner D. health", opts: ["A", "B", "C", "D"], ans: 2 }
+        ]
+    },
+    {
+        ex: "Exercise 2: Stress",
+        questions: [
+            { q: "1. A. manage B. answer C. contact D. believe", opts: ["A", "B", "C", "D"], ans: 3 },
+            { q: "2. A. install B. study C. decide D. improve", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "3. A. approach B. figure C. advice D. response", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "4. A. routine B. problem C. money D. hygiene", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "5. A. borrow B. provide C. destroy D. succeed", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "6. A. broaden B. provide C. pursue D. succeed", opts: ["A", "B", "C", "D"], ans: 0 },
+            { q: "7. A. college B. degree C. language D. subject", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "8. A. relic B. intact C. complex D. royal", opts: ["A", "B", "C", "D"], ans: 1 },
+            { q: "9. A. difficult B. interesting C. ambitious D. probable", opts: ["A", "B", "C", "D"], ans: 2 },
+            { q: "10. A. cultural B. confident C. critical D. important", opts: ["A", "B", "C", "D"], ans: 3 }
+        ]
+    },
+    {
+        ex: "Exercise 3: Vocabulary & Grammar",
+        questions: [
+            { q: "1. Tourists should be held __________ for the damage they have caused to the archeological site in our place.", opts: ["A. accountable", "B. guilty", "C. charged", "D. blamed"], ans: 0 },
+            { q: "2. The National Heritage Board’s (NHB) mandate, as the custodian of Singapore’s heritage, is to preserve, commemorate and promote their tangible and intangible ___________heritage.", opts: ["A. cultural", "B. culture", "C. culturally", "D. intercultural"], ans: 0 },
+            { q: "3. Visitors can enjoy the comfort and ___________ of five-star hotels and luxury cruise ships.", opts: ["A. goodwill", "B. elegance", "C. benevolence", "D. implementation"], ans: 1 },
+            { q: "4. Our heritage tells the story of who we are as a people and helps to _________our identity and our sense of belonging.", opts: ["A. alter", "B. adopt", "C. preserve", "D. balance"], ans: 2 },
+            { q: "5. Preserving our heritage not only benefits our cultural identity, but it can also bring economic __________ to local communities through tourism.", opts: ["A. threats", "B. investments", "C. interests", "D. benefits"], ans: 3 },
+            { q: "6. Although some of the structures are now ________ , most of the significant existing monuments have been partially restored.", opts: ["A. at risk", "B. in danger", "C. in ruins", "D. at war"], ans: 2 },
+            { q: "7. My dad wants me to go to university, but I'm in ________ minds about it.", opts: ["A. different", "B. my", "C. some", "D. two"], ans: 3 },
+            { q: "8. At the __________ level, you can join three-year or four-year colleges.", opts: ["A. primary", "B. secondary", "C. postgraduate", "D. undergraduate"], ans: 3 },
+            { q: "9. They _________ sacrifices so that their only child could have a good education.", opts: ["A. made", "B. did", "C. provided", "D. lent"], ans: 0 },
+            { q: "10. Peter is trying his best to study in hope that he will _______ fame and fortune in the near future.", opts: ["A. lose", "B. run", "C. move", "D. achieve"], ans: 3 },
+            { q: "11. He owed his success not to privilege but to self-education and a driving desire for _______.", opts: ["A. achieve", "B. achiever", "C. achievement", "D. achievable"], ans: 2 },
+            { q: "12. In England schooling is compulsory _________ all children from the age of 5 to 16.", opts: ["A. with", "B. for", "C. to", "D. over"], ans: 1 },
+            { q: "13. These days, many people _________ leading an independent life.", opts: ["A. attempt to", "B. work on", "C. strive for", "D. head for"], ans: 2 },
+            { q: "14. Simon earned the respect of his friends when he determined to complete such a challenging task while others had already ________.", opts: ["A. gone off", "B. given in", "C. given up", "D. gone through"], ans: 2 },
+            { q: "15. When getting into trouble, Jack never __________ on other people for help. He always solves them on his own.", opts: ["A. determines", "B. influences", "C. relies", "D. manages"], ans: 2 },
+            { q: "16. Many American teenagers have part-time jobs as they want to gain work ___________ and learn how to manage their money.", opts: ["A. salary", "B. experience", "C. relation", "D. habit"], ans: 1 },
+            { q: "17. Many American teenagers also volunteer at local hospitals, food banks, and old people's homes, or take part in clean-up activities to _________ their neighbourhood.", opts: ["A. protect", "B. improve", "C. prevent", "D. support"], ans: 1 },
+            { q: "18. He suffered __________ serious depression after losing his beloved pet.", opts: ["A. in", "B. from", "C. with", "D. for"], ans: 1 },
+            { q: "19. My parents don't want me to ________ with my friends from school.", opts: ["A. agree with", "B. hang out", "C. struggle with", "D. decide on"], ans: 1 },
+            { q: "20. In many cases, peer pressure can ________ to depression, low self-confidence, distance from family and poor school performance.", opts: ["A. make", "B. cause", "C. result", "D. lead"], ans: 3 },
+            { q: "21. They decided to focus their campaign on ________ because this issue is very common among teenagers these days.", opts: ["A. bully", "B. bullied", "C. to bully", "D. bullying"], ans: 3 },
+            { q: "22. You should know how to say no when you feel ________ and talk to adults when the situation looks dangerous.", opts: ["A. comfort", "B. uncomfortable", "C. comfortable", "D. comfortably"], ans: 1 },
+            { q: "23. There are more and more _______ TV programmes for children. Parents are complaining about that.", opts: ["A. suitable", "B. anxious", "C. violent", "D. depressed"], ans: 2 },
+            { q: "24. We are going to start a campaign to raise ________ of animal rights.", opts: ["A. aware", "B. unaware", "C. unawareness", "D. awareness"], ans: 3 },
+            { q: "25. One of the most common forms of ________ bullying is body shaming.", opts: ["A. physical", "B. cyber-", "C. verbal", "D. social"], ans: 2 },
+            { q: "26. People should be educated about the ________ of biodiversity.", opts: ["A. important", "B. importance", "C. unimportant", "D. importantly"], ans: 1 },
+            { q: "27. Collecting species will harm local biodiversity and have a serious effect on the ________ of the local ecosystem.", opts: ["A. imbalance", "B. balance", "C. equality", "D. equal"], ans: 1 },
+            { q: "28. U Minh Thuong attracts tourists not only with its wild and beautiful scenery but also with its rare and rich ________.", opts: ["A. diversely", "B. diversify", "C. biodiversity", "D. diverse"], ans: 2 },
+            { q: "29. Plants play an important role in ecosystems. They ________ food and shelter for many animal species.", opts: ["A. provide", "B. support", "C. prevent", "D. protect"], ans: 0 },
+            { q: "30. You shouldn't collect rare insects for your collection because they are ________.", opts: ["A. danger", "B. dangerous", "C. endanger", "D. endangered"], ans: 3 }
+        ]
+    },
+    {
+        ex: "Exercise 4: Advanced Grammar",
+        questions: [
+            { q: "1. I got my father __________ my bike last night.", opts: ["A. repair", "B. to repair", "C. repairing", "D. repaired"], ans: 1 },
+            { q: "2. The Citadel of the Ho Dynasty is the only stone citadel in Southeast Asia ________ of large limestone blocks.", opts: ["A. which constructed", "B. constructing", "C. to be constructed", "D. to construct"], ans: 2 },
+            { q: "3. Our house needs________ today so that we can organize a party for our mom tomorrow night.", opts: ["A. to paint", "B. to be painting", "C. to be painted", "D. paint"], ans: 2 },
+            { q: "4. It took me twenty minutes _________ along the walking street in District 1.", opts: ["A. walking", "B. to walk", "C. walk", "D. walked"], ans: 1 },
+            { q: "5. Try________ so many mistakes for the next essay about describing one of the most favorite heritage sites in the world.", opts: ["A. not to make", "B. not make", "C. to make not", "D. make not"], ans: 0 },
+            { q: "6. The guest on our show is the youngest golfer _________ the Open.", opts: ["A. winning", "B. to win", "C. won", "D. being won"], ans: 1 },
+            { q: "7. The fire isn’t hot enough ___________ a kettle.", opts: ["A. boiling", "B. to boil", "C. boil", "D. boiled"], ans: 1 },
+            { q: "8. ___________ this movie last week, I still wanted to see it again.", opts: ["A. Having seen", "B. Had seen", "C. Was seen", "D. Seeing"], ans: 0 },
+            { q: "9. Tom was accused ___________ some top secret document.", opts: ["A. to steal", "B. of having stolen", "C. for stealing", "D. to have stolen"], ans: 1 },
+            { q: "10. But after ___________ it over, I decided to laugh at myself and just join anyway.", opts: ["A. having thought", "B. I have thought", "C. thought", "D. to have thought"], ans: 0 },
+            { q: "11. Mary said, “I regret ___________ him earlier in my life.”", opts: ["A. to meet", "B. not having met", "C. to have met", "D. at meeting"], ans: 1 },
+            { q: "12. Tome made a bad mistake at work, but his boss didn’t fire him. He is happy about _________ a second chance.", opts: ["A. giving", "B. having been given", "C. to have been given", "D. to give"], ans: 1 },
+            { q: "13. Mr. Lee was upset by ___________ the truth.", opts: ["A. not having been told", "B. us not to tell him", "C. he hadn’t been told", "D. being not told"], ans: 0 },
+            { q: "14. _________ the desalination plant, the company could offer an effective solution to the problem of water scarcity.", opts: ["A. To build", "B. Having built", "C. Being built", "D. Having been built"], ans: 1 },
+            { q: "15. __________ my friend came to see me late", opts: ["A. It was last night that", "B. It was last night which", "C. It was last night when", "D. It was last night whom"], ans: 0 },
+            { q: "16. _________ the little boy greeted in a strange language.", opts: ["A. It was his grandfather which", "B. It is his grandfather who", "C. It was his grandfather that", "D. It is his grandfather which"], ans: 2 },
+            { q: "17. _________ asked the policeman a lot of questions.", opts: ["A. It is the pedestrian whom", "B. It is the pedestrian what", "C. It was the pedestrian who", "D. It was the pedestrian which"], ans: 2 },
+            { q: "18. ___________ my wife gave to me at my last birthday party.", opts: ["A. It was this T-shirt that", "B. It is this T-shirt which", "C. It was this T-shirt who", "D. It was this T-shirt whom"], ans: 0 },
+            { q: "19. _________ I bought this dictionary.", opts: ["A. It was from this bookstore that", "B. I was from this bookstore where", "C. It was this bookstore which", "D. It was this bookstore that"], ans: 0 },
+            { q: "20. __________ the young man had rescued from the accident.", opts: ["A. The baby girl", "B. The baby girl that", "C. It was the baby girl whom", "D. It was the baby girl who"], ans: 2 },
+            { q: "21. __________ my parents gave me a new computer.", opts: ["A. It was on my birthday when", "B. It was my birthday on that", "C. It was my birthday that", "D. It was on my birthday that"], ans: 3 },
+            { q: "22. She missed her flight ________ a traffic jam on the way to the airport.", opts: ["A. because", "B. because of", "C. although", "D. in spite of"], ans: 1 },
+            { q: "23. The team worked tirelessly day and night. ________, they completed the project ahead of schedule.", opts: ["A. However", "B. By contrast", "C. As a result", "D. In addition"], ans: 2 },
+            { q: "24. The restaurant on the corner is always crowded with long waiting lines. ________, the one across the street is usually empty and quiet.", opts: ["A. Although", "B. Despite", "C. As a consequence", "D. By contrast"], ans: 3 },
+            { q: "25. The restaurant not only serves delicious food but has excellent customer service; ________, it offers a cozy ambiance.", opts: ["A. moreover", "B. in addition to", "C. however", "D. because"], ans: 0 },
+            { q: "26. He promised to be on time; ________, he arrived late to the meeting.", opts: ["A. although", "B. however", "C. besides", "D. because"], ans: 1 }
+        ]
+    }
+];
 
-    let correctCountTotal = 0;
-    let firstTimeCorrect = 0;
-    let attemptedQuestions = new Set();
+const quizContent = document.getElementById('quiz-content');
+let totalQuestions = 0;
+let correctCount = 0;
 
-    // Render Quiz
-    const container = document.getElementById('quiz-container');
-    questions.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'question-block';
-        div.innerHTML = `
-            <span class="question-text">${item.q}</span>
-            <div class="options" id="grid-${index}">
-                ${item.options.map((opt, i) => `
-                    <div class="opt" onclick="checkAnswer(${index}, ${i}, this)">
-                        ${String.fromCharCode(65 + i)}. ${opt}
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(div);
+// Render bài tập
+data.forEach((exData, exIdx) => {
+    const exDiv = document.createElement('div');
+    exDiv.innerHTML = `<div class="exercise-title">${exData.ex}</div>`;
+    
+    exData.questions.forEach((q, qIdx) => {
+        totalQuestions++;
+        const qBlock = document.createElement('div');
+        qBlock.className = 'question-block';
+        qBlock.id = `qblock-${exIdx}-${qIdx}`;
+        
+        const qText = document.createElement('span');
+        qText.className = 'question-text';
+        qText.innerText = q.q;
+        
+        const optGrid = document.createElement('div');
+        optGrid.className = 'options-grid';
+        
+        q.opts.forEach((optStr, oIdx) => {
+            const optBtn = document.createElement('div');
+            optBtn.className = 'opt';
+            optBtn.innerText = optStr;
+            optBtn.onclick = () => checkAnswer(optBtn, oIdx, q.ans, qBlock);
+            optGrid.appendChild(optBtn);
+        });
+        
+        qBlock.appendChild(qText);
+        qBlock.appendChild(optGrid);
+        exDiv.appendChild(qBlock);
     });
+    quizContent.appendChild(exDiv);
+});
 
-    function checkAnswer(qIdx, oIdx, el) {
-        const item = questions[qIdx];
-        const grid = document.getElementById(`grid-${qIdx}`);
-
-        // Ghi nhận lần click đầu tiên cho câu hỏi này
-        if (!attemptedQuestions.has(qIdx)) {
-            if (oIdx === item.correct) firstTimeCorrect++;
-            attemptedQuestions.add(qIdx);
+function checkAnswer(btn, selected, correct, block) {
+    if (selected === correct) {
+        btn.classList.add('correct');
+        // Vô hiệu hóa các nút khác trong cùng block
+        const allOpts = block.querySelectorAll('.opt');
+        allOpts.forEach(o => o.classList.add('disabled'));
+        correctCount++;
+        if(correctCount === totalQuestions) {
+            document.getElementById('result-btn').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
         }
-
-        if (oIdx === item.correct) {
-            // Đúng: Hiện xanh
-            el.classList.add('correct');
-            // Khóa các lựa chọn khác trong câu này
-            Array.from(grid.children).forEach(child => {
-                if (!child.classList.contains('correct')) child.classList.add('disabled');
-                child.onclick = null;
-            });
-
-            correctCountTotal++;
-            // Nếu đã hoàn thành tất cả 35 câu thì hiện nút nộp bài
-            if (correctCountTotal === questions.length) {
-                document.getElementById('submit-btn').style.display = 'block';
-            }
-        } else {
-            // Sai: Hiện đỏ
-            el.classList.add('wrong');
-        }
+    } else {
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 400);
     }
-
-    // Timer logic
-    let timeLeft = 45 * 60;
-    const timerTick = setInterval(() => {
-        timeLeft--;
-        let m = Math.floor(timeLeft/60);
-        let s = timeLeft % 60;
-        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        if (timeLeft <= 0) showFinalResult();
-    }, 1000);
-
-    function showFinalResult() {
-        clearInterval(timerTick);
-        document.getElementById('quiz-container').style.display = 'none';
-        document.getElementById('submit-btn').style.display = 'none';
-        document.getElementById('timer').style.display = 'none';
-
-        const score = (firstTimeCorrect / questions.length * 10).toFixed(2);
-        document.getElementById('score-text').innerText = `Điểm thực tế: ${score}/10 (Số câu đúng lần đầu không sửa: ${firstTimeCorrect}/${questions.length})`;
-        
-        let history = JSON.parse(localStorage.getItem('lastQuizResult')) || { score: 0 };
-        const diff = (score - history.score).toFixed(2);
-        
-        document.getElementById('comparison-text').innerText = `Bạn đã ${diff >= 0 ? 'vượt qua' : 'thấp hơn'} người làm gần nhất ${Math.abs(diff)} điểm!`;
-
-        localStorage.setItem('lastQuizResult', JSON.stringify({ score: score }));
-        document.getElementById('result-area').style.display = 'block';
-        window.scrollTo(0, 0);
-    }
+}
 </script>
 
 </body>
 </html>
-
